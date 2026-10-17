@@ -1,6 +1,6 @@
 // Fait tourner les cas : marche dans le navigateur (tests/index.html) comme dans node (tests/run.js)
 function runCases(cases){
-  return cases.filter(c => (c.lang || "fr") === (EN ? "en" : "fr")).map(c => {
+  return cases.filter(c => (c.lang || "fr") === LANG).map(c => {
     CV = parseCV(c.cv); fixes = {}; over = {};
     const text = typeof cleanOffer === "function" && c.clean ? cleanOffer(c.offer).text : c.offer;
     const rs = analyse(text), by = Object.fromEntries(rs.map(r => [r.k, r])), fails = [];

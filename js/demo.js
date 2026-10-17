@@ -2,7 +2,8 @@
 // l'écrire seul dans la case de l'offre, ou ouvrir la page avec ?demo, remplit toute l'app avec un profil fictif : Maurice MARCEL, 32 ans,
 // ingénieur en informatique. Pour le retirer : supprimer ce fichier, sa ligne <script> et son entrée dans sw.js.
 (() => {
-const D = LANG !== "fr" ? {
+// Autre langue : L10N.demo (même forme), sinon la version anglaise
+const D = L10N?.demo || (LANG !== "fr" ? {
   file: "CV_Maurice_MARCEL.pdf (demo)", info: "Made-up profile for testing",
   cv: `MAURICE MARCEL · Software and IT engineer · 32 years old
 Caen, France · maurice.marcel@example.com · 07700 900123
@@ -156,7 +157,7 @@ Votre profil : 4 ans de développement Java, Git, anglais.`,
   prep: {g1: "Ingénieur informatique depuis 10 ans : support, puis administration systèmes, puis 120 serveurs et 800 utilisateurs chez Exemple Industrie. Je cherche maintenant un poste hybride avec plus de cloud.", g2: "Votre passage au cloud et la taille de la plateforme."},
   star: {s: "Une panne du stockage bloquait les sauvegardes de 300 utilisateurs.", a: "J'ai migré les sauvegardes sur Veeam avec un nouveau NAS en un week-end et testé les restaurations.", r: "Aucune donnée perdue, sauvegardes 40 % plus rapides."},
   fill: ["chez Exemple Industrie, 2 projets en 2024"]
-};
+});
 const link = (t, i) => `https://exemple.fr/offres/${fold(titleOf(t)).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40)}-${1000 + i}`;
 const day = n => n == null ? "" : addDays(today(), n);
 function fillApp(o, a, i){
