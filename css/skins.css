@@ -1,0 +1,165 @@
+/* ===== Skins de Ça colle ? =====
+   « Tampon » (par défaut) : l'esprit classeur, encre marine, couleurs adoucies, fond quadrillé façon cahier.
+   « Fiche » (html[data-skin="fiche"]) : appli moderne et calme, indigo et citron vert, cartes arrondies, sans ombres décalées.
+   Le choix se fait dans le menu « Aa » et reste sur l'appareil (js/lang.js l'applique avant l'affichage). */
+
+/* ---------- A · Tampon ---------- */
+:root {
+  --paper: #F4F1EA;
+  --ink: #1B2340;
+  --ink-soft: #3a4260;
+  --blue: #8FB8E8;
+  --yellow: #F2B53A;
+  --orange: #F5B57E;
+  --pink: #F3A08F;
+  --green: #7FB69B;
+  --red: #C9432B;
+  --violet: #B9A7E0;
+  --ok: #1f6b48; --ok-bg: #dcefe4;
+  --mid: #7a5300; --mid-bg: #fbe9bf;
+  --no: #a8301d; --no-bg: #fbe0d8;
+  --grid: rgba(27, 35, 64, .07);
+}
+body::before, .panel::before {
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  --dot: 22px; animation-duration: 9s;
+}
+.panel::before { --grid: rgba(27, 35, 64, .1); --dot: 22px; animation-duration: 9s; }
+.logo { padding: 0; border: 0; background: var(--ink); border-radius: 8px; box-shadow: 4px 4px 0 var(--yellow); }
+.logo span { border-color: rgba(244, 241, 234, .5); color: var(--paper); text-shadow: -3px 2px 0 var(--red); border-radius: 6px; margin: 4px; }
+.box, .point, .sug, .notice, .job, .filecard, .err, .sheet-input, .linkhelp, .resume, .app-card, .alert, .ask-rec, .sal-col, .share-body, .comfort-menu, .tablewrap, .promise, .drop { border-radius: 10px; }
+.box { box-shadow: 5px 5px 0 var(--ink); overflow: hidden; }
+.preview, .box.preview { overflow: visible; }
+.btn { border-radius: 8px; }
+.chip { border-radius: 6px; }
+.label, .stamp { border-radius: 6px; }
+.prio-list li, .offers li > button:first-child, .offers .del, .ats li, .words span[class], .review li, .gaplist li, .str, .facts li, .sentence, .field input, .field textarea, .afield input, .afield textarea, .afield select, .stsel { border-radius: 8px; }
+.tag.must { color: #fff; }
+
+/* ---------- B · Fiche ---------- */
+html[data-skin="fiche"] {
+  --paper: #EEF0FB;
+  --ink: #15142B;
+  --ink-soft: #4a4966;
+  --accent: #3D3BD4;
+  --lime: #D4F56A;
+  --blue: #DCE3FF;
+  --yellow: #FFEDB3;
+  --orange: #FFE1CC;
+  --pink: #FFD9E2;
+  --green: #DDF5C2;
+  --red: #B3123F;
+  --violet: #E4DCFF;
+  --ok: #2c6a12; --ok-bg: #DDF5C2;
+  --mid: #7a5600; --mid-bg: #FFEDB3;
+  --no: #a3123a; --no-bg: #FFD9E2;
+  --line: 1.5px solid #dcdff2;
+  --display: "Figtree", system-ui, sans-serif;
+  --soft: 0 1px 2px rgba(21, 20, 43, .06), 0 10px 28px rgba(21, 20, 43, .07);
+}
+html[data-skin="fiche"] *, html[data-skin="fiche"] *::before { box-shadow: none !important; text-shadow: none !important; }
+html[data-skin="fiche"] body::before, html[data-skin="fiche"] .panel::before { display: none; }
+html[data-skin="fiche"] :is(.big, .big small, .tab b, .section-title, .btn, .chip, .pill, .box-head, .point h3, .sug-h h3, .stamp, .tag, .drop b, .logo span, .foot h2, .toast, .field label, .field legend, .cvdoc .name, .cvdoc .sec, .score-box b, .app-card h3, .apps-table th, .apps-table th button, .sal-col legend, .alert > b, .ask-rec h3, .sal-res > div b, .formats b, .offers .score, .how li::before, .facts li small, .apps-table.compare th[scope="row"], .q h3) {
+  font-family: var(--body); font-style: normal; text-transform: none; letter-spacing: -.01em;
+}
+html[data-skin="fiche"] .big { font-weight: 800; letter-spacing: -.035em; line-height: 1; }
+html[data-skin="fiche"] .big small { font-weight: 700; color: var(--accent); }
+html[data-skin="fiche"] .section-title { font-weight: 800; font-size: 22px; }
+html[data-skin="fiche"] .section-title::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 10px; border-radius: 50%; background: var(--k, var(--accent)); vertical-align: middle; outline: 1.5px solid rgba(21, 20, 43, .15); }
+
+/* Haut de page */
+html[data-skin="fiche"] .logo { padding: 0; border: 0; background: none; transform: none; display: flex; align-items: center; gap: 10px; }
+html[data-skin="fiche"] .logo::before { content: "✓"; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 11px; background: var(--accent); color: var(--lime); font: 900 22px/1 var(--body); }
+html[data-skin="fiche"] .logo span { padding: 0; border: 0; font-weight: 800; font-size: 26px; color: var(--ink); }
+html[data-skin="fiche"] .pill { border: 0; background: #fff; font-weight: 700; font-size: 13px; box-shadow: var(--soft) !important; }
+html[data-skin="fiche"] .pill-safe { background: var(--lime); }
+html[data-skin="fiche"] .pill-track { background: var(--accent); color: #fff; }
+html[data-skin="fiche"] .tabs { gap: 4px; padding: 5px; margin: 6px 16px 0 0; background: #fff; border-radius: 16px; align-items: stretch; flex-basis: auto; width: fit-content; max-width: 100%; box-shadow: var(--soft) !important; }
+html[data-skin="fiche"] .tab { border: 0; border-radius: 11px; background: transparent; transform: none; padding: 9px 14px; margin: 0; }
+html[data-skin="fiche"] .tab small { color: var(--ink-soft); font-weight: 600; }
+html[data-skin="fiche"] .tab b { font-weight: 700; font-size: 15px; }
+html[data-skin="fiche"] .tab[aria-selected="true"] { background: var(--accent); color: #fff; padding: 9px 14px; }
+html[data-skin="fiche"] .tab[aria-selected="true"] small { color: rgba(255, 255, 255, .8); }
+html[data-skin="fiche"] .tab:disabled { background: transparent; opacity: .45; }
+html[data-skin="fiche"] .tab:hover:not(:disabled):not([aria-selected="true"]) { background: var(--paper); }
+
+/* Panneaux et zones */
+html[data-skin="fiche"] .panel { background: transparent; border: 0; }
+html[data-skin="fiche"] .panel-inner { padding-top: 28px; }
+html[data-skin="fiche"] .below { background: transparent; box-shadow: none; padding-top: 8px; }
+html[data-skin="fiche"] .label { border: 0; border-radius: 999px; background: var(--lime); font-weight: 700; padding: 7px 14px; }
+html[data-skin="fiche"] .box, html[data-skin="fiche"] .point, html[data-skin="fiche"] .sug, html[data-skin="fiche"] .app-card, html[data-skin="fiche"] .notice, html[data-skin="fiche"] .ask-rec, html[data-skin="fiche"] .sal-col, html[data-skin="fiche"] .share-body, html[data-skin="fiche"] .alert, html[data-skin="fiche"] .job, html[data-skin="fiche"] .filecard, html[data-skin="fiche"] .resume, html[data-skin="fiche"] .linkhelp, html[data-skin="fiche"] .tablewrap {
+  border: 0; border-radius: 20px; background: #fff; box-shadow: var(--soft) !important;
+}
+html[data-skin="fiche"] .alert.red { background: var(--no-bg); }
+html[data-skin="fiche"] .alert { background: var(--mid-bg); }
+html[data-skin="fiche"] .resume { background: var(--green); }
+html[data-skin="fiche"] .box { overflow: hidden; }
+html[data-skin="fiche"] .box-head { background: #fff !important; border-bottom: 1.5px solid #eceef8; font-weight: 800; font-size: 15px; color: var(--accent); }
+html[data-skin="fiche"] .box-body { background: #fff; }
+html[data-skin="fiche"] .box-body .prio-list li, html[data-skin="fiche"] .prio-list li { border: 0; border-radius: 14px; background: var(--paper); }
+html[data-skin="fiche"] .sheet-input, html[data-skin="fiche"] .field input, html[data-skin="fiche"] .field textarea, html[data-skin="fiche"] .letteredit, html[data-skin="fiche"] .afield input, html[data-skin="fiche"] .afield textarea, html[data-skin="fiche"] .stsel, html[data-skin="fiche"] .sentence {
+  border: 1.5px solid #d5d8ee; border-radius: 14px; background: #fff;
+}
+html[data-skin="fiche"] .sheet-input:focus, html[data-skin="fiche"] .afield input:focus, html[data-skin="fiche"] .afield textarea:focus { outline: 2.5px solid var(--accent); outline-offset: 1px; }
+html[data-skin="fiche"] .drop { border: 2px dashed #b9bde3; border-radius: 20px; background: #fff; }
+html[data-skin="fiche"] .promise { border: 0; border-radius: 16px; background: #fff; border-left: 0; }
+html[data-skin="fiche"] .meter, html[data-skin="fiche"] .jbar { border: 0; border-radius: 999px; background: var(--paper); overflow: hidden; }
+html[data-skin="fiche"] .meter i { background: var(--accent); }
+html[data-skin="fiche"] .score-box b { color: var(--accent); font-weight: 800; }
+html[data-skin="fiche"] #pct { color: var(--accent); }
+
+/* Boutons, puces, tampons */
+html[data-skin="fiche"] .btn { border: 0; border-radius: 12px; background: var(--accent); color: #fff; font-weight: 700; font-size: 15px; }
+html[data-skin="fiche"] .btn.small { font-size: 13.5px; }
+html[data-skin="fiche"] .btn:hover:not(:disabled) { transform: none; background: #2f2db8; }
+html[data-skin="fiche"] .btn.light { background: #fff; color: var(--ink); border: 1.5px solid #d5d8ee; }
+html[data-skin="fiche"] .btn.light:hover:not(:disabled) { background: var(--paper); }
+html[data-skin="fiche"] .btn.ghost { background: transparent; color: var(--accent); }
+html[data-skin="fiche"] .btn:disabled { background: #c9cbe0; color: #fff; }
+html[data-skin="fiche"] .chip { border: 1.5px solid #d5d8ee; border-radius: 999px; background: #fff; font-weight: 700; font-size: 13px; }
+html[data-skin="fiche"] .chip[style*="--k"] { background: color-mix(in srgb, var(--k) 100%, #fff); }
+html[data-skin="fiche"] .chip[aria-pressed="true"] { transform: none; outline: 0; background: var(--ink); color: #fff; border-color: var(--ink); }
+html[data-skin="fiche"] .chip[aria-pressed="true"] span { background: #fff; color: var(--ink); }
+html[data-skin="fiche"] .stamp { border: 0; border-radius: 999px; transform: none; font-weight: 700; padding: 6px 11px; }
+html[data-skin="fiche"] .tag { border: 0; font-weight: 700; background: var(--paper); }
+html[data-skin="fiche"] .tag.must { background: var(--red); color: #fff; }
+html[data-skin="fiche"] .tag.nice { background: var(--blue); }
+html[data-skin="fiche"] .point h3, html[data-skin="fiche"] .sug-h h3, html[data-skin="fiche"] .app-card h3 { font-weight: 800; font-size: 18px; }
+html[data-skin="fiche"] .why { border-top: 1.5px solid #eceef8; }
+html[data-skin="fiche"] .app-card { border-top: 6px solid var(--k) !important; }
+html[data-skin="fiche"] .ats li, html[data-skin="fiche"] .review li, html[data-skin="fiche"] .gaplist li, html[data-skin="fiche"] .str, html[data-skin="fiche"] .words span[class], html[data-skin="fiche"] .facts li, html[data-skin="fiche"] .offers li > button:first-child, html[data-skin="fiche"] .offers .del {
+  border: 0; border-radius: 14px; background: #fff; box-shadow: var(--soft) !important;
+}
+html[data-skin="fiche"] .ats li { background: var(--ok-bg); } html[data-skin="fiche"] .ats li.ko { background: var(--no-bg); }
+html[data-skin="fiche"] .facts li.miss { background: transparent; box-shadow: none !important; border: 1.5px dashed #b9bde3; }
+html[data-skin="fiche"] .offers li.on > button:first-child { background: var(--accent); color: #fff; }
+html[data-skin="fiche"] .gaplist .bar { border: 0; border-radius: 999px; background: linear-gradient(90deg, var(--accent) var(--w), var(--paper) var(--w)); }
+html[data-skin="fiche"] .apps-table th { background: var(--paper); border-bottom: 1.5px solid #dcdff2; }
+html[data-skin="fiche"] .apps-table td { border-top-color: #eceef8; }
+html[data-skin="fiche"] .apps-table.compare .best { border: 0; border-radius: 999px; background: var(--lime); padding: 3px 10px; }
+html[data-skin="fiche"] .sal-col legend { border: 0; border-radius: 999px; background: var(--lime); }
+html[data-skin="fiche"] .sal-line { border-bottom: 1.5px solid #eceef8; }
+html[data-skin="fiche"] .sal-res > div b { color: var(--accent); font-weight: 800; }
+html[data-skin="fiche"] input[type="range"] { accent-color: var(--accent); }
+html[data-skin="fiche"] ins { background: var(--lime); border-radius: 4px; }
+html[data-skin="fiche"] mark.miss { background: var(--yellow); border: 0; border-radius: 4px; }
+html[data-skin="fiche"] .blank { border-bottom: 2.5px solid var(--accent); border-radius: 6px 6px 0 0; }
+html[data-skin="fiche"] .comfort-menu { border: 0; border-radius: 18px; box-shadow: var(--soft) !important; }
+html[data-skin="fiche"] .comfort-menu button { border: 1.5px solid #d5d8ee; border-radius: 12px; background: #fff; }
+html[data-skin="fiche"] .comfort-menu button[aria-pressed="true"] { background: var(--lime); border-color: var(--lime); }
+html[data-skin="fiche"] .toast { border: 0; border-radius: 14px; background: var(--ink); color: #fff; transform: translateX(-50%); font-weight: 700; }
+html[data-skin="fiche"] .foot { border-top: 0; }
+html[data-skin="fiche"] .foot h2 { font-weight: 800; color: var(--lime); }
+html[data-skin="fiche"] :focus-visible { outline: 2.5px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 560px) {
+  html[data-skin="fiche"] .logo span { font-size: 21px; }
+  html[data-skin="fiche"] .logo::before { width: 32px; height: 32px; font-size: 18px; border-radius: 9px; }
+  html[data-skin="fiche"] .tabs { margin-right: 0; }
+}
+
+/* Choix du skin dans le menu « Aa » */
+.comfort-menu .skins { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding-bottom: 6px; border-bottom: 1.5px dashed var(--ink); margin-bottom: 2px; }
+.comfort-menu .skins b { grid-column: 1 / -1; font: 700 12px/1 var(--body); text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); }
+.comfort-menu [data-skin] { text-align: center; }
+html[data-skin="fiche"] [data-p="3"] .big { color: var(--accent); }
