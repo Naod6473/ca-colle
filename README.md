@@ -16,13 +16,24 @@ Tout se passe dans le navigateur : le CV ne quitte jamais l'appareil de la perso
 
 ## État actuel
 
-`index.html` est la **maquette v2** : un seul fichier, données fictives (offre logistique, CV de « Camille Martin »), aucune dépendance à part les polices Google Fonts.
+- `index.html` : les 4 étapes. L'offre et le CV de départ sont des exemples fictifs.
+- `js/lecteur.js` : lecture du vrai CV dans le navigateur. PDF (pdf.js), Word `.docx` et `.odt` (petit lecteur ZIP intégré), texte, photo ou PDF scanné (OCR Tesseract, français et anglais). Les bibliothèques ne se chargent qu'au premier fichier déposé.
+- `js/app.js` : découpage du CV en rubriques (Expériences, Compétences, Formation, Divers), comparaison avec l'offre, réécriture à trous.
+- `vendor/` : pdf.js 6.4.299 et tesseract.js 5.1.1 avec leurs licences (voir `vendor/README.txt`). Aucune requête vers un autre site, à part les polices pour l'instant.
 
-Ouvrir `index.html` dans un navigateur suffit pour la tester.
+## Lancer en local
+
+pdf.js et Tesseract utilisent des workers, qui ne marchent pas en ouvrant le fichier directement. Il faut un petit serveur :
+
+```sh
+python3 -m http.server 8000
+```
+
+puis ouvrir http://localhost:8000.
 
 ## À faire
 
-- [ ] Lecture réelle du CV : PDF (pdf.js), Word (.docx), photo (Tesseract OCR), le tout en local
+- [x] Lecture réelle du CV : PDF, Word, photo, le tout en local
 - [ ] Repérage des points de l'annonce sans liste figée (dictionnaire de métiers, synonymes)
 - [ ] Polices auto-hébergées (pas de requête externe, RGPD)
 - [ ] Export du CV réécrit (texte, puis PDF)

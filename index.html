@@ -6,155 +6,7 @@
 <title>Ça colle ?</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&display=swap">
-<style>
-/* Layout: assistant en 4 onglets de classeur (Offre, CV, Résultat, Réécrire). Une seule feuille visible à la fois ; le résultat et la réécriture ont un aperçu du CV collant à droite. */
-:root{
-  --paper:#f6efdf; --dot:#e4d8bd; --sheet:#fffaf0; --ink:#1f2433; --muted:#5d6273; --line:#e3d7bd; --line2:#cbbd9c;
-  --blue:#3d6bd8; --orange:#f08a24; --pink:#e5527a; --green:#1f9d63; --violet:#7a5cd6;
-  --ok-bg:#dff3e7; --ok-ink:#126a42; --mid-bg:#fff1c4; --mid-ink:#7a5a00; --no-bg:#fde0e7; --no-ink:#a3214a;
-  --shadow:#1f2433; --mark:#ffe27a; --ins:#c9f0da;
-  --f-display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
-  --f-body:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --f-mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
-}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --paper:#1b1d26; --dot:#2b2e3c; --sheet:#242734; --ink:#f1ece0; --muted:#a9aab8; --line:#363a4b; --line2:#4a4f64;
-  --blue:#7c9cff; --orange:#ffa552; --pink:#ff7fa0; --green:#4fd394; --violet:#ab93ff;
-  --ok-bg:#163a2a; --ok-ink:#7ee6b1; --mid-bg:#3b3112; --mid-ink:#ffd86a; --no-bg:#43192a; --no-ink:#ff9db7;
-  --shadow:#000; --mark:#6b5a12; --ins:#1d4a34; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --paper:#1b1d26; --dot:#2b2e3c; --sheet:#242734; --ink:#f1ece0; --muted:#a9aab8; --line:#363a4b; --line2:#4a4f64;
-  --blue:#7c9cff; --orange:#ffa552; --pink:#ff7fa0; --green:#4fd394; --violet:#ab93ff;
-  --ok-bg:#163a2a; --ok-ink:#7ee6b1; --mid-bg:#3b3112; --mid-ink:#ffd86a; --no-bg:#43192a; --no-ink:#ff9db7;
-  --shadow:#000; --mark:#6b5a12; --ins:#1d4a34; color-scheme:dark}
-
-*{box-sizing:border-box}
-body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;
-  background-image:radial-gradient(var(--dot) 1.4px, transparent 1.6px);background-size:22px 22px;animation:drift 40s linear infinite}
-@keyframes drift{to{background-position:220px 220px}}
-@media (prefers-reduced-motion:reduce){body{animation:none}*{transition:none!important;animation:none!important}}
-.wrap{max-width:1160px;margin:0 auto;padding-block:22px 64px;
-  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));display:grid;gap:22px}
-button{font:inherit;color:inherit}
-:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
-
-/* En-tête */
-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
-.logo{display:flex;align-items:center;gap:12px}
-.logo h1{font-family:var(--f-display);font-weight:800;font-style:italic;font-size:clamp(1.9rem,5vw,2.6rem);line-height:1;margin:0;letter-spacing:-.02em;text-shadow:3px 3px 0 var(--orange)}
-.mock{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.local{display:flex;align-items:center;gap:8px;font-size:.88rem;color:var(--muted);background:var(--sheet);border:1.5px solid var(--line2);border-radius:999px;padding:6px 12px 6px 8px}
-.local svg{flex:none;color:var(--green)}
-
-/* Onglets étapes */
-.steps{display:flex;gap:6px;padding-left:12px;overflow-x:auto;scrollbar-width:none;margin-bottom:-24px;position:relative;z-index:1}
-.step{flex:none;display:flex;align-items:center;gap:8px;border:2px solid var(--ink);border-bottom:0;border-radius:12px 12px 0 0;
-  padding:8px 14px 14px;font-family:var(--f-display);font-weight:800;font-size:.98rem;cursor:pointer;background:var(--sheet);color:var(--ink);
-  transform:translateY(6px);transition:transform .15s}
-.step .n{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font:700 .72rem var(--f-mono);border:2px solid currentColor}
-.step.done .n{background:currentColor}.step.done .n::after{content:"✓";color:var(--sheet);font-size:.8rem}
-.step.done .n span{display:none}
-.step[aria-selected="true"]{transform:none}
-.step.s1[aria-selected="true"]{background:var(--blue);color:#fff}.step.s2[aria-selected="true"]{background:var(--orange);color:#1f2433}
-.step.s3[aria-selected="true"]{background:var(--green);color:#fff}.step.s4[aria-selected="true"]{background:var(--violet);color:#fff}
-.step[aria-selected="true"].done .n::after{color:inherit;filter:invert(1)}
-
-.sheet{background:var(--sheet);border:2px solid var(--ink);border-radius:14px;box-shadow:6px 6px 0 var(--shadow);padding:clamp(16px,3vw,28px);position:relative;min-width:0}
-.panel{display:grid;gap:18px}
-.panel h2{font-family:var(--f-display);font-weight:800;font-size:clamp(1.4rem,3.4vw,1.9rem);line-height:1.1;margin:0;text-wrap:balance}
-.lead{margin:0;color:var(--muted);max-width:62ch}
-.btn{border:2px solid var(--ink);border-radius:10px;padding:9px 16px;background:var(--sheet);font-weight:700;cursor:pointer;box-shadow:3px 3px 0 var(--shadow);min-height:44px;display:inline-flex;align-items:center;gap:8px}
-.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--shadow)}
-.btn.main{background:var(--ink);color:var(--sheet);font-family:var(--f-display);font-size:1.05rem}
-.btn.small{min-height:38px;padding:6px 12px;font-size:.9rem;box-shadow:2px 2px 0 var(--shadow)}
-.btn.ghost{border-color:var(--line2);box-shadow:none;background:transparent}
-.btn:disabled{opacity:.45;cursor:not-allowed}
-.bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
-
-/* Étape 1 & 2 */
-textarea{width:100%;min-height:300px;resize:vertical;border:2px solid var(--line2);border-radius:12px;background:var(--paper);color:var(--ink);font:inherit;font-size:.95rem;padding:14px;line-height:1.5}
-.meta{font-size:.85rem;color:var(--muted)}
-.drop{border:2.5px dashed var(--orange);border-radius:14px;padding:26px;display:grid;justify-items:center;gap:8px;text-align:center;background:var(--paper)}
-.drop b{font-family:var(--f-display);font-size:1.15rem}
-.formats{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
-.formats span{font:700 .72rem var(--f-mono);border:1.5px solid var(--line2);border-radius:6px;padding:2px 7px}
-.file{display:flex;align-items:center;gap:12px;border:2px solid var(--ok-ink);background:var(--ok-bg);border-radius:12px;padding:12px 14px;color:var(--ink)}
-.file b{display:block;word-break:break-all}.file small{color:var(--muted)}
-.file .btn{margin-left:auto}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-@media (max-width:820px){.two{grid-template-columns:1fr}}
-
-/* Résultat */
-.layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:24px;align-items:start}
-@media (max-width:900px){.layout{grid-template-columns:1fr}}
-.verdict{display:flex;flex-wrap:wrap;align-items:center;gap:18px 26px}
-.bigstamp{font-family:var(--f-display);font-weight:800;text-transform:uppercase;border:4px double var(--mid-ink);color:var(--mid-ink);background:var(--mid-bg);
-  border-radius:10px;padding:8px 16px;transform:rotate(-5deg);text-align:center;line-height:1}
-.bigstamp b{display:block;font-size:2.6rem;font-variant-numeric:tabular-nums}
-.bigstamp small{font-size:.8rem;letter-spacing:.06em}
-.bigstamp.good{border-color:var(--ok-ink);color:var(--ok-ink);background:var(--ok-bg)}
-.verdict p{margin:0;flex:1 1 260px;font-size:1.05rem}
-.meter{display:flex;height:12px;border-radius:999px;overflow:hidden;border:2px solid var(--ink);margin-top:10px}
-.meter i{display:block;transition:flex-grow .4s}
-.meter .m-ok{background:var(--green)}.meter .m-mid{background:#e9b100}.meter .m-no{background:var(--pink)}
-
-.prio{border:2px solid var(--ink);border-radius:12px;padding:16px;background:var(--paper);display:grid;gap:10px}
-.prio h3,.group h3{margin:0;font-family:var(--f-display);font-size:1.1rem;display:flex;align-items:center;gap:8px}
-.prio ol{margin:0;padding-left:1.3em;display:grid;gap:8px}
-.prio li{padding-left:4px}
-.prio li button{margin-left:6px}
-
-.filters{display:flex;flex-wrap:wrap;gap:8px}
-.chip{font-weight:700;font-size:.9rem;border:2px solid currentColor;border-radius:999px;padding:5px 12px;cursor:pointer;background:transparent;min-height:38px}
-.chip.ok{color:var(--ok-ink);background:var(--ok-bg)}.chip.mid{color:var(--mid-ink);background:var(--mid-bg)}.chip.no{color:var(--no-ink);background:var(--no-bg)}
-.chip[aria-pressed="true"]{box-shadow:inset 0 0 0 2px currentColor, 2px 2px 0 var(--shadow)}
-.group{display:grid;gap:8px}
-.row{display:grid;grid-template-columns:132px minmax(0,1fr) auto;gap:14px;align-items:center;border:1.5px solid var(--line2);border-radius:12px;padding:12px 14px;background:var(--sheet);cursor:pointer;transition:border-color .15s, transform .15s}
-.row:hover{border-color:var(--ink)}.row.on{border-color:var(--ink);box-shadow:3px 3px 0 var(--shadow)}
-@media (max-width:560px){.row{grid-template-columns:1fr auto}.row .stamp{grid-column:1/-1}}
-.stamp{justify-self:start;font-family:var(--f-display);font-weight:800;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;border:3px double currentColor;border-radius:6px;padding:2px 8px;transform:rotate(-4deg);white-space:nowrap}
-.stamp.ok{color:var(--ok-ink);background:var(--ok-bg)}.stamp.mid{color:var(--mid-ink);background:var(--mid-bg);transform:rotate(3deg)}.stamp.no{color:var(--no-ink);background:var(--no-bg);transform:rotate(-2deg)}
-.stamp::before{margin-right:4px}.stamp.ok::before{content:"✓"}.stamp.mid::before{content:"?"}.stamp.no::before{content:"✕"}
-.kw b{display:block}.kw p{margin:2px 0 0;font-size:.9rem;color:var(--muted)}
-.kw p em{font-style:normal;font-weight:700;color:var(--ink)}
-.fixed{font:700 .72rem var(--f-mono);color:var(--ok-ink);text-transform:uppercase;letter-spacing:.06em}
-
-/* Aperçu CV */
-.preview{position:sticky;top:calc(env(safe-area-inset-top, 0px) + 12px);border:2px solid var(--ink);border-radius:12px;background:var(--paper);overflow:hidden}
-@media (max-width:900px){.preview{position:static}}
-.preview header{padding:10px 14px;border-bottom:2px solid var(--ink);background:var(--sheet);font-weight:700;font-size:.92rem}
-.cvdoc{padding:16px;font-size:.9rem;display:grid;gap:8px;max-height:560px;overflow:auto}
-.cvdoc .name{font-family:var(--f-display);font-weight:800;font-size:1.15rem}
-.cvdoc .sec{font:700 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--orange);margin-top:6px}
-.cvdoc p{margin:0}
-mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 2px}
-ins{text-decoration:none;background:var(--ins);border-radius:3px;padding:0 2px;box-shadow:inset 0 -2px 0 var(--green)}
-.preview footer{padding:10px 14px;border-top:2px dashed var(--line2);display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;font-size:.85rem;color:var(--muted)}
-
-/* Réécriture */
-.promise{display:flex;gap:10px;align-items:flex-start;border:2px solid var(--violet);border-radius:12px;padding:12px 14px;font-size:.93rem}
-.promise svg{flex:none;color:var(--violet);margin-top:2px}
-.sugs{display:grid;gap:14px}
-.sug{border:2px solid var(--line2);border-radius:12px;background:var(--sheet);padding:14px;display:grid;gap:10px}
-.sug.accepted{border-color:var(--ok-ink);background:var(--ok-bg)}
-.sug.skipped{opacity:.6}
-.sug-h{display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between}
-.sug-h b{font-family:var(--f-display);font-size:1.05rem}
-.ba{display:grid;gap:6px;font-size:.93rem}
-.ba div{display:grid;grid-template-columns:62px minmax(0,1fr);gap:8px;align-items:baseline}
-.ba .lab{font:700 .7rem var(--f-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
-.ba .before{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--pink)}
-.ba .after{line-height:2}
-.blank{font:inherit;font-weight:700;color:var(--ink);border:0;border-bottom:2px dashed var(--violet);background:var(--mid-bg);border-radius:4px 4px 0 0;padding:1px 6px;min-width:6ch;max-width:100%}
-.blank:not(:placeholder-shown){background:var(--ins);border-bottom-style:solid;border-bottom-color:var(--green)}
-.ask{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-weight:700}
-.sug-a{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.sug-a small{color:var(--muted)}
-.tip{font-size:.9rem;color:var(--muted);margin:0}
-[data-p]{display:none}[data-p].show{display:grid}
-@media (prefers-reduced-motion:no-preference){.panel.show{animation:in .25s ease-out}@keyframes in{from{opacity:.4;transform:translateY(6px)}}}
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom, 0px));transform:translateX(-50%);background:var(--ink);color:var(--sheet);padding:10px 16px;border-radius:10px;font-weight:700;z-index:5}
-</style>
+<link rel="stylesheet" href="css/app.css">
 </head>
 <body>
 
@@ -162,7 +14,7 @@ ins{text-decoration:none;background:var(--ins);border-radius:3px;padding:0 2px;b
   <header>
     <div class="logo">
       <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><rect x="3" y="3" width="38" height="38" rx="8" fill="var(--sheet)" stroke="var(--ink)" stroke-width="2.5" transform="rotate(-6 22 22)"/><path d="M13 23l6 6 12-14" fill="none" stroke="var(--green)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <div><h1>Ça colle ?</h1><div class="mock">Maquette v2 · exemple fictif</div></div>
+      <div><h1>Ça colle ?</h1><div class="mock">Version de test</div></div>
     </div>
     <div class="local"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Ton CV ne quitte jamais ton appareil</div>
   </header>
@@ -187,19 +39,27 @@ ins{text-decoration:none;background:var(--ins);border-radius:3px;padding:0 2px;b
       <div class="panel" data-p="2">
         <div><h2>Ajoute ton CV</h2><p class="lead">On lit le texte de ton CV directement dans ton navigateur. Rien n'est envoyé ni gardé.</p></div>
         <div class="two">
-          <div class="drop">
+          <label class="drop" id="drop" for="file">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>
             <b>Glisse ton CV ici</b><span class="meta">ou</span>
-            <button class="btn small" id="pick">Choisir un fichier</button>
-            <div class="formats"><span>PDF</span><span>WORD</span><span>PHOTO</span></div>
-          </div>
-          <div style="display:grid;gap:10px;align-content:start">
-            <div class="file">
+            <span class="btn small">Choisir un fichier</span>
+            <div class="formats"><span>PDF</span><span>WORD</span><span>PHOTO</span><span>TXT</span></div>
+            <input type="file" id="file" accept=".pdf,.docx,.odt,.txt,.md,image/*" hidden>
+          </label>
+          <div style="display:grid;gap:10px;align-content:start;min-width:0">
+            <div class="file" id="filecard">
               <svg width="30" height="36" viewBox="0 0 34 40" aria-hidden="true"><path d="M3 2h19l9 9v27H3z" fill="var(--sheet)" stroke="currentColor" stroke-width="2"/><path d="M22 2v9h9" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-              <div><b>CV_Camille_Martin.pdf</b><small>2 pages · 8 lignes lues</small></div>
+              <div style="min-width:0"><b id="fname">Exemple : CV de Camille Martin</b><small id="finfo">CV fictif pour essayer</small></div>
             </div>
-            <p class="tip">Vérifie que le texte lu correspond bien à ton CV. Si une photo est floue, certaines lignes peuvent manquer.</p>
+            <div class="job" id="job" hidden><p id="jobtxt"></p><div class="jbar"><i id="jbar"></i></div></div>
+            <p class="err" id="ferr" role="alert" hidden></p>
+            <button class="btn small ghost" id="sample" type="button" hidden>Revenir à l'exemple</button>
           </div>
+        </div>
+        <div style="display:grid;gap:8px">
+          <label for="cvraw" class="mock">Texte lu dans ton CV · tu peux corriger ici</label>
+          <textarea id="cvraw" spellcheck="false" style="min-height:220px"></textarea>
+          <p class="tip" id="cvsum"></p>
         </div>
         <div class="bar"><button class="btn ghost" data-to="1">← L'offre</button><button class="btn main" data-to="3">Voir si ça colle →</button></div>
       </div>
@@ -248,201 +108,7 @@ ins{text-decoration:none;background:var(--ins);border-radius:3px;padding:0 2px;b
 </div>
 <div class="toast" id="toast" hidden></div>
 
-<script>
-const OFFER = `Employé(e) logistique polyvalent(e) – CDI – Caen (exemple fictif)
-
-Au sein de notre entrepôt, vous préparez les commandes et participez à la réception des marchandises.
-
-Vos missions :
-- Préparation de commandes et contrôle qualité
-- Réception et rangement des livraisons
-- Gestion des stocks et inventaires
-- Conduite de chariot élévateur (CACES 1 et 3)
-- Saisie informatique sur Excel
-
-Profil recherché :
-- Permis B indispensable
-- Travail en équipe, ponctualité, rigueur
-- Anglais de base apprécié
-- Horaires en 2x8`;
-
-/* CV fictif : lignes modifiables par la réécriture */
-const CV = [
-  {id:"nom", t:"Camille Martin", name:true},
-  {id:"sx", sec:"Expériences"},
-  {id:"e1", t:"Préparatrice de commandes, Drive Super U (2022-2025) : 120 commandes par jour, contrôle qualité des produits frais, travail en équipe de 6.", exp:true},
-  {id:"e2", t:"Vendeuse, boulangerie du centre (2020-2022) : ouverture à 6h, caisse, rangement des livraisons chaque matin.", exp:true},
-  {id:"sc", sec:"Compétences"},
-  {id:"k1", t:"Excel, gestion des stocks, rigueur, ponctualité"},
-  {id:"sd", sec:"Divers"},
-  {id:"k2", t:"Permis B, véhicule personnel"}
-];
-
-/* Points de l'offre. fix = réécriture proposée : ligne visée, texte avec {trous}, question si c'est absent du CV */
-const DICT = [
-  {k:"Préparation de commandes", o:/pr[ée]paration de commandes?/i, c:/pr[ée]par\w* de commandes?/i, ok:"Tu donnes un chiffre (<em>120 par jour</em>), c'est parfait."},
-  {k:"Contrôle qualité", o:/contr[ôo]le qualit[ée]/i, c:/contr[ôo]le qualit[ée]/i, ok:"Ton exemple des <em>produits frais</em> parle tout seul."},
-  {k:"Réception des livraisons", o:/r[ée]ception/i, c:/livraisons?|r[ée]ception/i, ok:"Tu en parles pour la boulangerie."},
-  {k:"Gestion des stocks", o:/gestion des stocks?/i, c:/gestion des stocks?|suivi des stocks/i,
-    mid:"Le mot est dans ta liste, mais aucune expérience ne le montre.",
-    fix:{line:"e2", why:"Montre où tu as géré du stock.", tpl:" Suivi des stocks de {quoi ? ex : farine et emballages} et commande {à quelle fréquence ? ex : chaque semaine}."}},
-  {k:"Inventaires", o:/inventaires?/i, c:/inventaires?/i,
-    no:"L'annonce le demande, ton CV n'en parle pas.",
-    fix:{line:"e1", ask:"As-tu déjà participé à un inventaire ?", tpl:" Participation à l'inventaire annuel ({combien ? ex : 3 000} références).", nope:"Pas grave. Dis en entretien que tu sais compter et vérifier, avec l'exemple du contrôle qualité."}},
-  {k:"CACES (chariot élévateur)", o:/caces|chariot/i, c:/caces|chariot|transpalette/i,
-    no:"Souvent demandé en entrepôt.",
-    fix:{line:"k1", ask:"As-tu le CACES ?", tpl:", CACES R489 catégories {lesquelles ? ex : 1 et 3} ({année})", nope:"Beaucoup d'entreprises le financent. Tu peux écrire dans ta lettre que tu es prête à le passer."}},
-  {k:"Excel", o:/excel/i, c:/excel/i,
-    mid:"Cité dans ta liste, sans dire à quoi il te sert.",
-    fix:{line:"k1", find:"Excel", tpl:"Excel ({pour quoi faire ? ex : tableau de suivi des commandes})"}},
-  {k:"Permis B", o:/permis b/i, c:/permis b/i, plain:true, ok:"Bien visible, et le véhicule est un plus."},
-  {k:"Travail en équipe", o:/travail en [ée]quipe/i, c:/travail en [ée]quipe|[ée]quipe de/i, ok:"Tu donnes la taille de l'équipe."},
-  {k:"Ponctualité", o:/ponctualit[ée]/i, c:/ponctualit[ée]|ouverture [àa] \d|6h/i, ok:"L'ouverture à 6h le prouve mieux qu'un mot."},
-  {k:"Rigueur", o:/rigueur/i, c:/rigueur/i,
-    mid:"Juste un mot dans ta liste. Il faut un exemple.",
-    fix:{line:"e1", why:"Un fait concret prouve ta rigueur.", tpl:" {un exemple ? ex : aucune erreur de commande signalée en 2024}."}},
-  {k:"Anglais", o:/anglais/i, c:/anglais|english/i,
-    no:"« Apprécié » : pas bloquant, mais ça peut départager.",
-    fix:{line:"k1", ask:"Tu parles un peu anglais ?", tpl:", anglais {ton niveau ? ex : scolaire}", nope:"Aucun souci, l'annonce dit seulement « apprécié »."}},
-  {k:"Horaires en 2x8", o:/2x8|horaires d[ée]cal[ée]s/i, c:/2x8|ouverture [àa] \d|6h|horaires d[ée]cal[ée]s/i, ok:"Tes horaires à 6h montrent que tu sais te lever tôt."}
-];
-
-const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
-const esc = t => String(t).replace(/[&<>"]/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
-const LABEL = {ok:"Ça colle", mid:"À préciser", no:"Pas dans ton CV"};
-let step = 3, filter = "all", active = null, results = [];
-const fixes = {}; // k -> {vals:{}, state:"open"|"yes"|"accepted"|"skipped"}
-
-$("#offer").value = OFFER;
-
-const blanksOf = tpl => [...tpl.matchAll(/\{([^}]+)\}/g)].map(m => m[1]);
-const filled = (k) => { const f = fixes[k], d = DICT.find(x => x.k === k); return blanksOf(d.fix.tpl).every((b,i) => (f.vals[i]||"").trim()); };
-const fillTpl = (d, f) => { let i = 0; return d.fix.tpl.replace(/\{[^}]+\}/g, () => f.vals[i++] || ""); };
-
-function cvLines(withIns){
-  return CV.map(l => {
-    if (l.sec || l.name) return {...l};
-    let t = esc(l.t), raw = l.t;
-    DICT.filter(d => d.fix && d.fix.line === l.id && fixes[d.k]?.state === "accepted").forEach(d => {
-      const add = fillTpl(d, fixes[d.k]);
-      if (d.fix.find) { t = t.replace(esc(d.fix.find), withIns ? `<ins>${esc(add)}</ins>` : esc(add)); raw = raw.replace(d.fix.find, add); }
-      else {
-        const put = (s, a) => s.endsWith(".") && a.startsWith(",") ? s.slice(0, -1) + a + "." : s + a;
-        t = put(t, withIns ? `<ins>${esc(add)}</ins>` : esc(add)); raw = put(raw, add);
-      }
-    });
-    return {...l, html:t, raw};
-  });
-}
-
-function analyse(){
-  const offer = $("#offer").value, lines = cvLines(false);
-  const exp = lines.filter(l => l.exp).map(l => l.raw).join("\n"), other = lines.filter(l => l.raw && !l.exp).map(l => l.raw).join("\n");
-  results = DICT.filter(d => d.o.test(offer)).map(d => {
-    let st = "no";
-    if (fixes[d.k]?.state === "accepted") st = "ok";
-    else if (d.c.test(exp)) st = "ok";
-    else if (d.c.test(other)) st = d.plain ? "ok" : "mid";
-    return {...d, st, fixedNow: fixes[d.k]?.state === "accepted"};
-  });
-  const words = offer.trim().split(/\s+/).filter(Boolean).length;
-  $("#offer-meta").textContent = `${words} mots · ${results.length} points repérés dans l'annonce`;
-}
-
-const counts = () => ({ok:results.filter(r=>r.st==="ok").length, mid:results.filter(r=>r.st==="mid").length, no:results.filter(r=>r.st==="no").length});
-const score = () => { const c = counts(), t = results.length || 1; return Math.round((c.ok + c.mid*.5)/t*100); };
-
-function renderResult(){
-  const c = counts(), p = score(), t = results.length;
-  $("#pct").textContent = p + "%";
-  $("#stamp").classList.toggle("good", p >= 80);
-  $("#stamp-txt").textContent = p >= 80 ? "Ça colle" : p >= 50 ? "Ça colle presque" : "À retravailler";
-  $("#sum").innerHTML = t ? `L'annonce demande <b>${t} choses</b>. Ton CV en prouve <b>${c.ok}</b>, en cite <b>${c.mid}</b> sans exemple, et oublie <b>${c.no}</b>.` : "Aucun point reconnu. Colle le texte complet de l'annonce à l'étape 1.";
-  ["ok","mid","no"].forEach(s => { $("#m-"+s).style.flexGrow = c[s]; $("#n-"+s).textContent = c[s]; });
-  const todo = results.filter(r => r.st !== "ok").sort((a,b) => (a.st==="no"?0:1)-(b.st==="no"?0:1)).slice(0,3);
-  $("#prio").innerHTML = todo.length
-    ? `<h3>À faire en premier</h3><ol>${todo.map(r => `<li><b>${esc(r.k)}</b> : ${r.st==="no"?"absent de ton CV":"à prouver avec un exemple"} <button class="btn small" data-fix="${esc(r.k)}">Réécrire</button></li>`).join("")}</ol>`
-    : `<h3>✓ Rien d'urgent</h3><p class="tip">Ton CV couvre toute l'annonce. Tu peux l'envoyer.</p>`;
-  const groups = ["no","mid","ok"].filter(s => filter === "all" || filter === s);
-  $("#groups").innerHTML = groups.map(s => {
-    const list = results.filter(r => r.st === s); if (!list.length) return "";
-    return `<div class="group"><h3>${LABEL[s]} <span class="meta">(${list.length})</span></h3>${list.map(r => `
-      <div class="row ${active===r.k?"on":""}" tabindex="0" role="button" data-k="${esc(r.k)}" aria-label="${esc(r.k)} : ${LABEL[s]}">
-        <span class="stamp ${s}">${LABEL[s]}</span>
-        <div class="kw"><b>${esc(r.k)}</b><p>${r.fixedNow ? "Ajouté à ton CV à l'étape 4." : (r[s] || r.ok || "")}</p></div>
-        ${s !== "ok" && r.fix ? `<button class="btn small" data-fix="${esc(r.k)}">Réécrire</button>` : r.fixedNow ? `<span class="fixed">Corrigé</span>` : "<span></span>"}
-      </div>`).join("")}</div>`;
-  }).join("") || `<p class="tip">Rien dans cette catégorie.</p>`;
-  paintCV("#cv3", false);
-}
-
-function paintCV(sel, withIns){
-  const hit = active ? DICT.find(d => d.k === active) : null;
-  $(sel).innerHTML = cvLines(withIns).map(l => l.name ? `<div class="name">${esc(l.t)}</div>` : l.sec ? `<div class="sec">${esc(l.sec)}</div>` :
-    `<p>${hit && !withIns ? l.html.replace(new RegExp(hit.c.source,"gi"), m => `<mark>${m}</mark>`) : l.html}</p>`).join("");
-}
-
-function renderRewrite(){
-  const list = results.filter(r => r.fix && (r.st !== "ok" || r.fixedNow));
-  DICT.forEach(d => { if (d.fix && !fixes[d.k]) fixes[d.k] = {vals:{}, state: d.fix.ask ? "open" : "yes"}; });
-  $("#sugs").innerHTML = list.map(r => {
-    const f = fixes[r.k], b = blanksOf(r.fix.tpl); let i = 0;
-    const line = CV.find(l => l.id === r.fix.line);
-    const after = esc(r.fix.tpl).replace(/\{([^}]+)\}/g, (m, ph) => { const j = i++; return `<input class="blank" data-k="${esc(r.k)}" data-i="${j}" placeholder="${esc(ph)}" value="${esc(f.vals[j]||"")}" size="${Math.max(6, ph.length - 2)}" aria-label="${esc(ph)}">`; });
-    let body;
-    if (f.state === "open") body = `<div class="ask">${esc(r.fix.ask)} <button class="btn small" data-yes="${esc(r.k)}">Oui</button><button class="btn small ghost" data-no="${esc(r.k)}">Non</button></div>`;
-    else if (f.state === "skipped") body = `<p class="tip">${esc(r.fix.nope || "Ignoré.")} <button class="btn small ghost" data-undo="${esc(r.k)}">Revenir</button></p>`;
-    else body = `<div class="ba">
-        <div><span class="lab">Où</span><span class="meta">${line.exp ? "Expérience : " + esc(line.t.split(",")[0]) : "Compétences"}</span></div>
-        <div><span class="lab">Ajout</span><span class="after">${r.fix.find ? `<span class="before">${esc(r.fix.find)}</span> → ` : "… "}${after}</span></div>
-      </div>
-      <div class="sug-a">${f.state === "accepted"
-        ? `<span class="stamp ok">Ajouté</span><button class="btn small ghost" data-undo="${esc(r.k)}">Retirer</button>`
-        : `<button class="btn small" data-add="${esc(r.k)}" ${filled(r.k) ? "" : "disabled"}>Ajouter à mon CV</button><small>${filled(r.k) ? "Prêt." : "Complète les trous d'abord."}</small>`}</div>`;
-    return `<div class="sug ${f.state === "accepted" ? "accepted" : f.state === "skipped" ? "skipped" : ""}">
-      <div class="sug-h"><b>${esc(r.k)}</b><span class="stamp ${r.fixedNow ? "ok" : r.st}">${r.fixedNow ? "Ça colle" : LABEL[r.st]}</span></div>
-      ${r.fix.why && f.state !== "skipped" ? `<p class="tip">${esc(r.fix.why)}</p>` : ""}${body}</div>`;
-  }).join("") || `<p class="tip">Rien à réécrire pour cette offre.</p>`;
-  $("#score4").textContent = `· ${score()}% de l'annonce couverte`;
-  paintCV("#cv4", true);
-}
-
-function go(n){
-  step = n; analyse();
-  $$(".step").forEach(s => s.setAttribute("aria-selected", s.dataset.to == n));
-  $$("[data-p]").forEach(p => p.classList.toggle("show", p.dataset.p == n));
-  $$(".step").forEach(s => s.classList.toggle("done", +s.dataset.to < n || (+s.dataset.to <= 2)));
-  if (n === 3) renderResult(); if (n === 4) renderRewrite();
-}
-function toast(t){ const el = $("#toast"); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 1800); }
-
-document.addEventListener("click", e => {
-  const t = e.target.closest("button,[data-k].row"); if (!t) return;
-  if (t.dataset.to) { go(+t.dataset.to); $(".steps").scrollIntoView({block:"nearest"}); return; }
-  if (t.dataset.fix) { e.stopPropagation(); go(4); return; }
-  if (t.dataset.f) { filter = t.dataset.f; $$(".chip").forEach(c => c.setAttribute("aria-pressed", c === t)); renderResult(); return; }
-  if (t.classList.contains("row")) { active = active === t.dataset.k ? null : t.dataset.k; renderResult(); return; }
-  if (t.dataset.yes) { fixes[t.dataset.yes].state = "yes"; renderRewrite(); return; }
-  if (t.dataset.no) { fixes[t.dataset.no].state = "skipped"; renderRewrite(); return; }
-  if (t.dataset.undo) { fixes[t.dataset.undo].state = DICT.find(d=>d.k===t.dataset.undo).fix.ask ? "open" : "yes"; analyse(); renderRewrite(); return; }
-  if (t.dataset.add) { fixes[t.dataset.add].state = "accepted"; analyse(); renderRewrite(); toast("Ajouté à ton CV"); return; }
-  if (t.id === "pick") { toast("Dans l'app, ça ouvrira tes fichiers"); return; }
-  if (t.id === "copy") {
-    const txt = cvLines(false).map(l => l.name ? l.t : l.sec ? "\n" + l.sec.toUpperCase() : l.raw).join("\n");
-    const done = () => toast("Texte copié");
-    try { navigator.clipboard.writeText(txt).then(done, () => toast("Sélectionne le texte pour le copier")); } catch { toast("Sélectionne le texte pour le copier"); }
-  }
-});
-document.addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === " ") && e.target.classList?.contains("row")) { e.preventDefault(); e.target.click(); } });
-document.addEventListener("input", e => {
-  if (e.target.id === "offer") { analyse(); return; }
-  if (e.target.classList.contains("blank")) {
-    const k = e.target.dataset.k; fixes[k].vals[e.target.dataset.i] = e.target.value;
-    const card = e.target.closest(".sug"), btn = card.querySelector("[data-add]"), sm = card.querySelector(".sug-a small");
-    if (btn) { btn.disabled = !filled(k); sm.textContent = filled(k) ? "Prêt." : "Complète les trous d'abord."; }
-  }
-});
-go(3);
-</script>
+<script src="js/lecteur.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
