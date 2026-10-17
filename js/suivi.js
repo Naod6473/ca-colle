@@ -23,7 +23,7 @@ const today = () => new Date().toISOString().slice(0, 10);
 const addDays = (d, n) => { const x = new Date(d + "T12:00:00"); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
 const daysFrom = d => Math.round((new Date(today() + "T12:00:00") - new Date(d + "T12:00:00")) / 864e5);
 const fmtDate = d => d ? new Date(d + "T12:00:00").toLocaleDateString(tr("fr-FR", "en-GB"), {day: "numeric", month: "short", year: "numeric"}) : "";
-let trackView = "cards", trackFilter = "all", trackSort = {k: "appliedDate", dir: -1}, openApp = null, prepFor = null;
+let trackView = "table", trackFilter = "all", trackSort = {k: "appliedDate", dir: -1}, openApp = null, prepFor = null;
 
 const apps = () => offers.filter(o => o.app);
 function ensureApp(o, status){
@@ -101,7 +101,8 @@ function renderTrack(){
   if (trackView === "compare") { $("#trackout").innerHTML = compareHTML(list); return; }
   if (trackView === "stats") { $("#trackout").innerHTML = statsHTML(); return; }
   if (!list.length) { $("#trackout").innerHTML = all.length ? `<p class="notice">${tr("Aucune candidature dans ce filtre.", "No application in this filter.")}</p>` : ""; return; }
-  $("#trackout").innerHTML = gapsHTML() + (trackView === "table" ? tableHTML(list) : `<div class="apps">${list.sort((a, b) => (b.app.appliedDate || b.app.history[0].d).localeCompare(a.app.appliedDate || a.app.history[0].d)).map(cardHTML).join("")}</div>`);
+  // La liste d'abord, puis ce qui manque le plus au CV sur toutes les offres
+  $("#trackout").innerHTML = (trackView === "table" ? tableHTML(list) : `<div class="apps">${list.sort((a, b) => (b.app.appliedDate || b.app.history[0].d).localeCompare(a.app.appliedDate || a.app.history[0].d)).map(cardHTML).join("")}</div>`) + gapsHTML();
 }
 const statusSelect = o => `<select class="stsel" data-app="${o.id}" data-fld="status" aria-label="${tr("État", "Status")}" style="--k: ${ST[o.app.status].c}">${STATUSES.map(s => `<option value="${s.id}" ${s.id === o.app.status ? "selected" : ""}>${LL(s)}</option>`).join("")}</select>`;
 const field = (o, k, label, type = "text", ph = "") => `<label class="afield"><span>${label}</span>${type === "area"
@@ -146,13 +147,13 @@ function tableHTML(list){
   const val = (o, k) => k === "score" ? (o.text.trim() && o.score != null ? o.score : -1) : k === "status" ? STATUSES.findIndex(s => s.id === o.app.status) : k === "job" ? appTitle(o).toLowerCase() : (o.app[k] || "").toLowerCase();
   const {k, dir} = trackSort;
   list = list.slice().sort((a, b) => { const x = val(a, k), y = val(b, k); return (x > y ? 1 : x < y ? -1 : 0) * dir; });
-  return `<div class="tablewrap"><table class="apps-table">
+  return `<div class="tablewrap"><table class="apps-table apps-list">
     <thead><tr>${cols.map(([c, l]) => `<th scope="col" aria-sort="${k === c ? (dir > 0 ? "ascending" : "descending") : "none"}"><button type="button" data-sort="${c}">${l}${k === c ? (dir > 0 ? " ↑" : " ↓") : ""}</button></th>`).join("")}<th scope="col"><span class="sr-only">${tr("Actions", "Actions")}</span></th></tr></thead>
     <tbody>${list.map(o => { const a = o.app, late = todosOf(o).some(t => t.urgent); return `<tr>
-      <td><b>${esc(appTitle(o))}</b></td><td>${esc(a.company || "–")}</td><td>${fmtDate(a.offerDate) || "–"}</td><td>${fmtDate(a.appliedDate) || "–"}</td>
-      <td>${statusSelect(o)}</td><td class="${late ? "late" : ""}">${fmtDate(a.next) || "–"}${late ? ` <span class="sr-only">${tr("(en retard)", "(overdue)")}</span>` : ""}</td>
-      <td>${o.text.trim() && o.score != null ? o.score + " %" : "–"}</td>
-      <td><button type="button" class="btn light small" data-openapp="${o.id}">${tr("Ouvrir", "Open")}</button></td></tr>`; }).join("")}</tbody>
+      <td class="t-job"><b>${esc(appTitle(o))}</b></td><td class="t-co">${esc(a.company || "–")}</td><td class="t-off" data-l="${cols[2][1]}">${fmtDate(a.offerDate) || "–"}</td><td data-l="${cols[3][1]}">${fmtDate(a.appliedDate) || "–"}</td>
+      <td class="t-st">${statusSelect(o)}</td><td data-l="${cols[5][1]}" class="${late ? "late" : ""}">${fmtDate(a.next) || "–"}${late ? ` <span class="sr-only">${tr("(en retard)", "(overdue)")}</span>` : ""}</td>
+      <td data-l="${cols[6][1]}">${o.text.trim() && o.score != null ? o.score + " %" : "–"}</td>
+      <td class="t-open"><button type="button" class="btn light small" data-openapp="${o.id}">${tr("Ouvrir", "Open")}</button></td></tr>`; }).join("")}</tbody>
   </table></div>`;
 }
 function csvExport(){

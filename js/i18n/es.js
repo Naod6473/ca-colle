@@ -726,6 +726,10 @@ Tu perfil: 4 años de desarrollo en Java, Git, inglés.`,
 
   // Motifs de l'analyse (texte sans accents, en minuscules)
   re: {
+    // Message d'erreur à l'étape de l'offre : « ton CV » devient « l'offre »
+    cvWord: "tu CV", offerWord: "la oferta",
+    // Annonce de bureau ou d'informatique : on propose de demander pour le télétravail
+    office: "informati|oficina|software|datos|desarroll|contab|administrativ",
     to: "hasta|al",
     now: "actualidad|actualmente|actual|hoy|la fecha",
     years: "(\\d{1,2})\\+?\\s*(?:a\\s*\\d{1,2}\\s*)?anos? (?:de )?experiencia|experiencia (?:minima |demostrable |previa )?(?:de )?(?:al menos )?(\\d{1,2})\\+? anos?|(\\d{1,2})\\+?\\s*(?:years?|yrs?)\\s*(?:of\\s+)?(?:[a-z-]+\\s+){0,3}?experience|al menos (\\d{1,2}) anos?|(\\d{1,2}) ans? (?:d'|de )?experience",

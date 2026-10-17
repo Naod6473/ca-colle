@@ -32,6 +32,15 @@ const PAGES = {
   sal:   {fr: "salaire.html", en: "salary-en.html", de: "salary-de.html", es: "salary-es.html", it: "salary-it.html"},
   infos: {fr: "infos.html", en: "infos-en.html", de: "infos-de.html", es: "infos-es.html", it: "infos-it.html"}
 };
+// Première visite sur une page française avec un navigateur réglé dans une autre langue de l'app : on y va directement.
+// Pas si on vient d'une autre page du site, ni si une langue a déjà été choisie dans le menu (cacolle-lang).
+if (typeof document !== "undefined" && LANG === "fr") try {
+  const file = location.pathname.split("/").pop() || "./", kind = Object.keys(PAGES).find(k => PAGES[k].fr === file || (k === "app" && file === "index.html"));
+  const want = (navigator.languages || [navigator.language]).map(l => String(l).slice(0, 2).toLowerCase()).find(l => l in PAGES.app);
+  const fromSite = document.referrer && new URL(document.referrer).origin === location.origin;
+  if (kind && want && want !== "fr" && !localStorage.getItem("cacolle-lang") && !fromSite && !/[?&]lang=fr\b/.test(location.search))
+    location.replace(PAGES[kind][want] + location.search + location.hash);
+} catch {}
 // Skin et mode confort appliqués tout de suite, avant l'affichage (réglage d'affichage gardé sur l'appareil)
 if (typeof document !== "undefined") try {
   const c = JSON.parse(localStorage.getItem("cacolle-confort")) || {}, h = document.documentElement;

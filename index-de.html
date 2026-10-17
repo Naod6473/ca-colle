@@ -46,7 +46,7 @@
   </div>
   <nav class="tabs" role="tablist" aria-label="Schritte">
     <button class="tab" role="tab" data-step="1" data-n="1" data-s="Anzeige" style="--c: var(--blue)"><small>Schritt 1</small><b>Das Angebot</b></button>
-    <button class="tab" role="tab" data-step="2" data-n="2" data-s="Lebenslauf" style="--c: var(--yellow)"><small>Schritt 2</small><b>Dein Lebenslauf</b></button>
+    <button class="tab" role="tab" data-step="2" data-n="2" data-s="CV" style="--c: var(--yellow)"><small>Schritt 2</small><b>Dein Lebenslauf</b></button>
     <button class="tab" role="tab" data-step="3" data-n="3" data-s="Ergebnis" style="--c: var(--green)"><small>Schritt 3</small><b>Das Ergebnis</b></button>
     <button class="tab" role="tab" data-step="4" data-n="4" data-s="Besser" style="--c: var(--pink)"><small>Schritt 4</small><b>Lebenslauf verbessern</b></button>
     <button class="tab" role="tab" data-step="5" data-n="5" data-s="Brief" style="--c: var(--violet)"><small>Schritt 5</small><b>Mein Anschreiben</b></button>
@@ -314,17 +314,15 @@
       <h1 class="big">Meine Bewerbungen</h1>
       <p class="lede">Notier, wo du dich beworben hast, wie weit jede Bewerbung ist und wann du nachfassen solltest.</p>
       <div class="track-bar">
-        <div class="filters" role="group" aria-label="Ansicht">
-          <button class="chip" type="button" data-view="cards" aria-pressed="true">Nach Angebot</button>
-          <button class="chip" type="button" data-view="table" aria-pressed="false">Tabelle</button>
-          <button class="chip" type="button" data-view="compare" aria-pressed="false">Vergleichen</button>
-          <button class="chip" type="button" data-view="stats" aria-pressed="false">Statistik</button>
-        </div>
         <button class="btn small" id="addapp" type="button">+ Bewerbung hinzufügen</button>
-        <button class="btn light small" id="csv" type="button">Für eine Tabelle exportieren</button>
-        <details class="share proofmenu"><summary class="btn light small">Nachweis der Eigenbemühungen</summary><div class="share-body"><div class="export"><button class="btn small" type="button" data-proof="month">Dieser Monat</button><button class="btn light small" type="button" data-proof="last">Letzter Monat</button><button class="btn light small" type="button" data-proof="all">Alle</button></div></div></details>
-        <button class="btn light small" id="backup" type="button">In einer Datei sichern</button>
-        <button class="btn light small" id="restore" type="button">Sicherung öffnen</button>
+        <details class="share proofmenu iomenu" id="iomenu"><summary class="btn light small">Import / Export <span aria-hidden="true">▾</span></summary><div class="share-body io-body">
+          <p class="io-h">Exportieren</p>
+          <button class="io-item" id="csv" type="button"><b>Tabelle für Excel</b><small>Alle deine Bewerbungen, zum Öffnen in einer Tabellenkalkulation</small></button>
+          <div class="io-item io-proof"><b>Nachweis der Eigenbemühungen</b><small>Eine Seite zum Drucken oder als PDF</small><span class="export"><button class="btn small" type="button" data-proof="month">Dieser Monat</button><button class="btn light small" type="button" data-proof="last">Letzter Monat</button><button class="btn light small" type="button" data-proof="all">Alle</button></span></div>
+          <button class="io-item" id="backup" type="button"><b>Komplette Sicherung</b><small>Eine Datei mit deiner ganzen Übersicht, zum Aufbewahren oder für ein anderes Gerät</small></button>
+          <p class="io-h">Importieren</p>
+          <button class="io-item" id="restore" type="button"><b>Sicherung öffnen</b><small>Eine mit „Komplette Sicherung“ gespeicherte Übersicht wieder laden</small></button>
+        </div></details>
         <input type="file" id="restorefile" accept=".json,application/json" hidden>
       </div>
       <p class="notice" id="tracknokeep" hidden>Deine Übersicht wird noch nicht auf diesem Gerät gespeichert: Sie verschwindet, wenn du die Seite schließt. <button class="btn small" id="keepon" type="button">Auf diesem Gerät behalten</button></p>
@@ -336,11 +334,19 @@
   </div>
 </section>
 <div class="below" id="trackbelow" hidden style="--c: var(--orange)">
-  <div class="filters" role="group" aria-label="Filter" id="trackfilters">
-    <button class="chip" type="button" data-tf="all" aria-pressed="true">Alle <span id="tf-all"></span></button>
-    <button class="chip" type="button" data-tf="active" aria-pressed="false" style="--k: var(--yellow)">Laufend <span id="tf-active"></span></button>
-    <button class="chip" type="button" data-tf="talk" aria-pressed="false" style="--k: var(--violet)">Gespräche <span id="tf-talk"></span></button>
-    <button class="chip" type="button" data-tf="done" aria-pressed="false" style="--k: var(--card)">Abgeschlossen <span id="tf-done"></span></button>
+  <div class="track-tools">
+    <div class="seg" role="group" aria-label="Ansicht">
+      <button type="button" data-view="table" aria-pressed="true">Tabelle</button>
+      <button type="button" data-view="cards" aria-pressed="false">Karten</button>
+      <button type="button" data-view="compare" aria-pressed="false">Vergleichen</button>
+      <button type="button" data-view="stats" aria-pressed="false">Statistik</button>
+    </div>
+    <div class="filters" role="group" aria-label="Filter" id="trackfilters">
+      <button class="chip" type="button" data-tf="all" aria-pressed="true">Alle <span id="tf-all"></span></button>
+      <button class="chip" type="button" data-tf="active" aria-pressed="false" style="--k: var(--yellow)">Laufend <span id="tf-active"></span></button>
+      <button class="chip" type="button" data-tf="talk" aria-pressed="false" style="--k: var(--violet)">Gespräche <span id="tf-talk"></span></button>
+      <button class="chip" type="button" data-tf="done" aria-pressed="false" style="--k: var(--card)">Abgeschlossen <span id="tf-done"></span></button>
+    </div>
   </div>
   <div id="trackout"></div>
 </div>
@@ -368,6 +374,5 @@
 <script src="js/suivi.js"></script>
 <script src="js/outils.js"></script>
 <script src="js/confort.js"></script>
-<script src="js/demo.js"></script><!-- mode démo temporaire -->
 </body>
 </html>

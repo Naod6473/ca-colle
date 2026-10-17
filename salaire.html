@@ -18,7 +18,7 @@
 <script src="js/lang.js"></script>
 <script defer src="https://stats.pissits.com/script.js" data-website-id="79e7d60a-075b-4867-9973-a2659b51101c"></script>
 <title>Salaire brut en net · Ça colle ?</title>
-<meta name="description" content="Calcule ton salaire net à partir du brut (horaire, mensuel, annuel), selon ton statut, ton temps de travail et le prélèvement à la source. Gratuit, dans ton navigateur.">
+<meta name="description" content="Calcule ton salaire net à partir du brut (horaire, mensuel, annuel) en France, en Belgique, en Suisse ou au Québec : cotisations, impôt, 13e mois. Gratuit, dans ton navigateur.">
 </head>
 <body>
 <a class="skip-link" href="#contenu">Aller au contenu</a>
@@ -57,37 +57,43 @@
     <div class="main-col">
       <span class="label">Outil · salaire</span>
       <h1 class="big">Brut → net</h1>
+      <div class="filters" role="group" aria-label="Pays">
+        <button class="chip" type="button" data-pays-set="fr" aria-pressed="true">France</button><button class="chip" type="button" data-pays-set="be" aria-pressed="false">Belgique</button><button class="chip" type="button" data-pays-set="ch" aria-pressed="false">Suisse</button><button class="chip" type="button" data-pays-set="qc" aria-pressed="false">Québec</button>
+      </div>
       <p class="lede" id="sum"></p>
       <p class="notice" id="from" hidden>Salaire lu dans l'annonce : <b id="fromv"></b></p>
       <div class="sal-grid">
-        <fieldset class="sal-col"><legend>Ton salaire brut</legend>
-          <label class="afield"><span>Horaire brut</span><input class="money" id="hb" inputmode="decimal" autocomplete="off" placeholder="0"></label>
-          <label class="afield main"><span>Mensuel brut <i class="tag" id="rate"></i></span><input class="money" id="mb" inputmode="decimal" autocomplete="off" placeholder="0"></label>
-          <label class="afield main"><span>Annuel brut</span><input class="money" id="ab" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+        <fieldset class="sal-col"><legend data-l="lb">Ton salaire brut</legend>
+          <label class="afield"><span data-l="hb">Horaire brut</span><input class="money" id="hb" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label class="afield main"><span><span data-l="mb">Mensuel brut</span> <i class="tag" id="rate"></i></span><input class="money" id="mb" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label class="afield main"><span data-l="ab">Annuel brut</span><input class="money" id="ab" inputmode="decimal" autocomplete="off" placeholder="0"></label>
         </fieldset>
-        <fieldset class="sal-col"><legend>Ton salaire net</legend>
-          <label class="afield"><span>Horaire net</span><input class="money" id="hn" inputmode="decimal" autocomplete="off" placeholder="0"></label><label class="afield main"><span>Mensuel net</span><input class="money" id="mn" inputmode="decimal" autocomplete="off" placeholder="0"></label><label class="afield"><span>Annuel net</span><input class="money" id="an" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+        <fieldset class="sal-col"><legend data-l="ln">Ton salaire net</legend>
+          <label class="afield"><span data-l="hn">Horaire net</span><input class="money" id="hn" inputmode="decimal" autocomplete="off" placeholder="0"></label><label class="afield main"><span data-l="mn">Mensuel net</span><input class="money" id="mn" inputmode="decimal" autocomplete="off" placeholder="0"></label><label class="afield"><span data-l="an">Annuel net</span><input class="money" id="an" inputmode="decimal" autocomplete="off" placeholder="0"></label>
         </fieldset>
-        <fieldset class="sal-col"><legend>Net après impôt</legend>
-          <label class="afield"><span>Horaire après impôt</span><input class="money" id="hp" inputmode="decimal" autocomplete="off" placeholder="0"></label>
-          <label class="afield"><span>Mensuel après impôt</span><input class="money" id="mp" inputmode="decimal" autocomplete="off" placeholder="0"></label>
-          <label class="afield"><span>Annuel après impôt</span><input class="money" id="ap" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+        <fieldset class="sal-col"><legend data-l="lp">Net après impôt</legend>
+          <label class="afield"><span data-l="hp">Horaire après impôt</span><input class="money" id="hp" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label class="afield"><span data-l="mp">Mensuel après impôt</span><input class="money" id="mp" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label class="afield"><span data-l="ap">Annuel après impôt</span><input class="money" id="ap" inputmode="decimal" autocomplete="off" placeholder="0"></label>
         </fieldset>
       </div>
     </div>
     <aside class="box">
-      <div class="box-head">Après le prélèvement à la source</div>
+      <div class="box-head" data-l="head">Après le prélèvement à la source</div>
       <div class="box-body sal-res">
-        <div><small>Par mois</small><b id="pmn">0</b><span>€ net</span></div>
-        <div><small>Par an</small><b id="pan">0</b><span>€ net</span></div>
-        <label class="afield"><span>Taux de prélèvement à la source : <b id="pasv"></b></span><input type="range" id="pas" min="0" max="43" step="0.1" value="0"></label>
-        <p class="hint"><span id="pasauto">Taux estimé avec la grille du taux neutre (sans tenir compte de ta famille ni de tes autres revenus). </span>Ton vrai taux est sur ta fiche de paie ou sur impots.gouv.fr : règle le curseur dessus.</p>
+        <div><small data-l="per">Par mois</small><b id="pmn">0</b><span data-l="unit">€ net</span></div>
+        <div><small>Par an</small><b id="pan">0</b><span data-l="unit">€ net</span></div>
+        <label class="afield" data-pays="fr"><span>Taux de prélèvement à la source : <b id="pasv"></b></span><input type="range" id="pas" min="0" max="43" step="0.1" value="0"></label>
+        <p class="hint" data-pays="fr"><span id="pasauto">Taux estimé avec la grille du taux neutre (sans tenir compte de ta famille ni de tes autres revenus). </span>Ton vrai taux est sur ta fiche de paie ou sur impots.gouv.fr : règle le curseur dessus.</p>
+        <label class="afield" data-pays="ch" hidden><span>Impôt (à la source ou déclaré) : <b id="impv"></b></span><input type="range" id="imp" min="0" max="30" step="0.5" value="10"></label>
+        <p class="hint" data-pays="ch" hidden>En pourcentage du brut. Il dépend beaucoup de ton canton et de ta commune : souvent entre 5 et 15 % pour un salaire moyen, plus bas à Zoug ou Schwytz, plus haut à Genève ou Vaud. Le barème de l'impôt à la source de ton canton te donne le vrai taux.</p>
+        <section class="sal-lines" data-pays="be ch qc" hidden><p class="hint" id="linesh">Ce qui part, par mois</p><div id="lines"></div></section>
       </div>
     </aside>
   </div>
 </section>
 <div class="below" style="--c: var(--teal)">
-  <section class="group"><h2 class="section-title" style="--k: var(--yellow)">Ton statut</h2>
+  <section class="group" data-pays="fr"><h2 class="section-title" style="--k: var(--yellow)">Ton statut</h2>
     <div class="filters" role="group" aria-label="Statut">
       <button class="chip" type="button" data-st="nc" aria-pressed="true">Salarié non-cadre · −22 %</button>
       <button class="chip" type="button" data-st="c" aria-pressed="false">Salarié cadre · −25 %</button>
@@ -96,17 +102,42 @@
       <button class="chip" type="button" data-st="ps" aria-pressed="false">Portage salarial · −51 %</button>
     </div>
   </section>
-  <section class="group"><h2 class="section-title" style="--k: var(--yellow)">Temps de travail : <span id="timev"></span></h2>
+  <section class="group" data-pays="fr"><h2 class="section-title" style="--k: var(--yellow)">Temps de travail : <span id="timev"></span></h2>
     <label class="sr-only" for="time">Temps de travail</label><input type="range" id="time" min="10" max="100" step="5" value="100">
     <p class="hint">100 % = 35 heures par semaine (151,67 heures par mois). Ça change le salaire horaire.</p>
   </section>
-  <section class="group"><h2 class="section-title" style="--k: var(--yellow)">Mois de salaire par an</h2>
+  <section class="group" data-pays="fr"><h2 class="section-title" style="--k: var(--yellow)">Mois de salaire par an</h2>
     <div class="filters" role="group" aria-label="Nombre de mois">
       <button class="chip" type="button" data-mo="12" aria-pressed="true">12 mois</button><button class="chip" type="button" data-mo="13" aria-pressed="false">13 mois</button><button class="chip" type="button" data-mo="14" aria-pressed="false">14 mois</button><button class="chip" type="button" data-mo="15" aria-pressed="false">15 mois</button><button class="chip" type="button" data-mo="16" aria-pressed="false">16 mois</button>
     </div>
     <p class="hint">Un 13e mois (ou plus) prévu par ton contrat ou ta convention collective augmente le salaire annuel.</p>
   </section>
-  <p class="promise"><b>C'est une estimation.</b> Les cotisations exactes dépendent de ton entreprise et de ta convention collective : ta fiche de paie fait foi. <button type="button" class="linkbtn" id="clear">Effacer les cases</button></p>
+  <section class="group" data-pays="be ch qc" hidden><h2 class="section-title" style="--k: var(--yellow)">Heures par semaine : <span id="hoursv"></span></h2>
+    <label class="sr-only" for="hours">Heures par semaine</label><input type="range" id="hours" min="5" max="50" step="0.5" value="38">
+    <p class="hint" data-pays="be" hidden>Temps plein en Belgique : 38 heures par semaine en général. Ça change seulement le salaire horaire.</p>
+    <p class="hint" data-pays="ch" hidden>Temps plein en Suisse : souvent 40 à 42 heures par semaine. Ça change seulement le salaire horaire.</p>
+    <p class="hint" data-pays="qc" hidden>Temps plein au Québec : souvent 35 à 40 heures par semaine, sur 52 semaines par an. Ça change seulement le salaire horaire.</p>
+  </section>
+  <section class="group" data-pays="be" hidden><h2 class="section-title" style="--k: var(--yellow)">Paiements par an</h2>
+    <div class="filters" role="group" aria-label="Paiements par an">
+      <button class="chip" type="button" data-pay="12" aria-pressed="false">12 mois</button><button class="chip" type="button" data-pay="13.92" aria-pressed="true">13,92 mois</button>
+    </div>
+    <p class="hint">13,92 = 12 mois + le 13e mois + le double pécule de vacances (environ 92 % d'un mois), ce que touchent la plupart des employés du privé.</p>
+  </section>
+  <section class="group" data-pays="ch" hidden><h2 class="section-title" style="--k: var(--yellow)">Salaires par an</h2>
+    <div class="filters" role="group" aria-label="Salaires par an">
+      <button class="chip" type="button" data-pay="12" aria-pressed="true">12 salaires</button><button class="chip" type="button" data-pay="13" aria-pressed="false">13 salaires</button>
+    </div>
+    <p class="hint">Beaucoup de contrats suisses prévoient un 13e salaire : regarde ton contrat.</p>
+  </section>
+  <section class="group" data-pays="ch" hidden><h2 class="section-title" style="--k: var(--yellow)">2e pilier (LPP) : <span id="lppv"></span></h2>
+    <label class="sr-only" for="lpp">Cotisation LPP</label><input type="range" id="lpp" min="0" max="15" step="0.5" value="7">
+    <p class="hint">Ta part de la caisse de pension, en pourcentage du brut. Elle monte avec l'âge (souvent 3,5 % à 25 ans, 9 % après 55 ans) et dépend de ta caisse. Mets 0 si ton salaire est sous 22 680 CHF par an.</p>
+  </section>
+  <p class="promise" data-pays="fr"><b>C'est une estimation.</b> Les cotisations exactes dépendent de ton entreprise et de ta convention collective : ta fiche de paie fait foi. <button type="button" class="linkbtn" data-clear>Effacer les cases</button></p>
+  <p class="promise" data-pays="be" hidden><b>C'est une estimation, règles 2025, pour une personne seule sans enfant.</b> On simplifie : le précompte est calculé avec le barème annuel de l'impôt (25, 40, 45 et 50 %, quotité exemptée de 10 910 €, frais professionnels forfaitaires de 30 % plafonnés à 5 930 €) plus une taxe communale moyenne de 7 %, pas avec les tableaux de précompte de ton employeur. Le bonus à l'emploi (qui augmente le net des salaires sous environ 3 100 € brut) n'est pas compté, et le pécule de vacances est traité comme un mois normal. Ta fiche de paie fait foi. <button type="button" class="linkbtn" data-clear>Effacer les cases</button></p>
+  <p class="promise" data-pays="ch" hidden><b>C'est une estimation, règles 2025, pour une personne seule sans enfant, en CHF.</b> On simplifie : la LPP est un pourcentage du brut (en vrai, elle se calcule sur le salaire coordonné), l'assurance accidents non professionnels est fixée à 1,3 % et l'impôt est un seul taux que tu règles, parce qu'il dépend du canton, de la commune et de l'Église. Ton certificat de salaire fait foi. <button type="button" class="linkbtn" data-clear>Effacer les cases</button></p>
+  <p class="promise" data-pays="qc" hidden><b>C'est une estimation, règles 2025, pour une personne seule sans enfant, en dollars canadiens.</b> On compte le RRQ, l'assurance-emploi, le RQAP, l'impôt fédéral (avec l'abattement du Québec de 16,5 %) et l'impôt du Québec, avec les montants personnels de base, le montant canadien pour emploi et la déduction pour travailleur. On ne compte pas la prime d'assurance médicaments de la RAMQ, les cotisations syndicales, ni les crédits remboursables comme la TPS ou la solidarité. Ton talon de paie fait foi. <button type="button" class="linkbtn" data-clear>Effacer les cases</button></p>
 </div>
 </main>
 <footer class="foot">

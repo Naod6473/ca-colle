@@ -711,6 +711,10 @@ Dein Profil: 4 Jahre Java-Entwicklung, Git, Englisch.`,
     "BAFA": ["Jugendleiter-Card (Juleica)", "juleica|jugendleiter\\w*|jugendgruppenleiter\\w*", "2022"]
   },
   re: {
+    // Message d'erreur à l'étape de l'offre : « ton CV » devient « l'offre »
+    cvWord: "deinen Lebenslauf|dein Lebenslauf|deines Lebenslaufs", offerWord: "die Anzeige",
+    // Annonce de bureau ou d'informatique : on propose de demander pour le télétravail
+    office: "informati|buro|software|daten|entwickl|buchhalt|verwaltung|sachbearbeit|\\bit-",
     to: "bis",
     // mots très courants (reconnaître un CV allemand), marqueur de l'exemple, mots de diplôme, mention de genre
     langWords: "der|die|das|und|mit|fur|von|bei|zur|zum|ein|eine|einer|im|auf|ich|als|seit",

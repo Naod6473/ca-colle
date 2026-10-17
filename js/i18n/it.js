@@ -714,6 +714,10 @@ Requisiti: 4 anni di sviluppo Java, Git, inglese.`,
   lexOnly: ["Accompagnement des personnes âgées", "Supervision"],
   ocr: ["ita"],
   re: {
+    // Message d'erreur à l'étape de l'offre : « ton CV » devient « l'offre »
+    cvWord: "il tuo CV|tuo CV", offerWord: "l'annuncio",
+    // Annonce de bureau ou d'informatique : on propose de demander pour le télétravail
+    office: "informati|ufficio|software|dati|svilupp|contabil|amministrativ",
     langWords: "il|lo|gli|e|con|per|del|della|di|nel|una|che|sono",
     sample: String.raw`\s*\(esempio fittizio\)`,
     eduWords: "laurea|diploma|maturita|maturità|master|dottorato|\\bits\\b|qualifica",

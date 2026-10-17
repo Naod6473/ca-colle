@@ -314,17 +314,15 @@
       <h1 class="big">Le mie candidature</h1>
       <p class="lede">Segna dove hai inviato la candidatura, a che punto è ognuna e quando sollecitare.</p>
       <div class="track-bar">
-        <div class="filters" role="group" aria-label="Vista">
-          <button class="chip" type="button" data-view="cards" aria-pressed="true">Per offerta</button>
-          <button class="chip" type="button" data-view="table" aria-pressed="false">Tabella</button>
-          <button class="chip" type="button" data-view="compare" aria-pressed="false">Confronta</button>
-          <button class="chip" type="button" data-view="stats" aria-pressed="false">Cruscotto</button>
-        </div>
         <button class="btn small" id="addapp" type="button">+ Aggiungi una candidatura</button>
-        <button class="btn light small" id="csv" type="button">Esporta per un foglio di calcolo</button>
-        <details class="share proofmenu"><summary class="btn light small">Prova della ricerca di lavoro</summary><div class="share-body"><div class="export"><button class="btn small" type="button" data-proof="month">Questo mese</button><button class="btn light small" type="button" data-proof="last">Mese scorso</button><button class="btn light small" type="button" data-proof="all">Tutto</button></div></div></details>
-        <button class="btn light small" id="backup" type="button">Salva in un file</button>
-        <button class="btn light small" id="restore" type="button">Apri un backup</button>
+        <details class="share proofmenu iomenu" id="iomenu"><summary class="btn light small">Importa / Esporta <span aria-hidden="true">▾</span></summary><div class="share-body io-body">
+          <p class="io-h">Esporta</p>
+          <button class="io-item" id="csv" type="button"><b>Tabella per Excel</b><small>Tutte le tue candidature, da aprire in un foglio di calcolo</small></button>
+          <div class="io-item io-proof"><b>Prova della ricerca di lavoro</b><small>Una pagina da stampare o salvare in PDF</small><span class="export"><button class="btn small" type="button" data-proof="month">Questo mese</button><button class="btn light small" type="button" data-proof="last">Mese scorso</button><button class="btn light small" type="button" data-proof="all">Tutto</button></span></div>
+          <button class="io-item" id="backup" type="button"><b>Backup completo</b><small>Un file con tutto il tuo monitoraggio, da conservare o per cambiare dispositivo</small></button>
+          <p class="io-h">Importa</p>
+          <button class="io-item" id="restore" type="button"><b>Apri un backup</b><small>Riprendi un monitoraggio salvato con «Backup completo»</small></button>
+        </div></details>
         <input type="file" id="restorefile" accept=".json,application/json" hidden>
       </div>
       <p class="notice" id="tracknokeep" hidden>Il tuo registro non è ancora conservato su questo dispositivo: sparirà quando chiudi la pagina. <button class="btn small" id="keepon" type="button">Conservalo su questo dispositivo</button></p>
@@ -336,11 +334,19 @@
   </div>
 </section>
 <div class="below" id="trackbelow" hidden style="--c: var(--orange)">
-  <div class="filters" role="group" aria-label="Filtro" id="trackfilters">
-    <button class="chip" type="button" data-tf="all" aria-pressed="true">Tutte <span id="tf-all"></span></button>
-    <button class="chip" type="button" data-tf="active" aria-pressed="false" style="--k: var(--yellow)">In corso <span id="tf-active"></span></button>
-    <button class="chip" type="button" data-tf="talk" aria-pressed="false" style="--k: var(--violet)">Colloqui <span id="tf-talk"></span></button>
-    <button class="chip" type="button" data-tf="done" aria-pressed="false" style="--k: var(--card)">Chiuse <span id="tf-done"></span></button>
+  <div class="track-tools">
+    <div class="seg" role="group" aria-label="Vista">
+      <button type="button" data-view="table" aria-pressed="true">Tabella</button>
+      <button type="button" data-view="cards" aria-pressed="false">Schede</button>
+      <button type="button" data-view="compare" aria-pressed="false">Confronta</button>
+      <button type="button" data-view="stats" aria-pressed="false">Statistiche</button>
+    </div>
+    <div class="filters" role="group" aria-label="Filtro" id="trackfilters">
+      <button class="chip" type="button" data-tf="all" aria-pressed="true">Tutte <span id="tf-all"></span></button>
+      <button class="chip" type="button" data-tf="active" aria-pressed="false" style="--k: var(--yellow)">In corso <span id="tf-active"></span></button>
+      <button class="chip" type="button" data-tf="talk" aria-pressed="false" style="--k: var(--violet)">Colloqui <span id="tf-talk"></span></button>
+      <button class="chip" type="button" data-tf="done" aria-pressed="false" style="--k: var(--card)">Chiuse <span id="tf-done"></span></button>
+    </div>
   </div>
   <div id="trackout"></div>
 </div>
@@ -368,6 +374,5 @@
 <script src="js/suivi.js"></script>
 <script src="js/outils.js"></script>
 <script src="js/confort.js"></script>
-<script src="js/demo.js"></script><!-- mode démo temporaire -->
 </body>
 </html>

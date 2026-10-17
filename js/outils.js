@@ -122,7 +122,7 @@ function askQs(o){
     if (miss("contract")) out.push(tr("Quel type de contrat est proposé, et pour combien de temps ?", "What kind of contract is it, and for how long?"));
     if (miss("hours")) out.push(tr("Quels sont les horaires et le temps de travail ?", "What are the hours and working time?"));
     if (miss("place")) out.push(tr("Où se trouve le lieu de travail ? Y a-t-il des déplacements ?", "Where is the workplace? Is there any travel?"));
-    if (!has("remote") && /informati|bureau|logiciel|donnees|digital|numerique|develop|comptab|administrati|software|office|data|developer|admin/.test(fold(o.text))) out.push(tr("Le télétravail est-il possible, même en partie ?", "Is remote work possible, even partly?"));
+    if (!has("remote") && LX("office", /informati|bureau|logiciel|donnees|digital|numerique|develop|comptab|administrati|software|office|data|developer|admin/).test(fold(o.text))) out.push(tr("Le télétravail est-il possible, même en partie ?", "Is remote work possible, even partly?"));
     if (!has("start")) out.push(tr("Quand le poste commence-t-il ?", "When does the job start?"));
     if (ad.flags.length) out.push(tr("Pouvez-vous me donner le nom et l'adresse exacts de l'entreprise ?", "Could you give me the company's exact name and address?"));
   }

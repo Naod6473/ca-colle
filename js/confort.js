@@ -23,7 +23,9 @@ function initComfort(){
     applyComfort(); pressed(); if (comfort[k]) stat("confort", {k});
     try { localStorage.setItem(COMFORT_KEY, JSON.stringify(comfort)); } catch {}
   });
-  document.addEventListener("click", e => { [menu, document.getElementById("langmenu")].forEach(m => { if (m?.open && !m.contains(e.target)) m.open = false; }); });
+  // Langue choisie à la main : plus de redirection automatique selon le navigateur
+  document.addEventListener("click", e => { const a = e.target.closest(".lang-menu a[hreflang]"); if (a) try { localStorage.setItem("cacolle-lang", a.hreflang); } catch {} });
+  document.addEventListener("click", e => { [menu, document.getElementById("langmenu"), document.getElementById("iomenu")].forEach(m => { if (m?.open && (!m.contains(e.target) || e.target.closest(".io-item > b, button.io-item"))) m.open = false; }); });
 
   // Écouter le résultat : synthèse vocale du navigateur, rien n'est envoyé par l'app
   const say = document.getElementById("listen");
