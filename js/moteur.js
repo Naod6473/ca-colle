@@ -42,8 +42,8 @@ const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
 const SECS = [
   ["exp", /^(experiences?( professionnelles?)?|parcours( professionnel)?|emplois?|postes? occupes|work experience|experience)$/],
   ["skills", /^(competences( cles| techniques)?|savoir[- ]faire|savoir[- ]etre|qualites|outils|informatique|langues|skills|atouts)$/],
-  ["edu", /^(formations?|diplomes?|etudes|scolarite|education|formation et diplomes|diplomes et formations)$/],
-  ["misc", /^(divers|loisirs|centres? d'interets?|informations?( complementaires)?|autres|interets|hobbies)$/]
+  ["edu", /^((formations?|diplomes?|certifications?)( et (formations?|diplomes?|certifications?))*|etudes|scolarite|education|cursus)$/],
+  ["misc", /^(divers|loisirs|centres? d'interets?|informations?( complementaires)?|autres|interets|hobbies|resume( professionnel)?|profil( professionnel)?|a propos( de moi)?|objectif professionnel)$/]
 ];
 function parseCV(text){
   const out = []; let kind = null, n = 0, named = false;
