@@ -236,6 +236,7 @@ ins { text-decoration: none; background: var(--green); padding: 0 3px; }
 @media (max-width: 900px) {
   .panel-inner, .rewrite { grid-template-columns: minmax(0, 1fr); }
   .preview { position: static; }
+  .letter, .cvdoc { max-height: none; }
 }
 @media (max-width: 560px) {
   .logo span { font-size: 22px; padding: 5px 10px 3px; }
@@ -259,3 +260,78 @@ ins { text-decoration: none; background: var(--green); padding: 0 3px; }
 .linkhelp { width: 100%; display: grid; gap: 8px; padding: 14px 16px; border: var(--line); background: var(--yellow); box-shadow: 4px 4px 0 var(--ink); }
 .linkhelp ol { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
 .linkhelp p { margin: 0; }
+
+/* Étape 1 : plusieurs offres, session revenue */
+.side { display: grid; gap: 18px; align-content: start; min-width: 0; }
+.resume { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 14px; padding: 12px 16px; border: var(--line); background: var(--green); box-shadow: 4px 4px 0 var(--ink); }
+#offersbox .box-head { background: var(--blue); }
+.offers { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.offers li { display: flex; gap: 6px; min-width: 0; }
+.offers li > button:first-child { flex: 1; min-width: 0; display: flex; justify-content: space-between; align-items: center; gap: 8px; text-align: left; padding: 8px 12px; border: 2px solid var(--ink); background: #fff; cursor: pointer; box-shadow: 2px 2px 0 var(--ink); }
+.offers li > button b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.offers li.on > button:first-child { background: var(--yellow); }
+.offers .score { flex: none; font: italic 900 13px var(--display); }
+.offers .del { flex: none; width: 36px; border: 2px solid var(--ink); background: #fff; cursor: pointer; font-weight: 900; }
+.offers .del:hover { background: var(--pink); }
+
+/* Étape 3 : étiquettes, mots, robot recruteur */
+.point-h { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.tag { font: italic 800 11px/1 var(--display); text-transform: uppercase; padding: 4px 8px; border: 2px solid var(--ink); border-radius: 999px; background: #fff; }
+.tag.must { background: var(--red); color: #fff; }
+.tag.nice { background: var(--blue); }
+.vocab { margin: 0; padding: 8px 10px; border-left: 4px solid var(--blue); background: #eef7ff; font-size: 14px; }
+.words, .ats { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.words li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.words span[class] { padding: 4px 10px; border: 2px solid var(--ink); font-weight: 700; overflow-wrap: anywhere; }
+.w-cv { background: #fff; text-decoration: line-through; text-decoration-color: var(--ink-soft); }
+.w-offer { background: var(--blue); }
+.ats li { display: grid; gap: 2px; padding: 10px 14px; border: 2px solid var(--ink); background: var(--ok-bg); }
+.ats li.ko { background: var(--no-bg); }
+.ats li.ok b span { color: var(--ok); }
+.ats li.ko b span { color: var(--no); }
+.ats li > span:not(.sr-only) { font-size: 14px; color: var(--ink-soft); }
+
+/* Étapes 4 et 5 : export et lettre */
+.export { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 18px; border-top: 2px dashed var(--ink); }
+.letter-form { display: grid; gap: 16px; align-content: start; min-width: 0; }
+.field { display: grid; gap: 6px; min-width: 0; margin: 0; padding: 0; border: 0; }
+.field label, .field legend { font: italic 900 14px/1.2 var(--display); text-transform: uppercase; padding: 0; margin-bottom: 6px; }
+.field input, .field textarea, .letteredit { width: 100%; padding: 10px 12px; border: var(--line); background: #fff; box-shadow: 3px 3px 0 var(--ink); }
+.field textarea, .letteredit { resize: vertical; }
+.strengths { display: grid; gap: 8px; }
+.str { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border: 2px solid var(--ink); background: #fff; cursor: pointer; }
+.str:has(input:checked) { background: var(--ok-bg); }
+.str input { margin-top: 4px; width: 18px; height: 18px; flex: none; }
+.str span { display: grid; min-width: 0; }
+.str small { color: var(--ink-soft); overflow-wrap: anywhere; }
+.below[data-for="5"] .preview .box-head { background: var(--violet); }
+.letter { display: grid; gap: 0; max-height: 70vh; overflow: auto; font-size: 15px; }
+.letter p { margin: 0 0 2px; }
+.letter p.gap { height: 10px; }
+mark.miss { background: var(--yellow); padding: 0 3px; border: 1px dashed var(--ink); }
+.letteredit { display: block; width: calc(100% - 36px); margin: 14px 18px; min-height: 380px; font-size: 15px; line-height: 1.5; }
+
+/* Pied de page */
+.foot-text { display: grid; gap: 10px; }
+.keep { display: flex; gap: 10px; align-items: center; font-weight: 700; cursor: pointer; }
+.keep input { width: 20px; height: 20px; flex: none; }
+.linkbtn { border: 0; background: none; padding: 0; color: inherit; text-decoration: underline; cursor: pointer; font-weight: 700; }
+
+/* Impression : seulement le CV ou la lettre */
+#printzone { display: none; }
+@media print {
+  body.printing > *:not(#printzone) { display: none !important; }
+  body.printing #printzone { display: block; }
+  body.printing { background: #fff; }
+  body.printing::before { display: none; }
+  @page { margin: 18mm; }
+  #printzone { font: 11pt/1.45 var(--body); color: #000; }
+  .p-cv .name { font: italic 900 20pt/1.1 var(--display); text-transform: uppercase; margin-bottom: 6pt; }
+  .p-cv .sec { margin: 12pt 0 4pt; font: italic 900 11pt/1 var(--display); text-transform: uppercase; border-bottom: 1.5pt solid #000; padding-bottom: 2pt; }
+  .p-cv p { margin: 0 0 3pt; }
+  .p-cv ins { text-decoration: none; background: none; }
+  .p-letter p { margin: 0 0 2pt; }
+}
+.field .str { font: 500 15px/1.35 var(--body); text-transform: none; margin: 0; }
+.str b { font-weight: 800; }
+.str small { font-size: 13px; }

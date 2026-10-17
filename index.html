@@ -24,6 +24,7 @@
     <button class="tab" role="tab" data-step="2" style="--c: var(--yellow)"><small>Étape 2</small><b>Ton CV</b></button>
     <button class="tab" role="tab" data-step="3" style="--c: var(--green)"><small>Étape 3</small><b>Le résultat</b></button>
     <button class="tab" role="tab" data-step="4" style="--c: var(--pink)"><small>Étape 4</small><b>Améliorer mon CV</b></button>
+    <button class="tab" role="tab" data-step="5" style="--c: var(--violet)"><small>Étape 5</small><b>Ma lettre</b></button>
   </nav>
 </header>
 <span id="contenu" tabindex="-1"></span>
@@ -33,7 +34,8 @@
 <section class="panel" data-p="1" style="--c: var(--blue); --shadow: var(--orange)">
   <div class="panel-inner">
     <div class="main-col">
-      <span class="label">Étape 1 sur 4</span>
+      <div class="resume" id="resume" hidden><b>Ta session est revenue.</b> <span id="resumetxt"></span> <button class="btn light small" id="wipe2" type="button">Tout effacer</button></div>
+      <span class="label">Étape 1 sur 5</span>
       <h1 class="big">Colle l'offre</h1>
       <p class="lede">Copie le texte de l'annonce qui t'intéresse et colle-le ici, ou joins-la en fichier.</p>
       <label class="sr-only" for="offer">Texte de l'annonce</label>
@@ -60,6 +62,11 @@
         <span class="hint" id="hint1">Colle au moins quelques lignes de l'annonce.</span>
       </div>
     </div>
+    <div class="side">
+    <aside class="box" id="offersbox" hidden>
+      <div class="box-head">Mes offres <button type="button" id="newoffer">+ Nouvelle offre</button></div>
+      <div class="box-body"><ul class="offers" id="offers"></ul><p class="hint">Ton CV reste le même : compare-le à plusieurs offres.</p></div>
+    </aside>
     <aside class="box">
       <div class="box-head">Comment ça marche</div>
       <div class="box-body">
@@ -68,11 +75,13 @@
           <li><b>Tu ajoutes ton CV</b> : PDF, Word ou photo.</li>
           <li><b>Tu vois ce qui colle</b>, ce qui manque et ce qu'il faut prouver.</li>
           <li><b>Tu améliores ton CV</b> avec des phrases à compléter.</li>
+          <li><b>Tu prépares ta lettre</b> de motivation à partir de tes points forts.</li>
         </ol>
         <p class="safe">Ton CV ne quitte jamais ton appareil : tout est lu dans ton navigateur.</p>
         <button class="btn light wide" id="demo" type="button">Essayer avec un exemple</button>
       </div>
     </aside>
+    </div>
   </div>
 </section>
 
@@ -80,7 +89,7 @@
 <section class="panel" data-p="2" hidden style="--c: var(--yellow); --shadow: var(--blue)">
   <div class="panel-inner">
     <div class="main-col">
-      <span class="label">Étape 2 sur 4</span>
+      <span class="label">Étape 2 sur 5</span>
       <h1 class="big">Ajoute ton CV</h1>
       <p class="lede">Glisse ton fichier ou choisis-le. On en lit le texte ici même, rien n'est envoyé ni gardé.</p>
       <label class="drop" id="drop" for="file">
@@ -128,7 +137,7 @@
 <section class="panel" data-p="3" hidden style="--c: var(--green); --shadow: var(--yellow)">
   <div class="panel-inner">
     <div class="main-col">
-      <span class="label">Étape 3 sur 4 · le résultat</span>
+      <span class="label">Étape 3 sur 5 · le résultat</span>
       <h1 class="big"><span id="pct">0</span> % <small id="verdict">ça colle</small></h1>
       <p class="lede" id="sum"></p>
       <div class="filters" role="group" aria-label="Afficher">
@@ -137,6 +146,7 @@
         <button class="chip" data-f="mid" aria-pressed="false" style="--k: var(--yellow)">? À préciser <span id="n-mid"></span></button>
         <button class="chip" data-f="ok" aria-pressed="false" style="--k: #fff">✓ Ça colle <span id="n-ok"></span></button>
       </div>
+      <button class="btn light small" id="compare" type="button">Comparer avec une autre offre</button>
     </div>
     <aside class="box">
       <div class="box-head">À faire en premier</div>
@@ -157,7 +167,7 @@
 <section class="panel" data-p="4" hidden style="--c: var(--pink); --shadow: var(--violet)">
   <div class="panel-inner">
     <div class="main-col">
-      <span class="label">Étape 4 sur 4</span>
+      <span class="label">Étape 4 sur 5</span>
       <h1 class="big">Améliore ton CV</h1>
       <p class="lede">Pour chaque point, complète la phrase avec tes vrais chiffres, puis clique sur « Ajouter ».</p>
       <p class="promise"><b>On n'invente rien à ta place.</b> Une ligne n'entre dans ton CV que si tu la complètes toi-même.</p>
@@ -176,24 +186,75 @@
   <div class="rewrite">
     <div class="sugs" id="sugs"></div>
     <aside class="box preview">
-      <div class="box-head">Ton nouveau CV <button type="button" id="copy">Copier le texte</button></div>
+      <div class="box-head">Ton nouveau CV</div>
       <div class="box-body cvdoc" id="cv4"></div>
-      <p class="preview-foot"><ins>Surligné</ins> = tes ajouts. Recopie-les dans ton fichier Word ou PDF.</p>
+      <div class="export">
+        <button class="btn small" type="button" data-dl="cv-docx">Télécharger en Word</button>
+        <button class="btn light small" type="button" data-dl="cv-pdf">En PDF</button>
+        <button class="btn light small" type="button" data-dl="cv-copy">Copier le texte</button>
+      </div>
+      <p class="preview-foot"><ins>Surligné</ins> = tes ajouts. Le fichier Word reprend le texte : remets ensuite ta mise en page si tu veux.</p>
+    </aside>
+  </div>
+  <div class="next-row"><button class="btn" data-go="5">Étape suivante : ma lettre →</button></div>
+</div>
+
+<!-- ============ 5. MA LETTRE ============ -->
+<section class="panel" data-p="5" hidden style="--c: var(--violet); --shadow: var(--yellow)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <span class="label">Étape 5 sur 5</span>
+      <h1 class="big">Ta lettre</h1>
+      <p class="lede">On prépare ta lettre de motivation avec les points forts trouvés dans ton CV. Complète les cases, la lettre s'écrit à côté.</p>
+      <p class="promise"><b>Toujours rien d'inventé :</b> la lettre ne reprend que ce qui est écrit dans ton CV et ce que tu tapes ici.</p>
+    </div>
+    <aside class="box">
+      <div class="box-head">Conseil</div>
+      <div class="box-body"><p>Une bonne lettre tient en une page : pourquoi ce poste, ce que tu sais déjà faire (avec des exemples), et quand tu es disponible.</p></div>
+    </aside>
+  </div>
+</section>
+<div class="below" data-for="5" hidden style="--c: var(--violet)">
+  <div class="rewrite">
+    <form class="letter-form" id="lform" autocomplete="on">
+      <div class="field"><label for="l-name">Ton nom</label><input id="l-name" autocomplete="name"></div>
+      <div class="field"><label for="l-contact">Ton email et ton téléphone</label><input id="l-contact"></div>
+      <div class="field"><label for="l-company">Nom de l'entreprise</label><input id="l-company" placeholder="ex : Normandie Distribution"></div>
+      <div class="field"><label for="l-job">Intitulé du poste</label><input id="l-job"></div>
+      <div class="field"><label for="l-why">Pourquoi ce poste ou cette entreprise ?</label><textarea id="l-why" rows="3" placeholder="ex : J'aime le travail en équipe et votre entrepôt est à 10 minutes de chez moi."></textarea></div>
+      <fieldset class="field"><legend>Tes points forts à mettre en avant</legend><div id="l-strengths" class="strengths"></div></fieldset>
+      <div class="field"><label for="l-when">Quand es-tu disponible ?</label><input id="l-when" placeholder="ex : dès maintenant"></div>
+    </form>
+    <aside class="box preview">
+      <div class="box-head">Ta lettre <button type="button" id="l-edit">Modifier le texte</button></div>
+      <div class="box-body letter" id="letter"></div>
+      <textarea id="letteredit" class="letteredit" hidden aria-label="Texte de la lettre"></textarea>
+      <div class="export">
+        <button class="btn small" type="button" data-dl="l-docx">Télécharger en Word</button>
+        <button class="btn light small" type="button" data-dl="l-pdf">En PDF</button>
+        <button class="btn light small" type="button" data-dl="l-copy">Copier le texte</button>
+      </div>
     </aside>
   </div>
 </div>
 </main>
+<div id="printzone" aria-hidden="true"></div>
 
 <footer class="foot">
   <div class="foot-inner">
     <h2>Rien n'est envoyé.</h2>
-    <p>Ton CV et l'offre restent dans ton navigateur. Aucun compte, aucune donnée gardée.<br><small>Une app de <a href="https://portfolio.pissits.com/">Simon Victor</a>.</small></p>
+    <div class="foot-text">
+      <p>Ton CV et l'offre restent dans ton navigateur. Aucun compte, rien sur un serveur.</p>
+      <label class="keep"><input type="checkbox" id="keep"> Garder ma session sur cet appareil pour revenir plus tard</label>
+      <p><button type="button" class="linkbtn" id="wipe">Effacer mes données de cet appareil</button> · <small>Une app de <a href="https://portfolio.pissits.com/">Simon Victor</a>.</small></p>
+    </div>
   </div>
 </footer>
 <div class="toast" id="toast" role="status" hidden></div>
 
 <script src="js/lecteur.js"></script>
 <script src="js/moteur.js"></script>
+<script src="js/export.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
