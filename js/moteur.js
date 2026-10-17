@@ -95,8 +95,8 @@ const LEX = [
   ["Diplôme d'aide-soignant", "aide[- ]soignant\\w*|\\bdeas\\b", "l", "obtenu en 2021"],
   ["Soins infirmiers", "infirmi(er|ere)s?|\\bide\\b", "l", "diplôme d'État 2019"],
   // Restauration, hôtellerie, propreté
-  ["Service en salle", "service en salle|serveu(r|se)|prise de commandes?|service au plateau|chef de rang|runner", "t", "service de 60 couverts"],
-  ["Cuisine", "cuisine|cuisinier|cuisiniere|\\bcommis\\b|mise en place|preparation culinaire", "t", "mise en place pour 80 couverts"],
+  ["Service en salle", "service en salle|\\bserveuse\\b|\\bserveur ?(\\/|\\()|serveur de restaurant|serveur en (salle|restauration)|prise de commandes? en salle|service au plateau|chef de rang|\\brunner\\b", "t", "service de 60 couverts"],
+  ["Cuisine", "\\bcuisine\\b|cuisinier|cuisiniere|\\bcommis\\b|mise en place (en cuisine|des plats)|preparation culinaire", "t", "mise en place pour 80 couverts"],
   ["Règles d'hygiène (HACCP)", "haccp|hygiene alimentaire|normes d'hygiene|regles d'hygiene", "l", "formation HACCP 2022"],
   ["Plonge", "\\bplonge\\b|plongeu(r|se)|vaisselle", "t", "plonge pour 100 couverts"],
   ["Bar", "\\bbar\\b|barman|barmaid|barista|cocktails?", "t", "préparation des boissons chaudes"],
@@ -106,7 +106,7 @@ const LEX = [
   ["Lecture de plans", "lecture de plans?|lire (un |des |les )?plans?|plans techniques", "o", "plans d'exécution sur chantier"],
   ["Habilitation électrique", "habilitations? electriques?|\\bb0\\b|\\bh0v?\\b|\\bbr\\b|\\bb1v?\\b|\\bb2v?\\b", "l", "B1V, 2024"],
   ["Électricité", "electricit\\w*|electricien|cablage|tableaux? electriques?", "t", "câblage de tableaux électriques"],
-  ["Plomberie et chauffage", "plomb\\w*|sanitaires?|chauffagiste|chauffage", "t", "installation de salles de bain"],
+  ["Plomberie et chauffage", "plomb\\w*|installations? sanitaires?|chauffagiste|chauffage", "t", "installation de salles de bain"],
   ["Maçonnerie", "maconn\\w*|coffrage|beton|gros oeuvre", "t", "coffrage et coulage de dalles"],
   ["Peinture", "peintre|peinture|enduits?", "t", "rénovation de 10 appartements"],
   ["Travail en hauteur", "travail en hauteur|nacelles?|echafaudages?|harnais", "l", "CACES nacelle R486, 2023"],
@@ -114,7 +114,7 @@ const LEX = [
   ["Conduite de machines", "conduite de (machines?|lignes?|production)|operat(eur|rice) de production|regleu(r|se)|commande numerique", "t", "conduite d'une ligne de conditionnement"],
   ["Soudure", "soudu\\w*|soudeu(r|se)|souder", "t", "soudure MIG et TIG"],
   ["Maintenance", "\\bmaintenance|\\bdepannage|\\breparation", "t", "maintenance préventive de 20 machines"],
-  ["Mécanique", "mecani\\w*", "t", "entretien de véhicules légers"],
+  ["Mécanique", "mecanique|mecanicien\\w*", "t", "entretien de véhicules légers"],
   // Bureau, administratif
   ["Accueil téléphonique", "accueil telephonique|standard telephonique|standardiste|appels? telephoniques?|au telephone", "t", "50 appels par jour", "telephon|standard|appels?"],
   ["Pack Office", "pack office|microsoft office|suite office|office 365|microsoft 365|\\bword\\b|powerpoint|outlook", "o", "courriers sur Word, mails sur Outlook"],
@@ -122,7 +122,7 @@ const LEX = [
   ["Outils informatiques", "outils? informatiques?|bureautique|maitrise de l'informatique", "o", "Word, mails, tableaux simples", "informatique|bureautique|\\bword\\b|excel|tableur|office|ordinateur|logiciels?"],
   ["Saisie de données", "saisie|encodage", "t", "saisie des bons de livraison"],
   ["Gestion d'agenda", "gestion (de l'|d'|des |du )?(agendas?|plannings?)|prise de rendez-vous|rendez-vous", "t", "agenda de 3 médecins"],
-  ["Rédaction de courriers", "courriers?|redaction|redig\\w*|comptes? rendus?", "t", "courriers aux clients"],
+  ["Rédaction de courriers", "courriers?|redaction de (courriers|lettres|comptes? rendus)|comptes? rendus?", "t", "courriers aux clients"],
   ["Facturation", "factur\\w*|devis|relances?", "t", "100 factures par mois"],
   ["Comptabilité", "comptab\\w*|rapprochement bancaire|ecritures comptables", "t", "saisie des écritures"],
   ["Paie", "\\bpaie\\b|bulletins? de salaire", "t", "paie de 40 salariés"],
@@ -130,18 +130,35 @@ const LEX = [
   ["Logiciel de gestion (ERP)", "\\bsap\\b|\\berp\\b|\\bsage\\b|cegid|\\bebp\\b", "o", "SAP, commandes et stocks"],
   ["Recrutement", "recrutement|recruter|ressources humaines|\\brh\\b", "t", "20 recrutements par an"],
   // Informatique
-  ["Support utilisateurs", "support (aux |des )?utilisateurs|assistance (aux |des )?utilisateurs|helpdesk|hotline|\\bn1\\b|\\bn2\\b|niveau [12]", "t", "30 tickets par jour"],
+  ["Support utilisateurs", "support (aux |des |a l'|de proximite )?utilisateurs?|assistance (aux |des )?utilisateurs?|helpdesk|hotline|\\bn1\\b|\\bn2\\b|niveau [12]|support informatique", "t", "30 tickets par jour", "support (aux |des |a l'|de proximite )?utilisateurs?|support de [\\d ]+ utilisateurs|assistance (aux |des )?utilisateurs?|helpdesk|hotline|\\bn1\\b|\\bn2\\b|niveau [12]|support informatique|support vip|\\bsupport\\b"],
   ["Windows", "windows", "o", "installation de postes Windows 11"],
   ["Linux", "linux|debian|ubuntu", "o", "serveurs Debian"],
-  ["Réseaux informatiques", "reseaux? informatiques?|\\btcp\\b|vlan|switch\\w*|routeurs?|\\bwi-?fi\\b|administration reseau", "o", "VLAN et switchs d'un site de 50 postes"],
+  ["Réseaux informatiques", "reseaux? informatiques?|equipements? reseaux?|reseaux et systemes|systemes et reseaux|\\blan\\b|\\bwan\\b|\\btcp\\b|vlan|switch\\w*|routeurs?|\\bwi-?fi\\b|administration reseau", "o", "VLAN et switchs d'un site de 50 postes"],
   ["Active Directory", "active directory|\\bgpo\\b|azure ad|entra id", "o", "comptes et droits de 300 utilisateurs"],
-  ["Cybersécurité", "cyber\\w*|securite informatique|pare-feu|firewall|antivirus|\\bedr\\b|\\brgpd\\b", "o", "mise en place d'un pare-feu"],
+  ["Cybersécurité", "cyber\\w*|securite informatique|pare-feu|firewall|antivirus|\\bedr\\b", "o", "mise en place d'un pare-feu"],
+  ["Administration des serveurs", "administr\\w* (et maintenir )?(les |des )?(serveurs?|systemes?)|administration systemes?|windows server|serveurs? (windows|linux)", "t", "15 serveurs Windows et Linux", "serveurs?|windows server|administration (systemes?|de l'active directory|du tenant)|vmware|hyper-v|proxmox"],
+  ["Virtualisation", "virtualis\\w*|vmware|hyper-v|proxmox|vsphere", "o", "VMware, 20 machines virtuelles"],
+  ["Sauvegardes et restauration", "sauvegardes?|backups?|restauration (des |de )?donnees|operations de restauration|veeam", "t", "sauvegarde quotidienne de 10 serveurs", "sauvegardes?|backups?|restauration|veeam|\\bpra\\b"],
+  ["Supervision", "supervis\\w*|monitoring|zabbix|centreon|nagios|\\bprtg\\b", "t", "supervision de 50 équipements"],
+  ["Gestion des incidents (ITIL)", "\\bitil\\b|\\bitsm\\b|gestion des incidents|incidents? (materiels|systemes|reseaux|informatiques)|tickets?", "t", "30 tickets par jour", "\\bitil\\b|\\bitsm\\b|incidents?|tickets?|glpi|support"],
+  ["Comptes et droits d'accès", "comptes? utilisateurs?|droits d'acces|controle d'acces|gestion des acces|habilitations? (informatiques|utilisateurs)", "t", "comptes et droits de 300 utilisateurs", "comptes? utilisateurs?|droits d'acces|controle d'acces|active directory|entra|\\bgpo\\b|\\bmfa\\b"],
+  ["Déploiement de logiciels", "deploi\\w* (et faire evoluer )?(des |de |les )?(logiciels?|applications?|postes?|solutions?)|deployer (et faire evoluer )?(les |des )?(logiciels?|applications?)|intune|\\bsccm\\b|masteris\\w*", "t", "déploiement de 300 postes", "deploi\\w*|deployer|intune|\\bsccm\\b|masteris\\w*"],
+  ["Gestion de parc", "gestion (de |du )?parc|parc informatique|\\bglpi\\b", "t", "parc de 500 postes"],
+  ["Documentation technique", "documentation (technique|informatique)|redig\\w* (et maintenir )?(la )?documentation|procedures? techniques?", "t", "procédures pour l'équipe support", "documentation|procedures?|wiki"],
+  ["Veille technologique", "veille (technologique|technique)|veille", "t", "veille sécurité chaque semaine"],
+  ["Relation avec les prestataires", "prestataires?|editeurs? (de logiciels)?|fournisseurs?|sous-traitants?", "t", "suivi de 10 prestataires"],
+  ["Politique de sécurité (PSSI)", "politique de (cyber)?securite|politiques de securite|\\bpssi\\b", "t", "rédaction de la PSSI", "politique de (cyber)?securite|politiques de securite|\\bpssi\\b|nis ?2|\\banssi\\b"],
+  ["Conformité (RGPD, NIS2…)", "\\brgpd\\b|conformite (reglementaire|rgpd)|\\bhds\\b|nis ?2|iso ?27001", "l", "mise en conformité NIS2", "\\brgpd\\b|conformite|\\bhds\\b|nis ?2|iso ?27001"],
+  ["Sensibilisation des utilisateurs", "sensibilis\\w*", "t", "sensibilisation de 300 agents"],
+  ["Continuité d'activité (PCA/PRA)", "\\bpca\\b|\\bpra\\b|continuite d'activite|reprise d'activite|plan de continuite", "t", "PRA testé chaque année"],
+  ["Gestion de crise", "gestion (de |des )?(la )?crises?|situations? de crise|cellule de crise", "t", "cellule de crise lors d'une cyberattaque"],
+  ["Transformation numérique", "transformation (numerique|digitale)|digitalisation|dematerialis\\w*|outils numeriques", "t", "dématérialisation des factures", "transformation (numerique|digitale)|digitalis\\w*|dematerialis\\w*|numerique|modernisation"],
   ["Python", "python", "o", "scripts d'automatisation"],
   ["JavaScript", "javascript|typescript|\\breact\\b|node\\.?js", "o", "site web en React"],
   ["HTML / CSS", "\\bhtml\\d?\\b|\\bcss\\d?\\b", "o", "pages web responsive"],
   ["SQL", "\\bsql\\b|mysql|postgre\\w*|bases? de donnees", "o", "requêtes sur une base clients"],
   ["Cloud", "\\bcloud\\b|\\bazure\\b|\\baws\\b", "o", "migration vers Microsoft 365"],
-  ["Gestion de projet", "gestion de projets?|chef de projets?|pilotage de projets?|conduite de projets?", "t", "projet de 6 mois, 3 personnes"],
+  ["Gestion de projet", "gestion de projets?|chefs? de projets?|pilot\\w* (de |des )?projets?|conduite de projets?|participer (aux|au) (deploiement des )?projets?|projets? informatiques?", "t", "projet de 6 mois, 3 personnes", "gestion de projets?|chefs? de projets?|pilot\\w* (de |des )?projets?|conduite de projets?|projets?"],
   ["Management d'équipe", "management|manag(er|eur)|encadr\\w*|chef d'equipe|responsable d'equipe|animer (une |l')equipe", "t", "équipe de 5 personnes"],
   // Qualités et conditions, tous métiers
   ["Permis B", "permis b\\b|permis de conduire|permis vl", "l", "depuis 2018", "permis b\\b|permis de conduire|permis vl|vehicule"],
@@ -242,9 +259,9 @@ function cvYears(text){
 }
 
 /* ---------- Mots importants d'une ligne de l'offre qui n'est pas dans le lexique ---------- */
-const STOP = new Set(("le la les un une des du de d l au aux et ou en a dans sur pour par avec sans sous chez vers entre ce cet cette ces son sa ses leur leurs votre vos notre nos vous nous il elle ils elles on qui que quoi dont est sont etre avoir sera serez etes avez ont fait faire tout tous toute toutes tres plus moins bien bon bonne bonnes bons poste postes missions mission profil recherche recherchons recherche h f h/f cdi cdd temps plein partiel salaire experience experiences ans annee annees minimum maximum souhaite souhaitee apprecie appreciee requis requise exige exigee indispensable obligatoire capacite capacites savoir connaissance connaissances maitrise maitriser assurer assurez participer participez realiser realisez effectuer effectuez gerer gerez etc ainsi selon afin lors type idealement equivalent similaire premiere premier divers diverses ensemble differentes differents").split(" "));
+const STOP = new Set(("le la les un une des du de d l au aux et ou en a dans sur pour par avec sans sous chez vers entre ce cet cette ces son sa ses leur leurs votre vos notre nos vous nous il elle ils elles on qui que quoi dont est sont etre avoir sera serez etes avez ont fait faire tout tous toute toutes tres plus moins bien bon bonne bonnes bons poste postes missions mission profil recherche recherchons recherche h f h/f cdi cdd temps plein partiel salaire experience experiences ans annee annees minimum maximum souhaite souhaitee apprecie appreciee requis requise exige exigee indispensable obligatoire capacite capacites savoir connaissance connaissances maitrise maitriser assurer assurez participer participez realiser realisez effectuer effectuez gerer gerez etc ainsi selon afin lors type idealement equivalent similaire premiere premier divers diverses ensemble differentes differents garantir mettre oeuvre intervenir contribuer veiller cadre").split(" "));
 const tokens = s => [...new Set(fold(s).split(/[^a-z0-9+#]+/).filter(w => w.length >= 4 && !STOP.has(w)).map(w => w.slice(0, 6)))];
-const NOT_SKILL = /salaire|remuneration|€|euros?|\bcdi\b|\bcdd\b|contrat|temps (plein|partiel)|avantages|mutuelle|tickets? resto|primes?|postuler|candidature|envoy|\bcv\b|lieu de travail|poste base|prise de poste|date de debut|horaires? :|rejoignez|nous sommes|notre (entreprise|societe|groupe)|entreprise de|leader|\bdes que possible\b/;
+const NOT_SKILL = /salaire|remuneration|€|euros?|\bcdi\b|\bcdd\b|contrat|temps (plein|partiel)|avantages|mutuelle|tickets? resto|primes?|postuler|candidature|envoy|\bcv\b|lieu de travail|poste base|prise de poste|date de debut|horaires? :|rejoignez|nous sommes|notre (entreprise|societe|groupe)|entreprise de|leader|\bdes que possible\b|vous aurez|principales missions|en lien direct/;
 
 const DIPLOMA = /\b(cap|bep|bac ?\+ ?\d|bac pro|bac|bts|dut|but|licence|master|titre professionnel|diplome d'etat)\b/;
 
@@ -254,7 +271,8 @@ function analyse(offer){
   const expTxt = lines.filter(l => l.exp).map(l => l.raw).join("\n"), allTxt = lines.filter(l => l.raw).map(l => l.raw).join("\n");
   const E = fold(expTxt), A = fold(allTxt);
   const lineAt = i => { const a = O.lastIndexOf("\n", i) + 1, b = O.indexOf("\n", i); return O.slice(a, b < 0 ? O.length : b); };
-  const weight = i => { const l = lineAt(i); return /indispensable|exige|obligatoire|imperati|requis/.test(l) ? "must" : /apprecie|un plus|souhait|serait un|idealement|atout/.test(l) ? "nice" : ""; };
+  const clauseAt = i => { const l = O.slice(0, i).search(/[^,;.\n:]*$/), m = O.slice(i).search(/[,;.\n]/); return O.slice(l, m < 0 ? O.length : i + m); };
+  const weight = i => { const l = clauseAt(i); return /indispensable|exige|obligatoire|imperati|requis/.test(l) ? "must" : /apprecie|un plus|souhait|serait un|idealement|atout/.test(l) ? "nice" : ""; };
   const out = [];
 
   // Points du lexique
@@ -284,9 +302,13 @@ function analyse(offer){
   }
 
   // Lignes à puces de l'offre que le lexique ne connaît pas : on compare leurs mots importants
+  // Sans puces (annonce copiée d'un site), on prend les lignes courtes qui se suivent : c'est une liste.
   let generic = 0;
-  offer.split("\n").forEach((raw, idx, all) => {
-    if (generic >= 8 || !/^\s*[-•●▪◦*–·✓✔>]/.test(raw)) return;
+  const BUL = /^\s*[-•●▪◦*–·✓✔>]/, rows = offer.split("\n"), useBullets = rows.filter(l => BUL.test(l)).length >= 3;
+  const short = l => { const t = (l || "").trim(); return t.length >= 12 && t.length <= 160 && !/:\s*$/.test(t); };
+  const listy = i => short(rows[i]) && (short(rows[i - 1]) || short(rows[i + 1]));
+  rows.forEach((raw, idx) => {
+    if (generic >= 15 || !(useBullets ? BUL.test(raw) : listy(idx))) return;
     const line = raw.replace(/^\s*[-•●▪◦*–·✓✔>]+\s*/, "").replace(/[.;]+$/, "").trim(), F = fold(line);
     if (line.length < 6 || line.length > 120 || NOT_SKILL.test(F) || LEX.some(d => d.o.test(F)) || /\d+\s*ans?\b/.test(F) || DIPLOMA.test(F)) return;
     const tk = tokens(line); if (tk.length < 1) return;
