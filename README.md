@@ -27,6 +27,7 @@ Tout se passe dans le navigateur : le CV ne quitte jamais l'appareil de la perso
 - `cvCheck` (`js/moteur.js`) : « Relecture du CV » à l'étape 4 (fautes fréquentes corrigeables en un clic, verbes faibles, phrases trop longues, expériences sans chiffre, « je » répété).
 - Bilan à partager (étape 3) : résumé pour un conseiller ou un proche, en PDF, Word, texte ou mail. Pas de lien de partage : il faudrait un serveur.
 - `js/confort.js` : mode confort (texte plus gros, contraste fort, moins d'animations ; réglage gardé sur l'appareil) et « Écouter le résultat » avec la voix du navigateur.
+- `js/demo.js` (temporaire) : mode démo pour les tests. Taper « démo » hors d'un champ, l'écrire seul dans la case de l'offre, ou ouvrir `?demo` : profil fictif de Maurice MARCEL (ingénieur informatique), 5 offres, 7 candidatures, lettre, préparation d'entretien. À retirer avec sa ligne `<script>` et son entrée dans `sw.js`.
 - `manifest.webmanifest`, `sw.js`, `icons/` : app installable sur téléphone et utilisable sans réseau après la première visite.
 - `tests/` : banc de test (offres et CV fictifs, résultats attendus). `node tests/run.js` (ou `node tests/run.js en`), ou ouvrir `/tests/` dans le navigateur. À lancer après chaque changement du moteur.
 - Session : rien n'est gardé par défaut. Si la case du pied de page est cochée, le CV, les offres et les réponses restent dans le navigateur (localStorage) ; un bouton efface tout.

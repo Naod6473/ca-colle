@@ -421,7 +421,7 @@ mark.miss { background: var(--yellow); padding: 0 3px; border: 1px dashed var(--
 #trackout, #trackbelow { min-width: 0; max-width: 100%; }
 .tablewrap { max-width: 100%; contain: paint; }
 .todo .linkbtn { text-align: left; }
-@media (max-width: 560px) { #track .big { font-size: clamp(30px, 9.5vw, 60px); } }
+@media (max-width: 560px) { #track .big { font-size: clamp(30px, 9.5vw, 60px) !important; } }
 #trackbelow { grid-template-columns: minmax(0, 1fr); }
 
 /* L'annonce en bref */
@@ -475,3 +475,4 @@ html.c-contrast .hint, html.c-contrast small { color: #000; opacity: 1; }
 html.c-calm *, html.c-calm *::before { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
 .pill-comfort { text-transform: none; }
 @media (max-width: 560px) { .top-actions { flex-wrap: wrap; gap: 8px; min-width: 0; } .top-actions .pill { padding: 8px 12px; } .comfort-menu { position: fixed; top: auto; left: 16px; right: 16px; width: auto; } }
+#track .big { font-size: clamp(30px, 6.2vw, 84px); }
