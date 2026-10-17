@@ -21,7 +21,7 @@ function toast(t){ const el = $("#toast"); el.textContent = t; el.hidden = false
 
 /* ---------- Offres ---------- */
 const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-const titleOf = t => { const l = (t.split("\n").find(x => x.trim()) || tr("Offre", "Offer")).trim().replace(/\s*\((exemple fictif|sample offer)\)/i, ""); return l.length > 60 ? l.slice(0, 57) + "…" : l; };
+const titleOf = t => { const l = (t.split("\n").find(x => x.trim()) || tr("Offre", "Offer")).trim().replace(/\s*\((exemple fictif|sample offer)\)/i, "").replace(L10N?.re?.sample ? new RegExp(L10N.re.sample, "i") : /$^/, ""); return l.length > 60 ? l.slice(0, 57) + "…" : l; };
 function newOffer(text = ""){ cur = {id: newId(), text, fixes: {}, over: {}, letter: {}}; fixes = cur.fixes; over = cur.over; offers.push(cur); }
 function syncOffer(){
   if (!cur) newOffer();
@@ -242,7 +242,7 @@ const cvHTML = withIns => cvLines(withIns).map(l => l.name ? (([n, r]) => `<div 
 const cvText = () => cvLines(false).map(l => l.name ? l.t : l.sec ? "\n" + l.sec.toUpperCase() : l.raw).join("\n").trim();
 const refresh = () => { results = analyse($("#offer").value); renderRewrite(); save(); };
 const personName = () => (CV.find(l => l.name)?.t || "").split(/\s[·|–-]\s|,|·/)[0].trim();
-const fileBase = s => (s || "Mon").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^\w]+/g, "_").replace(/^_|_$/g, "");
+const fileBase = s => (s || tr("Mon", "My")).normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^\w]+/g, "_").replace(/^_|_$/g, "");
 
 /* ---------- Étape 5 : la lettre ---------- */
 function prefillLetter(){
@@ -251,7 +251,7 @@ function prefillLetter(){
   const top = all.slice(0, 300), tel = top.match(/(\+33|0)\s*[1-9](?:[\s.-]*\d{2}){4}/) || top.match(/(\+\d{1,3}\s?)?\(?0?\d{3,5}\)?[\s.-]?\d{3}[\s.-]?\d{3,4}/);
   if (!me.contact) me.contact = [all.match(/[\w.+-]+@[\w-]+\.[a-z.]{2,}/i)?.[0], tel?.[0]].filter(Boolean).join(" · ");
   const L = cur.letter;
-  if (L.job === undefined) L.job = titleOf($("#offer").value).split(/\s+[–-]\s+/)[0].replace(/\s*\(h\s*\/\s*f\)|\s*h\s*\/\s*f\b/ig, "").trim();
+  if (L.job === undefined) L.job = titleOf($("#offer").value).split(/\s+[–-]\s+/)[0].replace(GENDER, "").trim();
   if (!L.strengths) L.strengths = results.filter(r => r.st === "ok" && r.type !== "y" && r.type !== "h").slice(0, 3).map(r => r.k);
   return head;
 }
@@ -428,7 +428,7 @@ async function useOfferFile(f){
     toast(tr("Offre lue", "Offer read"));
     if (r.conf && r.conf < 75) { $("#oerr").textContent = tr("La capture n'était pas très nette : relis le texte de l'offre avant de continuer.", "The screenshot was not very sharp: check the offer text before going on."); $("#oerr").hidden = false; }
   } catch (e) {
-    $("#oerr").textContent = (e.message || tr("Je n'ai pas réussi à lire ce fichier.", "I could not read this file.")).replace(/ton CV/g, "l'offre").replace(/your CV/g, "the offer");
+    $("#oerr").textContent = (e.message || tr("Je n'ai pas réussi à lire ce fichier.", "I could not read this file.")).replace(/ton CV/g, "l'offre").replace(/your CV/g, "the offer").replace(L10N?.re?.cvWord ? new RegExp(L10N.re.cvWord, "g") : /$^/, L10N?.re?.offerWord || "");
     $("#oerr").hidden = false;
   } finally { $("#ojob").hidden = true; $("#offerfile").value = ""; }
 }

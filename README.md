@@ -15,11 +15,13 @@ Tout se passe dans le navigateur : le CV ne quitte jamais l'appareil de la perso
 ## État actuel
 
 - `index.html` + `css/app.css` : les 5 étapes, au style de l'accueil du portfolio (classeur coloré, une couleur par étape). On n'avance que quand l'étape d'avant est remplie ; « Essayer avec un exemple » remplit tout avec des données fictives.
-- `js/lecteur.js` : lecture du CV ou de l'offre dans le navigateur. PDF (pdf.js), Word `.docx` et `.odt` (petit lecteur ZIP intégré), texte, photo ou PDF scanné (OCR Tesseract, français et anglais).
+- `js/lecteur.js` : lecture du CV ou de l'offre dans le navigateur. PDF (pdf.js), Word `.docx` et `.odt` (petit lecteur ZIP intégré), texte, photo ou PDF scanné (OCR Tesseract : français et anglais, ou la langue de la page et l'anglais).
 - `js/moteur.js` : dictionnaire tous métiers (compétences, savoir-être, permis, horaires, langues, diplômes, années d'expérience) plus repérage des autres lignes de l'annonce, comparaison avec le CV, phrases à trous, mots de l'annonce, test robot recruteur.
 - `js/export.js` : fabrique le fichier Word (.docx) dans le navigateur, impression PDF, copie.
 - `js/app.js` : l'interface, les offres multiples, la lettre, la session gardée, « Pourquoi ce tampon ? » (avec correction à la main d'un tampon ou retrait d'un point).
-- `js/lang.js` : langue de l'app. `index.html` en français, `index-en.html` en anglais ; le lexique cherche les deux langues dans l'offre et le CV.
+- `js/lang.js` : langue de l'app et `tr("français", "english")`. Cinq versions : `index.html` (« Ça colle ? »), `index-en.html` (« Good fit? »), `index-de.html` (« Passt das? »), `index-es.html` (« ¿Encaja? »), `index-it.html` (« Calza? »), avec `salary-xx.html` et `infos-xx.html`. Le menu des langues de chaque page est dans `tests/langmenus.json`.
+- `js/i18n/de.js`, `es.js`, `it.js` : un pack par langue, chargé avant `js/lang.js` (textes rangés par texte français, lexique de l'analyse, lettre, mails, pitch, démo, calcul brut → net du pays : Allemagne, Espagne, Italie). Un nouveau texte dans `tr()` doit être ajouté aux trois packs, sinon l'anglais s'affiche.
+- `infos.html` (et `infos-xx.html`) : mentions légales, confidentialité, accessibilité, licences et plan du site sur une seule page.
 - Synonymes (`SYN` dans `js/moteur.js`) : « restauration » retrouve « brasserie », etc. La preuve affichée est la ligne du CV qui colle le mieux.
 - `cleanOffer` : retire d'une annonce collée les boutons, menus et mentions des sites d'emploi.
 - `js/suivi.js` : « Mes candidatures », suivi par fiche ou en tableau (date de l'offre, date de candidature, état, relance, contact, notes, historique), liste « À faire », export CSV pour un tableur, et préparation d'entretien (questions probables avec méthode STAR, export Word/PDF).
@@ -33,7 +35,7 @@ Tout se passe dans le navigateur : le CV ne quitte jamais l'appareil de la perso
 - `salaire.html` / `salary-en.html` + `js/salaire.js` : brut → net (même en-tête et onglets que l'app). Trois colonnes en France : brut, net, net après impôt, toutes modifiables. France : taux moyens par statut (non-cadre 22 %, cadre 25 %, fonction publique 15 %, libéral 45 %, portage 51 %), temps de travail, 12 à 16 mois, prélèvement à la source. Royaume-Uni : impôt + National Insurance 2025/26, pension. Ouvert depuis le salaire de « L'annonce en bref » (`?s=`).
 - `js/demo.js` (temporaire) : mode démo pour les tests. Taper « démo » hors d'un champ, l'écrire seul dans la case de l'offre, ou ouvrir `?demo` : profil fictif de Maurice MARCEL (ingénieur informatique), 5 offres, 7 candidatures, lettre, préparation d'entretien. À retirer avec sa ligne `<script>` et son entrée dans `sw.js`.
 - `manifest.webmanifest`, `sw.js`, `icons/` : app installable sur téléphone et utilisable sans réseau après la première visite.
-- `tests/` : banc de test (offres et CV fictifs, résultats attendus). `node tests/run.js` (ou `node tests/run.js en`), ou ouvrir `/tests/` dans le navigateur. À lancer après chaque changement du moteur.
+- `tests/` : banc de test (offres et CV fictifs, résultats attendus). `node tests/run.js` (ou `node tests/run.js en`, `de`, `es`, `it` ; cas propres à chaque langue dans `tests/cas-xx.js`), ou ouvrir `/tests/` dans le navigateur. À lancer après chaque changement du moteur.
 - Session : rien n'est gardé par défaut. Si la case du pied de page est cochée, le CV, les offres et les réponses restent dans le navigateur (localStorage) ; un bouton efface tout.
 - `fonts/` : Archivo et Figtree (licence OFL), hébergées avec l'app.
 - `vendor/` : pdf.js 6.4.299 et tesseract.js 5.1.1 avec leurs licences (voir `vendor/README.txt`). Aucune requête vers un autre site.

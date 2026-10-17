@@ -28,7 +28,7 @@ let trackView = "cards", trackFilter = "all", trackSort = {k: "appliedDate", dir
 const apps = () => offers.filter(o => o.app);
 function ensureApp(o, status){
   if (!o.app) {
-    const job = (o.letter && o.letter.job) || (o.text.trim() ? titleOf(o.text).split(/\s+[–-]\s+/)[0].replace(/\s*\(h\s*\/\s*f\)|\s*h\s*\/\s*f\b/ig, "").trim() : "");
+    const job = (o.letter && o.letter.job) || (o.text.trim() ? titleOf(o.text).split(/\s+[–-]\s+/)[0].replace(GENDER, "").trim() : "");
     o.app = {job, company: (o.letter && o.letter.company) || "", offerDate: "", appliedDate: "", status: "todo", next: "", contact: "", link: "", notes: "", history: [{d: today(), s: "todo"}]};
   }
   if (status && o.app.status !== status) setStatus(o, status);
@@ -178,7 +178,7 @@ function interviewQs(o){
   const rs = resultsFor(o).filter(r => r.type !== "x" || r.st !== "ok");
   const rank = r => (r.prio === "must" ? 0 : r.prio === "nice" ? 2 : 1) + (r.st === "no" ? 0 : r.st === "mid" ? .3 : .6);
   rs.sort((a, b) => rank(a) - rank(b)).slice(0, 7).forEach(r => {
-    const k = r.k, kl = r.type !== "o" && /^.[a-zà-ÿ]/.test(k) ? k.charAt(0).toLowerCase() + k.slice(1) : k, proof = r.st === "ok" ? excerpt(r, false) : "";
+    const k = r.k, kl = LANG !== "de" && r.type !== "o" && /^.[a-zà-ÿ]/.test(k) ? k.charAt(0).toLowerCase() + k.slice(1) : k, proof = r.st === "ok" ? excerpt(r, false) : "";
     let q, tip, one = false;
     if (r.type === "h") { q = tr(`Ces horaires vous conviennent-ils (${kl}) ?`, `Are these hours OK for you (${kl})?`); tip = tr("Réponds franchement, avec tes contraintes s'il y en a.", "Answer honestly, with any constraints you have."); one = true; }
     else if (r.type === "l" || r.type === "d") { q = r.st === "ok" ? tr(`${k} : depuis quand l'avez-vous ?`, `${k}: since when?`) : tr(`Avez-vous : ${kl} ? Sinon, êtes-vous prêt(e) à le passer ?`, `Do you have: ${kl}? If not, are you ready to get it?`); tip = tr("Une date, ou ton plan pour l'obtenir.", "A date, or your plan to get it."); one = true; }
@@ -216,7 +216,7 @@ function renderPrep(o){
 }
 function prepText(o){
   const qs = interviewQs(o), P = o.prep || {};
-  return [tr("Préparation d'entretien", "Interview preparation") + " : " + appTitle(o) + (o.app.company ? " · " + o.app.company : ""), "",
+  return [tr("Préparation d'entretien", "Interview preparation") + tr(" : ", ": ") + appTitle(o) + (o.app.company ? " · " + o.app.company : ""), "",
     ...qs.flatMap(q => { const a = P[q.id] || {}; return [q.q, ...(q.one ? [a.t || "…"] : [tr("Situation : ", "Situation: ") + (a.s || "…"), tr("Ce que j'ai fait : ", "What I did: ") + (a.a || "…"), tr("Résultat : ", "Result: ") + (a.r || "…")]), ""]; }),
     tr("Questions à poser au recruteur", "Questions to ask the recruiter"), ...askQs(o).map(q => "- " + q)].join("\n");
 }

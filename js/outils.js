@@ -64,7 +64,7 @@ function icsFor(o){
   const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+/, "");
   return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Ca colle//FR", "CALSCALE:GREGORIAN", "BEGIN:VEVENT",
     `UID:${o.id}-${d}@ca-colle.pissits.com`, `DTSTAMP:${stamp}`, `DTSTART;VALUE=DATE:${d}`, `DTEND;VALUE=DATE:${d2}`,
-    `SUMMARY:${x(`${what} : ${appTitle(o)}${a.company ? " · " + a.company : ""}`)}`, ...(desc ? [`DESCRIPTION:${x(desc)}`] : []), ...(a.link ? [`URL:${a.link}`] : []),
+    `SUMMARY:${x(`${what}${tr(" : ", ": ")}${appTitle(o)}${a.company ? " · " + a.company : ""}`)}`, ...(desc ? [`DESCRIPTION:${x(desc)}`] : []), ...(a.link ? [`URL:${a.link}`] : []),
     "BEGIN:VALARM", "ACTION:DISPLAY", `DESCRIPTION:${x(what)}`, "TRIGGER:-PT15H", "END:VALARM", "END:VEVENT", "END:VCALENDAR"].map(fold75).join("\r\n");
 }
 function downloadIcs(o){

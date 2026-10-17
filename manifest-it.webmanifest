@@ -1,0 +1,38 @@
+{
+  "name": "Calza? · il tuo CV e un'offerta di lavoro",
+  "short_name": "Calza?",
+  "description": "Confronta il tuo CV con un annuncio di lavoro, miglioralo e scrivi la tua lettera. Gratis, senza account, senza IA.",
+  "lang": "it",
+  "start_url": "index-it.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fdf3e3",
+  "theme_color": "#fdf3e3",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "share_target": {
+    "action": "./index-it.html",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}

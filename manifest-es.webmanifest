@@ -1,0 +1,38 @@
+{
+  "name": "¿Encaja? · tu CV frente a una oferta de empleo",
+  "short_name": "¿Encaja?",
+  "description": "Compara tu CV con un anuncio de empleo, mejóralo y escribe tu carta. Gratis, sin cuenta, sin IA.",
+  "lang": "es",
+  "start_url": "index-es.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fdf3e3",
+  "theme_color": "#fdf3e3",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "share_target": {
+    "action": "./index-es.html",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}

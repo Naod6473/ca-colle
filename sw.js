@@ -1,9 +1,9 @@
 // Ça colle ? hors connexion : l'app est gardée sur l'appareil après la première visite.
 // Pages, styles et scripts : réseau d'abord (pour avoir la dernière version), cache si pas de réseau.
 // Bibliothèques de lecture (vendor/) : cache d'abord, elles ne changent pas.
-const VERSION = "cacolle-2026-10-17r";
+const VERSION = "cacolle-2026-10-17s";
 const SHELL = [
-  "./", "index.html", "index-en.html", "salaire.html", "salary-en.html", "infos.html", "infos-en.html", "js/salaire.js", "css/app.css", "css/skins.css", "fonts/fonts.css",
+  "./", "index.html", "index-en.html", "salaire.html", "salary-en.html", "infos.html", "infos-en.html", "index-de.html", "salary-de.html", "infos-de.html", "manifest-de.webmanifest", "js/i18n/de.js", "index-es.html", "salary-es.html", "infos-es.html", "manifest-es.webmanifest", "js/i18n/es.js", "index-it.html", "salary-it.html", "infos-it.html", "manifest-it.webmanifest", "js/i18n/it.js", "js/salaire.js", "css/app.css", "css/skins.css", "fonts/fonts.css",
   "fonts/archivo-latin-700-normal.woff2", "fonts/archivo-latin-800-italic.woff2", "fonts/archivo-latin-900-italic.woff2", "fonts/archivo-latin-900-normal.woff2",
   "fonts/figtree-latin-400-normal.woff2", "fonts/figtree-latin-500-normal.woff2", "fonts/figtree-latin-600-normal.woff2", "fonts/figtree-latin-700-normal.woff2",
   "js/lang.js", "js/lecteur.js", "js/moteur.js", "js/suivi.js", "js/outils.js", "js/confort.js", "js/demo.js", "js/export.js", "js/app.js", "favicon.svg", "manifest.webmanifest", "manifest-en.webmanifest",
@@ -21,5 +21,5 @@ self.addEventListener("fetch", e => {
     e.respondWith(caches.match(req).then(hit => hit || fetch(req).then(put)));
     return;
   }
-  e.respondWith(fetch(req).then(put).catch(() => caches.match(req, {ignoreSearch: true}).then(hit => hit || (req.mode === "navigate" ? caches.match(url.pathname.endsWith("-en.html") ? "index-en.html" : "index.html") : undefined))));
+  e.respondWith(fetch(req).then(put).catch(() => caches.match(req, {ignoreSearch: true}).then(hit => hit || (req.mode === "navigate" ? caches.match((m => m ? `index-${m[1]}.html` : "index.html")(url.pathname.match(/-(en|de|es|it)\.html$/))) : undefined))));
 });

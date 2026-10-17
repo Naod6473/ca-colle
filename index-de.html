@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Passt das? · dein Lebenslauf und das Stellenangebot</title>
+<meta name="description" content="Füg ein Stellenangebot ein, lade deinen Lebenslauf hoch und sieh, was passt. Kostenlos, und dein Lebenslauf verlässt nie dein Gerät.">
+<meta name="theme-color" content="#fdf3e3">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest-de.webmanifest">
+<link rel="alternate" hreflang="fr" href="https://ca-colle.pissits.com/">
+<link rel="alternate" hreflang="en" href="https://ca-colle.pissits.com/index-en.html">
+<link rel="alternate" hreflang="de" href="https://ca-colle.pissits.com/index-de.html">
+<link rel="alternate" hreflang="es" href="https://ca-colle.pissits.com/index-es.html">
+<link rel="alternate" hreflang="it" href="https://ca-colle.pissits.com/index-it.html">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Passt das?">
+<link rel="preload" href="fonts/archivo-latin-900-italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/skins.css">
+<script src="js/i18n/de.js"></script>
+<script src="js/lang.js"></script>
+<script defer src="https://stats.pissits.com/script.js" data-website-id="79e7d60a-075b-4867-9973-a2659b51101c"></script>
+</head>
+<body>
+<a class="skip-link" href="#contenu">Zum Inhalt springen</a>
+
+<header class="top">
+  <a class="logo" href="index-de.html"><span>Passt das?</span></a>
+  <div class="top-actions">
+    <details class="comfort" id="comfortmenu">
+      <summary class="pill pill-comfort" title="Komfortmodus">Aa <span class="sr-only">Komfortmodus</span></summary>
+      <div class="comfort-menu" role="group" aria-label="Komfortmodus">
+        <div class="skins" role="group" aria-label="Aussehen"><b>Aussehen</b><button type="button" data-skin="tampon" aria-pressed="true">Stempel</button><button type="button" data-skin="fiche" aria-pressed="false">Karteikarte</button></div>
+        <button type="button" data-comfort="big" aria-pressed="false">Größere Schrift</button>
+        <button type="button" data-comfort="contrast" aria-pressed="false">Hoher Kontrast</button>
+        <button type="button" data-comfort="dark" aria-pressed="false">Dunkelmodus</button>
+        <button type="button" data-comfort="calm" aria-pressed="false">Weniger Bewegung</button>
+        <small>Einstellung bleibt auf diesem Gerät.</small>
+      </div>
+    </details>
+    <button class="pill pill-install" id="install" type="button" hidden>App installieren</button>
+    <details class="langs" id="langmenu"><summary class="pill pill-lang" title="Sprache">DE <span class="sr-only">Sprache</span></summary><div class="lang-menu" role="group" aria-label="Sprache"><a href="./" hreflang="fr" lang="fr"><b>FR</b> Français</a><a href="index-en.html" hreflang="en" lang="en"><b>EN</b> English</a><a href="index-de.html" hreflang="de" lang="de" aria-current="true"><b>DE</b> Deutsch</a><a href="index-es.html" hreflang="es" lang="es"><b>ES</b> Español</a><a href="index-it.html" hreflang="it" lang="it"><b>IT</b> Italiano</a></div></details>
+    <span class="pill pill-safe"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Kostenlos · ohne Konto · ohne KI</span>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="Schritte">
+    <button class="tab" role="tab" data-step="1" data-n="1" data-s="Anzeige" style="--c: var(--blue)"><small>Schritt 1</small><b>Das Angebot</b></button>
+    <button class="tab" role="tab" data-step="2" data-n="2" data-s="Lebenslauf" style="--c: var(--yellow)"><small>Schritt 2</small><b>Dein Lebenslauf</b></button>
+    <button class="tab" role="tab" data-step="3" data-n="3" data-s="Ergebnis" style="--c: var(--green)"><small>Schritt 3</small><b>Das Ergebnis</b></button>
+    <button class="tab" role="tab" data-step="4" data-n="4" data-s="Besser" style="--c: var(--pink)"><small>Schritt 4</small><b>Lebenslauf verbessern</b></button>
+    <button class="tab" role="tab" data-step="5" data-n="5" data-s="Brief" style="--c: var(--violet)"><small>Schritt 5</small><b>Mein Anschreiben</b></button>
+    <span class="tab-sep" aria-hidden="true"></span>
+    <button class="tab tab-tool" id="trackbtn" type="button" aria-selected="false" data-n="≡" data-s="Übersicht" style="--c: var(--orange)"><small>Meine Übersicht</small><b>Meine Bewerbungen <span id="trackn" hidden></span></b></button>
+    <a class="tab tab-tool" href="salary-de.html" data-n="€" data-s="Gehalt" style="--c: var(--teal)"><small>Werkzeug</small><b>Brutto → Netto</b></a>
+  </nav>
+</header>
+<span id="contenu" tabindex="-1"></span>
+
+<main>
+<!-- ============ 1. L'OFFRE ============ -->
+<section class="panel" data-p="1" style="--c: var(--blue); --shadow: var(--orange)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <div class="resume" id="resume" hidden><b>Deine Sitzung ist wieder da.</b> <span id="resumetxt"></span> <button class="btn light small" id="wipe2" type="button">Alles löschen</button></div>
+      <span class="label">Schritt 1 von 5</span>
+      <h1 class="big">Füg das Angebot ein</h1>
+      <p class="lede">Kopier den Text der Stellenanzeige, die dich interessiert, und füg ihn hier ein, oder häng sie als Datei an.</p>
+      <label class="sr-only" for="offer">Text der Stellenanzeige</label>
+      <textarea id="offer" class="sheet-input" spellcheck="false" placeholder="Füg hier den Text der Stellenanzeige ein oder zieh eine Datei hierher (PDF, Word, Screenshot)."></textarea>
+      <div class="attach">
+        <span class="hint">Ist die Anzeige eine Datei?</span>
+        <label class="btn light small" for="offerfile">Angebot anhängen</label>
+        <span class="hint">PDF, Word oder Screenshot</span>
+        <input type="file" id="offerfile" accept=".pdf,.docx,.odt,.txt,.md,image/*" class="sr-only">
+      </div>
+      <div class="job" id="ojob" hidden><p id="ojobtxt">Wird gelesen…</p><div class="jbar"><i id="ojbar"></i></div></div>
+      <p class="err" id="oerr" role="alert" hidden></p>
+      <div class="linkhelp" id="linkhelp" hidden>
+        <b>Das ist ein Link: Die App kann keine Jobbörsen öffnen.</b>
+        <ol>
+          <li>Öffne die Anzeige in deinem Browser.</li>
+          <li>Markier den ganzen Text der Anzeige und kopier ihn (am Computer: Strg+A, dann Strg+C).</li>
+          <li>Komm hierher zurück und füg ihn statt des Links ein.</li>
+        </ol>
+        <p>Am Handy geht es oft am einfachsten mit einem <b>Screenshot</b> der Anzeige, angehängt über den Button oben.</p>
+      </div>
+      <p class="cleaned" id="cleaned" hidden><span id="cleanedtxt"></span> <button type="button" class="linkbtn" id="unclean">Originaltext zurückholen</button></p>
+      <details class="copyhelp">
+        <summary>Wie kopiere ich eine Anzeige von einer Jobbörse?</summary>
+        <div class="copyhelp-body">
+          <div class="mini" aria-hidden="true">
+            <div class="mini-bar"><i></i><i></i><i></i><span>Jobbörse</span></div>
+            <div class="mini-page">
+              <span class="mini-btn">Bewerben</span>
+              <p class="sel"><b>Verkäufer/in</b><br>Aufgaben: Kundenempfang, Kasse, Regalpflege…<br>Profil: Führerschein, Teamfähigkeit…</p>
+              <span class="mini-junk">Ähnliche Jobs · Datenschutz</span>
+            </div>
+            <span class="mini-keys">Strg + C</span>
+          </div>
+          <ol>
+            <li><b>Öffne die ganze Anzeige.</b> Bei Indeed oder StepStone klickst du auf den Stellentitel, damit sie allein auf der Seite steht. Bei LinkedIn klickst du zuerst auf „Mehr anzeigen“ unter der Beschreibung.</li>
+            <li><b>Markier den Text</b> vom Stellentitel bis zum gesuchten Profil.</li>
+            <li><b>Kopier</b> ihn (Strg + C, am Mac Cmd + C) und <b>füg ihn hier ein</b> (Strg + V).</li>
+            <li><b>Am Handy:</b> lange auf den Text drücken, „Alles auswählen“, „Kopieren“. Oder mach einen Screenshot und häng ihn an.</li>
+          </ol>
+          <p class="hint">Kein Problem, wenn du zu viel kopierst: Die App entfernt Buttons, Menüs und Hinweise der Website von selbst.</p>
+        </div>
+      </details>
+      <div class="next-row">
+        <button class="btn" id="next1" data-go="2" disabled>Weiter: dein Lebenslauf →</button>
+        <span class="hint" id="hint1">Füg mindestens ein paar Zeilen der Anzeige ein.</span>
+      </div>
+    </div>
+    <div class="side">
+    <aside class="box" id="offersbox" hidden>
+      <div class="box-head">Meine Angebote <button type="button" id="newoffer">+ Neues Angebot</button></div>
+      <div class="box-body"><ul class="offers" id="offers"></ul><p class="hint">Dein Lebenslauf bleibt gleich: Vergleich ihn mit mehreren Angeboten.</p></div>
+    </aside>
+    <aside class="box">
+      <div class="box-head">So funktioniert es</div>
+      <div class="box-body">
+        <ol class="how">
+          <li><b>Du fügst das Stellenangebot ein</b> oder hängst es als PDF oder Screenshot an.</li>
+          <li><b>Du lädst deinen Lebenslauf hoch</b>: PDF, Word oder Foto.</li>
+          <li><b>Du siehst, was passt</b>, was fehlt und was du noch belegen musst.</li>
+          <li><b>Du verbesserst deinen Lebenslauf</b> mit Sätzen zum Ausfüllen.</li>
+          <li><b>Du schreibst dein Anschreiben</b> mit deinen Stärken.</li>
+        </ol>
+        <p class="safe">Dein Lebenslauf verlässt nie dein Gerät: Alles wird in deinem Browser gelesen.</p>
+        <button class="btn light wide" id="demo" type="button">Mit einem Beispiel ausprobieren</button>
+      </div>
+    </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2. TON CV ============ -->
+<section class="panel" data-p="2" hidden style="--c: var(--yellow); --shadow: var(--blue)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <span class="label">Schritt 2 von 5</span>
+      <h1 class="big">Dein Lebenslauf</h1>
+      <p class="lede">Zieh deine Datei hierher oder wähl sie aus. Der Text wird direkt hier gelesen: Deine Datei wird weder verschickt noch gespeichert.</p>
+      <label class="drop" id="drop" for="file">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>
+        <b>Lebenslauf hierher ziehen</b>
+        <span class="btn light small">Datei auswählen</span>
+        <input type="file" id="file" accept=".pdf,.docx,.odt,.txt,.md,image/*" class="sr-only">
+      </label>
+      <div class="job" id="job" hidden><p id="jobtxt">Wird gelesen…</p><div class="jbar"><i id="jbar"></i></div></div>
+      <p class="err" id="ferr" role="alert" hidden></p>
+      <div class="filecard" id="filecard" hidden>
+        <span class="ok-dot" aria-hidden="true">✓</span>
+        <div><b id="fname"></b><small id="finfo"></small></div>
+        <label class="btn light small" for="file">Ändern</label>
+      </div>
+      <div class="next-row">
+        <button class="btn ghost" data-go="1">← Das Angebot</button>
+        <button class="btn" id="next2" data-go="3" disabled>Passt das? Ansehen →</button>
+      </div>
+    </div>
+    <aside class="box">
+      <div class="box-head">Was wir lesen können</div>
+      <div class="box-body">
+        <ul class="formats">
+          <li><b>PDF</b> am zuverlässigsten</li>
+          <li><b>Word</b> .docx oder .odt</li>
+          <li><b>Foto</b> gerade und scharf</li>
+          <li><b>Text</b> .txt</li>
+        </ul>
+        <p>Für ein gutes Ergebnis behalte die Überschriften in deinem Lebenslauf: <b>Berufserfahrung</b>, <b>Kenntnisse</b>, <b>Ausbildung</b>.</p>
+      </div>
+    </aside>
+  </div>
+</section>
+<div class="below" data-for="2" hidden style="--c: var(--yellow)">
+  <details class="check" id="check">
+    <summary><span class="section-title" style="--k: var(--yellow)">Gelesenen Text prüfen</span> <span class="hint" id="cvsum"></span></summary>
+    <p class="hint">Wenn beim Lesen etwas schiefgegangen ist (vor allem bei einem Foto), korrigier es direkt hier.</p>
+    <label class="sr-only" for="cvraw">Aus deinem Lebenslauf gelesener Text</label>
+    <textarea id="cvraw" class="sheet-input" spellcheck="false"></textarea>
+  </details>
+</div>
+
+<!-- ============ 3. LE RÉSULTAT ============ -->
+<section class="panel" data-p="3" hidden style="--c: var(--green); --shadow: var(--yellow)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <span class="label">Schritt 3 von 5 · das Ergebnis</span>
+      <h1 class="big"><span id="pct">0</span> % <small id="verdict">das passt</small></h1>
+      <p class="lede" id="sum"></p>
+      <div class="filters" role="group" aria-label="Anzeigen">
+        <button class="chip" data-f="all" aria-pressed="true">Alle <span id="n-all"></span></button>
+        <button class="chip" data-f="no" aria-pressed="false" style="--k: var(--pink)">✕ Fehlt im Lebenslauf <span id="n-no"></span></button>
+        <button class="chip" data-f="mid" aria-pressed="false" style="--k: var(--yellow)">? Beleg fehlt <span id="n-mid"></span></button>
+        <button class="chip" data-f="ok" aria-pressed="false" style="--k: var(--card)">✓ Passt <span id="n-ok"></span></button>
+      </div>
+      <div class="next-row tight">
+        <button class="btn light small" id="compare" type="button">Mit einem anderen Angebot vergleichen</button>
+        <button class="btn light small" type="button" data-trackthis>Diese Bewerbung verfolgen</button>
+        <button class="btn light small" type="button" id="listen" aria-pressed="false">Ergebnis vorlesen</button>
+      </div>
+      <details class="share">
+        <summary class="btn light small">Auswertung teilen</summary>
+        <div class="share-body">
+          <p class="hint">Eine Zusammenfassung für deine Beratung beim Jobcenter oder bei der Agentur für Arbeit, deinen Coach oder eine Person deines Vertrauens: das Ergebnis, was passt, was fehlt und die Anzeige.</p>
+          <div class="export">
+            <button class="btn small" type="button" data-share="pdf">Als PDF</button>
+            <button class="btn light small" type="button" data-share="docx">Als Word</button>
+            <button class="btn light small" type="button" data-share="copy">Text kopieren</button>
+            <button class="btn light small" type="button" data-share="mail">Per E-Mail</button>
+          </div>
+        </div>
+      </details>
+    </div>
+    <aside class="box">
+      <div class="box-head">Zuerst erledigen</div>
+      <div class="box-body" id="prio"></div>
+    </aside>
+  </div>
+</section>
+<div class="below" data-for="3" hidden style="--c: var(--green)">
+  <div class="legend">
+    <span><i class="stamp ok">Passt</i> steht im Lebenslauf, mit einem echten Beispiel</span>
+    <span><i class="stamp mid">Beleg fehlt</i> wird genannt, aber nichts belegt es</span>
+    <span><i class="stamp no">Fehlt im Lebenslauf</i> die Anzeige verlangt es, dein Lebenslauf erwähnt es nicht</span>
+  </div>
+  <div id="groups"></div>
+</div>
+
+<!-- ============ 4. AMÉLIORER ============ -->
+<section class="panel" data-p="4" hidden style="--c: var(--pink); --shadow: var(--violet)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <span class="label">Schritt 4 von 5</span>
+      <h1 class="big">Lebenslauf verbessern</h1>
+      <p class="lede">Ergänze bei jedem Punkt den Satz mit deinen echten Zahlen und klick dann auf „Hinzufügen“.</p>
+      <p class="promise"><b>Nichts wird für dich erfunden.</b> Eine Zeile kommt nur in deinen Lebenslauf, wenn du sie selbst ergänzt.</p>
+    </div>
+    <aside class="box">
+      <div class="box-head">Dein Ergebnis</div>
+      <div class="box-body score-box">
+        <b id="score4">0 %</b>
+        <span id="score4txt"></span>
+        <div class="meter" aria-hidden="true"><i id="meter4"></i></div>
+      </div>
+    </aside>
+  </div>
+</section>
+<div class="below" data-for="4" hidden style="--c: var(--pink)">
+  <div class="rewrite">
+    <div class="sugs-col"><div class="sugs" id="sugs"></div><section class="group" id="review"></section></div>
+    <aside class="box preview">
+      <div class="box-head">Dein neuer Lebenslauf</div>
+      <div class="box-body cvdoc" id="cv4"></div>
+      <div class="export">
+        <button class="btn small" type="button" data-dl="cv-docx">Als Word herunterladen</button>
+        <button class="btn light small" type="button" data-dl="cv-pdf">Als PDF</button>
+        <button class="btn light small" type="button" data-dl="cv-copy">Text kopieren</button>
+      </div>
+      <p class="preview-foot"><ins>Markiert</ins> = deine Ergänzungen. Die Word-Datei enthält den Text: Dein eigenes Layout kannst du danach wieder anlegen.</p>
+    </aside>
+  </div>
+  <div class="next-row"><button class="btn" data-go="5">Weiter: mein Anschreiben →</button></div>
+</div>
+
+<!-- ============ 5. MA LETTRE ============ -->
+<section class="panel" data-p="5" hidden style="--c: var(--violet); --shadow: var(--yellow)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <span class="label">Schritt 5 von 5</span>
+      <h1 class="big">Dein Anschreiben</h1>
+      <p class="lede">Wir bereiten dein Anschreiben mit den Stärken aus deinem Lebenslauf vor. Füll die Felder aus, und das Anschreiben entsteht daneben von selbst.</p>
+      <p class="promise"><b>Auch hier wird nichts erfunden:</b> Das Anschreiben nutzt nur, was in deinem Lebenslauf steht und was du hier eintippst.</p>
+    </div>
+    <aside class="box">
+      <div class="box-head">Tipp</div>
+      <div class="box-body"><p>Ein gutes Anschreiben passt auf eine Seite: warum diese Stelle, was du schon kannst (mit Beispielen) und ab wann du verfügbar bist.</p></div>
+    </aside>
+  </div>
+</section>
+<div class="below" data-for="5" hidden style="--c: var(--violet)">
+  <div class="rewrite">
+    <form class="letter-form" id="lform" autocomplete="on">
+      <fieldset class="field"><legend>Ton des Anschreibens</legend><div class="filters" role="group" aria-label="Ton des Anschreibens"><button class="chip" type="button" data-tone="classic" aria-pressed="true">Klassisch</button><button class="chip" type="button" data-tone="dynamic" aria-pressed="false">Locker</button><button class="chip" type="button" data-tone="change" aria-pressed="false">Beruflicher Neustart</button><button class="chip" type="button" data-tone="study" aria-pressed="false">Ausbildung oder Praktikum</button></div></fieldset>
+      <div class="field"><label for="l-name">Dein Name</label><input id="l-name" autocomplete="name"></div>
+      <div class="field"><label for="l-contact">Deine E-Mail und Telefonnummer</label><input id="l-contact"></div>
+      <div class="field"><label for="l-company">Name des Unternehmens</label><input id="l-company" placeholder="z. B. Nordlogistik GmbH"></div>
+      <div class="field"><label for="l-job">Stellenbezeichnung</label><input id="l-job"></div>
+      <div class="field"><label for="l-why">Warum diese Stelle oder dieses Unternehmen?</label><textarea id="l-why" rows="3" placeholder="z. B. Ich arbeite gern im Team, und Ihr Lager ist 10 Minuten von meiner Wohnung entfernt."></textarea></div>
+      <fieldset class="field"><legend>Deine Stärken, die du hervorheben willst</legend><div id="l-strengths" class="strengths"></div></fieldset>
+      <div class="field"><label for="l-when">Ab wann bist du verfügbar?</label><input id="l-when" placeholder="z. B. ab sofort"></div>
+    </form>
+    <aside class="box preview">
+      <div class="box-head">Dein Anschreiben <button type="button" id="l-edit">Text bearbeiten</button></div>
+      <div class="box-body letter" id="letter"></div>
+      <textarea id="letteredit" class="letteredit" hidden aria-label="Text des Anschreibens"></textarea>
+      <div class="export">
+        <button class="btn small" type="button" data-dl="l-docx">Als Word herunterladen</button>
+        <button class="btn light small" type="button" data-dl="l-pdf">Als PDF</button>
+        <button class="btn light small" type="button" data-dl="l-copy">Text kopieren</button>
+      </div>
+      <p class="preview-foot">Anschreiben abgeschickt? <button class="linkbtn" type="button" data-trackthis="sent">In deiner Übersicht notieren</button></p>
+    </aside>
+  </div>
+  <section class="group" id="checklist"></section>
+</div>
+<!-- ============ SUIVI DES CANDIDATURES ============ -->
+<section class="panel" id="track" hidden style="--c: var(--orange); --shadow: var(--yellow)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <span class="label">Meine Übersicht</span>
+      <h1 class="big">Meine Bewerbungen</h1>
+      <p class="lede">Notier, wo du dich beworben hast, wie weit jede Bewerbung ist und wann du nachfassen solltest.</p>
+      <div class="track-bar">
+        <div class="filters" role="group" aria-label="Ansicht">
+          <button class="chip" type="button" data-view="cards" aria-pressed="true">Nach Angebot</button>
+          <button class="chip" type="button" data-view="table" aria-pressed="false">Tabelle</button>
+          <button class="chip" type="button" data-view="compare" aria-pressed="false">Vergleichen</button>
+          <button class="chip" type="button" data-view="stats" aria-pressed="false">Statistik</button>
+        </div>
+        <button class="btn small" id="addapp" type="button">+ Bewerbung hinzufügen</button>
+        <button class="btn light small" id="csv" type="button">Für eine Tabelle exportieren</button>
+        <details class="share proofmenu"><summary class="btn light small">Nachweis der Eigenbemühungen</summary><div class="share-body"><div class="export"><button class="btn small" type="button" data-proof="month">Dieser Monat</button><button class="btn light small" type="button" data-proof="last">Letzter Monat</button><button class="btn light small" type="button" data-proof="all">Alle</button></div></div></details>
+        <button class="btn light small" id="backup" type="button">In einer Datei sichern</button>
+        <button class="btn light small" id="restore" type="button">Sicherung öffnen</button>
+        <input type="file" id="restorefile" accept=".json,application/json" hidden>
+      </div>
+      <p class="notice" id="tracknokeep" hidden>Deine Übersicht wird noch nicht auf diesem Gerät gespeichert: Sie verschwindet, wenn du die Seite schließt. <button class="btn small" id="keepon" type="button">Auf diesem Gerät behalten</button></p>
+    </div>
+    <aside class="box">
+      <div class="box-head">Zu erledigen</div>
+      <div class="box-body" id="tracktodo"></div>
+    </aside>
+  </div>
+</section>
+<div class="below" id="trackbelow" hidden style="--c: var(--orange)">
+  <div class="filters" role="group" aria-label="Filter" id="trackfilters">
+    <button class="chip" type="button" data-tf="all" aria-pressed="true">Alle <span id="tf-all"></span></button>
+    <button class="chip" type="button" data-tf="active" aria-pressed="false" style="--k: var(--yellow)">Laufend <span id="tf-active"></span></button>
+    <button class="chip" type="button" data-tf="talk" aria-pressed="false" style="--k: var(--violet)">Gespräche <span id="tf-talk"></span></button>
+    <button class="chip" type="button" data-tf="done" aria-pressed="false" style="--k: var(--card)">Abgeschlossen <span id="tf-done"></span></button>
+  </div>
+  <div id="trackout"></div>
+</div>
+</main>
+<div id="printzone" aria-hidden="true"></div>
+
+<footer class="foot">
+  <div class="foot-inner">
+    <h2>Dein Lebenslauf bleibt bei dir.</h2>
+    <div class="foot-text">
+      <p>Dein Lebenslauf und das Stellenangebot bleiben in deinem Browser. Kein Konto, nichts auf einem Server. Nur Besuche werden gezählt, anonym und ohne Cookies (Umami).</p>
+      <p class="hint-foot" id="ioshint" hidden>Auf dem iPhone: Teilen-Button, dann „Zum Home-Bildschirm“, und du hast die App, auch offline.</p>
+      <label class="keep"><input type="checkbox" id="keep"> Meine Sitzung auf diesem Gerät behalten, um später weiterzumachen</label>
+      <p><a href="salary-de.html">Nettolohn berechnen</a> · <a href="infos-de.html">Impressum, Datenschutz und Seitenübersicht</a></p>
+      <p><button type="button" class="linkbtn" id="wipe">Meine Daten von diesem Gerät löschen</button> · <small>Eine App von <a href="https://portfolio.pissits.com/index-en.html">Simon Victor</a>.</small></p>
+    </div>
+  </div>
+</footer>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="js/lecteur.js"></script>
+<script src="js/moteur.js"></script>
+<script src="js/export.js"></script>
+<script src="js/app.js"></script>
+<script src="js/suivi.js"></script>
+<script src="js/outils.js"></script>
+<script src="js/confort.js"></script>
+<script src="js/demo.js"></script><!-- mode démo temporaire -->
+</body>
+</html>

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>¿Encaja? · tu CV frente a una oferta de empleo</title>
+<meta name="description" content="Pega una oferta de empleo, añade tu CV y mira lo que encaja. Gratis, y tu CV nunca sale de tu dispositivo.">
+<meta name="theme-color" content="#fdf3e3">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest-es.webmanifest">
+<link rel="alternate" hreflang="fr" href="https://ca-colle.pissits.com/">
+<link rel="alternate" hreflang="en" href="https://ca-colle.pissits.com/index-en.html">
+<link rel="alternate" hreflang="de" href="https://ca-colle.pissits.com/index-de.html">
+<link rel="alternate" hreflang="es" href="https://ca-colle.pissits.com/index-es.html">
+<link rel="alternate" hreflang="it" href="https://ca-colle.pissits.com/index-it.html">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="¿Encaja?">
+<link rel="preload" href="fonts/archivo-latin-900-italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/skins.css">
+<script src="js/i18n/es.js"></script>
+<script src="js/lang.js"></script>
+<script defer src="https://stats.pissits.com/script.js" data-website-id="79e7d60a-075b-4867-9973-a2659b51101c"></script>
+</head>
+<body>
+<a class="skip-link" href="#contenu">Ir al contenido</a>
+
+<header class="top">
+  <a class="logo" href="index-es.html"><span>¿Encaja?</span></a>
+  <div class="top-actions">
+    <details class="comfort" id="comfortmenu">
+      <summary class="pill pill-comfort" title="Modo confort">Aa <span class="sr-only">Modo confort</span></summary>
+      <div class="comfort-menu" role="group" aria-label="Modo confort">
+        <div class="skins" role="group" aria-label="Aspecto"><b>Aspecto</b><button type="button" data-skin="tampon" aria-pressed="true">Sello</button><button type="button" data-skin="fiche" aria-pressed="false">Ficha</button></div>
+        <button type="button" data-comfort="big" aria-pressed="false">Texto más grande</button>
+        <button type="button" data-comfort="contrast" aria-pressed="false">Contraste alto</button>
+        <button type="button" data-comfort="dark" aria-pressed="false">Modo oscuro</button>
+        <button type="button" data-comfort="calm" aria-pressed="false">Menos animaciones</button>
+        <small>Ajuste guardado en este dispositivo.</small>
+      </div>
+    </details>
+    <button class="pill pill-install" id="install" type="button" hidden>Instalar la app</button>
+    <details class="langs" id="langmenu"><summary class="pill pill-lang" title="Idioma">ES <span class="sr-only">Idioma</span></summary><div class="lang-menu" role="group" aria-label="Idioma"><a href="./" hreflang="fr" lang="fr"><b>FR</b> Français</a><a href="index-en.html" hreflang="en" lang="en"><b>EN</b> English</a><a href="index-de.html" hreflang="de" lang="de"><b>DE</b> Deutsch</a><a href="index-es.html" hreflang="es" lang="es" aria-current="true"><b>ES</b> Español</a><a href="index-it.html" hreflang="it" lang="it"><b>IT</b> Italiano</a></div></details>
+    <span class="pill pill-safe"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Gratis · sin cuenta · sin IA</span>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="Pasos">
+    <button class="tab" role="tab" data-step="1" data-n="1" data-s="Oferta" style="--c: var(--blue)"><small>Paso 1</small><b>La oferta</b></button>
+    <button class="tab" role="tab" data-step="2" data-n="2" data-s="CV" style="--c: var(--yellow)"><small>Paso 2</small><b>Tu CV</b></button>
+    <button class="tab" role="tab" data-step="3" data-n="3" data-s="Resultado" style="--c: var(--green)"><small>Paso 3</small><b>El resultado</b></button>
+    <button class="tab" role="tab" data-step="4" data-n="4" data-s="Mejorar" style="--c: var(--pink)"><small>Paso 4</small><b>Mejorar mi CV</b></button>
+    <button class="tab" role="tab" data-step="5" data-n="5" data-s="Carta" style="--c: var(--violet)"><small>Paso 5</small><b>Mi carta</b></button>
+    <span class="tab-sep" aria-hidden="true"></span>
+    <button class="tab tab-tool" id="trackbtn" type="button" aria-selected="false" data-n="≡" data-s="Seguir" style="--c: var(--orange)"><small>Mi seguimiento</small><b>Mis candidaturas <span id="trackn" hidden></span></b></button>
+    <a class="tab tab-tool" href="salary-es.html" data-n="€" data-s="Salario" style="--c: var(--teal)"><small>Herramienta</small><b>Bruto → neto</b></a>
+  </nav>
+</header>
+<span id="contenu" tabindex="-1"></span>
+
+<main>
+<!-- ============ 1. LA OFERTA ============ -->
+<section class="panel" data-p="1" style="--c: var(--blue); --shadow: var(--orange)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <div class="resume" id="resume" hidden><b>Tu sesión ha vuelto.</b> <span id="resumetxt"></span> <button class="btn light small" id="wipe2" type="button">Borrarlo todo</button></div>
+      <span class="label">Paso 1 de 5</span>
+      <h1 class="big">Pega la oferta</h1>
+      <p class="lede">Copia el texto del anuncio que te interesa y pégalo aquí, o adjúntalo como archivo.</p>
+      <label class="sr-only" for="offer">Texto del anuncio</label>
+      <textarea id="offer" class="sheet-input" spellcheck="false" placeholder="Pega aquí el texto del anuncio, o suelta encima un archivo (PDF, Word, captura de pantalla)."></textarea>
+      <div class="attach">
+        <span class="hint">¿El anuncio está en un archivo?</span>
+        <label class="btn light small" for="offerfile">Adjuntar la oferta</label>
+        <span class="hint">PDF, Word o captura de pantalla</span>
+        <input type="file" id="offerfile" accept=".pdf,.docx,.odt,.txt,.md,image/*" class="sr-only">
+      </div>
+      <div class="job" id="ojob" hidden><p id="ojobtxt">Leyendo…</p><div class="jbar"><i id="ojbar"></i></div></div>
+      <p class="err" id="oerr" role="alert" hidden></p>
+      <div class="linkhelp" id="linkhelp" hidden>
+        <b>Esto es un enlace: la app no puede abrir las webs de empleo.</b>
+        <ol>
+          <li>Abre el anuncio en tu navegador.</li>
+          <li>Selecciona todo el texto del anuncio y cópialo (en un ordenador: Ctrl+A y luego Ctrl+C).</li>
+          <li>Vuelve aquí y pégalo en lugar del enlace.</li>
+        </ol>
+        <p>En el móvil, lo más fácil suele ser una <b>captura de pantalla</b> del anuncio, adjuntada con el botón de arriba.</p>
+      </div>
+      <p class="cleaned" id="cleaned" hidden><span id="cleanedtxt"></span> <button type="button" class="linkbtn" id="unclean">Volver al texto original</button></p>
+      <details class="copyhelp">
+        <summary>¿Cómo copio un anuncio de una web de empleo?</summary>
+        <div class="copyhelp-body">
+          <div class="mini" aria-hidden="true">
+            <div class="mini-bar"><i></i><i></i><i></i><span>web de empleo</span></div>
+            <div class="mini-page">
+              <span class="mini-btn">Inscribirme</span>
+              <p class="sel"><b>Dependiente/a</b><br>Funciones: atención al público, caja, reposición…<br>Perfil: carné de conducir, trabajo en equipo…</p>
+              <span class="mini-junk">Ofertas similares · Política de privacidad</span>
+            </div>
+            <span class="mini-keys">Ctrl + C</span>
+          </div>
+          <ol>
+            <li><b>Abre el anuncio completo.</b> En InfoJobs o Indeed, haz clic en el título del puesto para verlo solo en la página. En LinkedIn, primero haz clic en «Ver más» debajo de la descripción.</li>
+            <li><b>Selecciona el texto</b> desde el título del puesto hasta el perfil que buscan.</li>
+            <li><b>Copia</b> (Ctrl + C, o Cmd + C en un Mac) y luego <b>pega aquí</b> (Ctrl + V).</li>
+            <li><b>En el móvil:</b> mantén pulsado el texto, «Seleccionar todo», «Copiar». O haz una captura de pantalla y adjúntala.</li>
+          </ol>
+          <p class="hint">No pasa nada si copias de más: la app quita sola los botones, menús y avisos de la web.</p>
+        </div>
+      </details>
+      <div class="next-row">
+        <button class="btn" id="next1" data-go="2" disabled>Siguiente paso: tu CV →</button>
+        <span class="hint" id="hint1">Pega al menos unas líneas del anuncio.</span>
+      </div>
+    </div>
+    <div class="side">
+    <aside class="box" id="offersbox" hidden>
+      <div class="box-head">Mis ofertas <button type="button" id="newoffer">+ Nueva oferta</button></div>
+      <div class="box-body"><ul class="offers" id="offers"></ul><p class="hint">Tu CV no cambia: compáralo con varias ofertas.</p></div>
+    </aside>
+    <aside class="box">
+      <div class="box-head">Cómo funciona</div>
+      <div class="box-body">
+        <ol class="how">
+          <li><b>Pegas la oferta de empleo</b>, o la adjuntas en PDF o captura.</li>
+          <li><b>Añades tu CV</b>: PDF, Word o foto.</li>
+          <li><b>Ves lo que encaja</b>, lo que falta y lo que hay que demostrar.</li>
+          <li><b>Mejoras tu CV</b> con frases para completar.</li>
+          <li><b>Escribes tu carta de presentación</b> a partir de tus puntos fuertes.</li>
+        </ol>
+        <p class="safe">Tu CV nunca sale de tu dispositivo: todo se lee en tu navegador.</p>
+        <button class="btn light wide" id="demo" type="button">Probar con un ejemplo</button>
+      </div>
+    </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2. TU CV ============ -->
+<section class="panel" data-p="2" hidden style="--c: var(--yellow); --shadow: var(--blue)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <span class="label">Paso 2 de 5</span>
+      <h1 class="big">Añade tu CV</h1>
+      <p class="lede">Suelta tu archivo o elígelo. Su texto se lee aquí mismo: tu archivo no se envía ni se guarda.</p>
+      <label class="drop" id="drop" for="file">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>
+        <b>Suelta tu CV aquí</b>
+        <span class="btn light small">Elegir un archivo</span>
+        <input type="file" id="file" accept=".pdf,.docx,.odt,.txt,.md,image/*" class="sr-only">
+      </label>
+      <div class="job" id="job" hidden><p id="jobtxt">Leyendo…</p><div class="jbar"><i id="jbar"></i></div></div>
+      <p class="err" id="ferr" role="alert" hidden></p>
+      <div class="filecard" id="filecard" hidden>
+        <span class="ok-dot" aria-hidden="true">✓</span>
+        <div><b id="fname"></b><small id="finfo"></small></div>
+        <label class="btn light small" for="file">Cambiar</label>
+      </div>
+      <div class="next-row">
+        <button class="btn ghost" data-go="1">← La oferta</button>
+        <button class="btn" id="next2" data-go="3" disabled>Ver si encaja →</button>
+      </div>
+    </div>
+    <aside class="box">
+      <div class="box-head">Lo que sabemos leer</div>
+      <div class="box-body">
+        <ul class="formats">
+          <li><b>PDF</b> lo más fiable</li>
+          <li><b>Word</b> .docx u .odt</li>
+          <li><b>Foto</b> recta y nítida</li>
+          <li><b>Texto</b> .txt</li>
+        </ul>
+        <p>Para un buen resultado, deja en tu CV los títulos de los apartados: <b>Experiencia</b>, <b>Competencias</b>, <b>Formación</b>.</p>
+      </div>
+    </aside>
+  </div>
+</section>
+<div class="below" data-for="2" hidden style="--c: var(--yellow)">
+  <details class="check" id="check">
+    <summary><span class="section-title" style="--k: var(--yellow)">Revisar el texto leído</span> <span class="hint" id="cvsum"></span></summary>
+    <p class="hint">Si la lectura ha salido mal (sobre todo con una foto), corrígela aquí mismo.</p>
+    <label class="sr-only" for="cvraw">Texto leído de tu CV</label>
+    <textarea id="cvraw" class="sheet-input" spellcheck="false"></textarea>
+  </details>
+</div>
+
+<!-- ============ 3. EL RESULTADO ============ -->
+<section class="panel" data-p="3" hidden style="--c: var(--green); --shadow: var(--yellow)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <span class="label">Paso 3 de 5 · el resultado</span>
+      <h1 class="big"><span id="pct">0</span> % <small id="verdict">encaja</small></h1>
+      <p class="lede" id="sum"></p>
+      <div class="filters" role="group" aria-label="Mostrar">
+        <button class="chip" data-f="all" aria-pressed="true">Todo <span id="n-all"></span></button>
+        <button class="chip" data-f="no" aria-pressed="false" style="--k: var(--pink)">✕ No está en tu CV <span id="n-no"></span></button>
+        <button class="chip" data-f="mid" aria-pressed="false" style="--k: var(--yellow)">? Por concretar <span id="n-mid"></span></button>
+        <button class="chip" data-f="ok" aria-pressed="false" style="--k: var(--card)">✓ Encaja <span id="n-ok"></span></button>
+      </div>
+      <div class="next-row tight">
+        <button class="btn light small" id="compare" type="button">Comparar con otra oferta</button>
+        <button class="btn light small" type="button" data-trackthis>Seguir esta candidatura</button>
+        <button class="btn light small" type="button" id="listen" aria-pressed="false">Escuchar el resultado</button>
+      </div>
+      <details class="share">
+        <summary class="btn light small">Compartir el resumen</summary>
+        <div class="share-body">
+          <p class="hint">Un resumen para enviar a tu orientador/a laboral, a quien te asesora o a alguien de confianza: la puntuación, lo que encaja, lo que falta y el anuncio.</p>
+          <div class="export">
+            <button class="btn small" type="button" data-share="pdf">En PDF</button>
+            <button class="btn light small" type="button" data-share="docx">En Word</button>
+            <button class="btn light small" type="button" data-share="copy">Copiar el texto</button>
+            <button class="btn light small" type="button" data-share="mail">Por correo</button>
+          </div>
+        </div>
+      </details>
+    </div>
+    <aside class="box">
+      <div class="box-head">Haz esto primero</div>
+      <div class="box-body" id="prio"></div>
+    </aside>
+  </div>
+</section>
+<div class="below" data-for="3" hidden style="--c: var(--green)">
+  <div class="legend">
+    <span><i class="stamp ok">Encaja</i> está en tu CV, con un ejemplo real</span>
+    <span><i class="stamp mid">Por concretar</i> lo mencionas, pero nada lo demuestra</span>
+    <span><i class="stamp no">No está en tu CV</i> la oferta lo pide, tu CV no lo menciona</span>
+  </div>
+  <div id="groups"></div>
+</div>
+
+<!-- ============ 4. MEJORAR ============ -->
+<section class="panel" data-p="4" hidden style="--c: var(--pink); --shadow: var(--violet)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <span class="label">Paso 4 de 5</span>
+      <h1 class="big">Mejora tu CV</h1>
+      <p class="lede">En cada punto, completa la frase con tus cifras reales y luego haz clic en «Añadir».</p>
+      <p class="promise"><b>No nos inventamos nada por ti.</b> Una línea solo entra en tu CV si la completas tú.</p>
+    </div>
+    <aside class="box">
+      <div class="box-head">Tu puntuación</div>
+      <div class="box-body score-box">
+        <b id="score4">0 %</b>
+        <span id="score4txt"></span>
+        <div class="meter" aria-hidden="true"><i id="meter4"></i></div>
+      </div>
+    </aside>
+  </div>
+</section>
+<div class="below" data-for="4" hidden style="--c: var(--pink)">
+  <div class="rewrite">
+    <div class="sugs-col"><div class="sugs" id="sugs"></div><section class="group" id="review"></section></div>
+    <aside class="box preview">
+      <div class="box-head">Tu nuevo CV</div>
+      <div class="box-body cvdoc" id="cv4"></div>
+      <div class="export">
+        <button class="btn small" type="button" data-dl="cv-docx">Descargar en Word</button>
+        <button class="btn light small" type="button" data-dl="cv-pdf">En PDF</button>
+        <button class="btn light small" type="button" data-dl="cv-copy">Copiar el texto</button>
+      </div>
+      <p class="preview-foot"><ins>Resaltado</ins> = lo que has añadido. El archivo Word lleva el texto: luego puedes volver a poner tu propio diseño.</p>
+    </aside>
+  </div>
+  <div class="next-row"><button class="btn" data-go="5">Siguiente paso: mi carta →</button></div>
+</div>
+
+<!-- ============ 5. MI CARTA ============ -->
+<section class="panel" data-p="5" hidden style="--c: var(--violet); --shadow: var(--yellow)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <span class="label">Paso 5 de 5</span>
+      <h1 class="big">Tu carta</h1>
+      <p class="lede">Preparamos tu carta de presentación con los puntos fuertes que hemos encontrado en tu CV. Rellena las casillas y la carta se escribe sola al lado.</p>
+      <p class="promise"><b>Seguimos sin inventar nada:</b> la carta solo usa lo que está en tu CV y lo que escribes aquí.</p>
+    </div>
+    <aside class="box">
+      <div class="box-head">Consejo</div>
+      <div class="box-body"><p>Una buena carta cabe en una página: por qué este puesto, lo que ya sabes hacer (con ejemplos) y cuándo estás disponible.</p></div>
+    </aside>
+  </div>
+</section>
+<div class="below" data-for="5" hidden style="--c: var(--violet)">
+  <div class="rewrite">
+    <form class="letter-form" id="lform" autocomplete="on">
+      <fieldset class="field"><legend>Tono de la carta</legend><div class="filters" role="group" aria-label="Tono de la carta"><button class="chip" type="button" data-tone="classic" aria-pressed="true">Clásico</button><button class="chip" type="button" data-tone="dynamic" aria-pressed="false">Dinámico</button><button class="chip" type="button" data-tone="change" aria-pressed="false">Cambio de profesión</button><button class="chip" type="button" data-tone="study" aria-pressed="false">Prácticas o FP dual</button></div></fieldset>
+      <div class="field"><label for="l-name">Tu nombre</label><input id="l-name" autocomplete="name"></div>
+      <div class="field"><label for="l-contact">Tu email y tu teléfono</label><input id="l-contact"></div>
+      <div class="field"><label for="l-company">Nombre de la empresa</label><input id="l-company" placeholder="p. ej.: Logística del Norte"></div>
+      <div class="field"><label for="l-job">Puesto</label><input id="l-job"></div>
+      <div class="field"><label for="l-why">¿Por qué este puesto o esta empresa?</label><textarea id="l-why" rows="3" placeholder="p. ej.: me gusta trabajar en equipo y vuestro almacén está a 10 minutos de mi casa."></textarea></div>
+      <fieldset class="field"><legend>Tus puntos fuertes para destacar</legend><div id="l-strengths" class="strengths"></div></fieldset>
+      <div class="field"><label for="l-when">¿Cuándo estás disponible?</label><input id="l-when" placeholder="p. ej.: desde ya"></div>
+    </form>
+    <aside class="box preview">
+      <div class="box-head">Tu carta <button type="button" id="l-edit">Editar el texto</button></div>
+      <div class="box-body letter" id="letter"></div>
+      <textarea id="letteredit" class="letteredit" hidden aria-label="Texto de la carta"></textarea>
+      <div class="export">
+        <button class="btn small" type="button" data-dl="l-docx">Descargar en Word</button>
+        <button class="btn light small" type="button" data-dl="l-pdf">En PDF</button>
+        <button class="btn light small" type="button" data-dl="l-copy">Copiar el texto</button>
+      </div>
+      <p class="preview-foot">¿Carta enviada? <button class="linkbtn" type="button" data-trackthis="sent">Anótala en tu seguimiento</button></p>
+    </aside>
+  </div>
+  <section class="group" id="checklist"></section>
+</div>
+<!-- ============ SEGUIMIENTO DE CANDIDATURAS ============ -->
+<section class="panel" id="track" hidden style="--c: var(--orange); --shadow: var(--yellow)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <span class="label">Mi seguimiento</span>
+      <h1 class="big">Mis candidaturas</h1>
+      <p class="lede">Anota dónde te has presentado, cómo va cada candidatura y cuándo recordarles que existes.</p>
+      <div class="track-bar">
+        <div class="filters" role="group" aria-label="Vista">
+          <button class="chip" type="button" data-view="cards" aria-pressed="true">Por oferta</button>
+          <button class="chip" type="button" data-view="table" aria-pressed="false">Tabla</button>
+          <button class="chip" type="button" data-view="compare" aria-pressed="false">Comparar</button>
+          <button class="chip" type="button" data-view="stats" aria-pressed="false">Panel</button>
+        </div>
+        <button class="btn small" id="addapp" type="button">+ Añadir una candidatura</button>
+        <button class="btn light small" id="csv" type="button">Exportar para una hoja de cálculo</button>
+        <details class="share proofmenu"><summary class="btn light small">Justificante de búsqueda de empleo</summary><div class="share-body"><div class="export"><button class="btn small" type="button" data-proof="month">Este mes</button><button class="btn light small" type="button" data-proof="last">El mes pasado</button><button class="btn light small" type="button" data-proof="all">Todo</button></div></div></details>
+        <button class="btn light small" id="backup" type="button">Guardar en un archivo</button>
+        <button class="btn light small" id="restore" type="button">Abrir una copia</button>
+        <input type="file" id="restorefile" accept=".json,application/json" hidden>
+      </div>
+      <p class="notice" id="tracknokeep" hidden>Tu seguimiento todavía no se guarda en este dispositivo: desaparecerá al cerrar la página. <button class="btn small" id="keepon" type="button">Guardarlo en este dispositivo</button></p>
+    </div>
+    <aside class="box">
+      <div class="box-head">Por hacer</div>
+      <div class="box-body" id="tracktodo"></div>
+    </aside>
+  </div>
+</section>
+<div class="below" id="trackbelow" hidden style="--c: var(--orange)">
+  <div class="filters" role="group" aria-label="Filtro" id="trackfilters">
+    <button class="chip" type="button" data-tf="all" aria-pressed="true">Todas <span id="tf-all"></span></button>
+    <button class="chip" type="button" data-tf="active" aria-pressed="false" style="--k: var(--yellow)">En curso <span id="tf-active"></span></button>
+    <button class="chip" type="button" data-tf="talk" aria-pressed="false" style="--k: var(--violet)">Entrevistas <span id="tf-talk"></span></button>
+    <button class="chip" type="button" data-tf="done" aria-pressed="false" style="--k: var(--card)">Cerradas <span id="tf-done"></span></button>
+  </div>
+  <div id="trackout"></div>
+</div>
+</main>
+<div id="printzone" aria-hidden="true"></div>
+
+<footer class="foot">
+  <div class="foot-inner">
+    <h2>Tu CV se queda contigo.</h2>
+    <div class="foot-text">
+      <p>Tu CV y la oferta se quedan en tu navegador. Sin cuenta, nada en un servidor. Solo se cuentan las visitas, de forma anónima y sin cookies (Umami).</p>
+      <p class="hint-foot" id="ioshint" hidden>En iPhone: botón Compartir y luego «Añadir a pantalla de inicio» para tener la app, incluso sin conexión.</p>
+      <label class="keep"><input type="checkbox" id="keep"> Guardar mi sesión en este dispositivo para volver más tarde</label>
+      <p><a href="salary-es.html">Calcular el sueldo neto</a> · <a href="infos-es.html">Información, privacidad y mapa del sitio</a></p>
+      <p><button type="button" class="linkbtn" id="wipe">Borrar mis datos de este dispositivo</button> · <small>Una app de <a href="https://portfolio.pissits.com/index-en.html">Simon Victor</a>.</small></p>
+    </div>
+  </div>
+</footer>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="js/lecteur.js"></script>
+<script src="js/moteur.js"></script>
+<script src="js/export.js"></script>
+<script src="js/app.js"></script>
+<script src="js/suivi.js"></script>
+<script src="js/outils.js"></script>
+<script src="js/confort.js"></script>
+<script src="js/demo.js"></script><!-- mode démo temporaire -->
+</body>
+</html>

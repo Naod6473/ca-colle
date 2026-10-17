@@ -62,7 +62,7 @@ Other
 Driving licence, own car`;
 const OFFER = L10N?.offer || (LANG === "fr" ? OFFER_FR : OFFER_EN), SAMPLE_CV = L10N?.cv || (LANG === "fr" ? SAMPLE_CV_FR : SAMPLE_CV_EN);
 // Motifs propres à une autre langue (js/i18n) : ajoutés aux motifs français et anglais
-const LX = (k, base) => L10N?.re?.[k] ? new RegExp(`(?:${base.source})|(?:${L10N.re[k]})`, base.flags) : base;
+const LX = (k, base) => L10N?.re?.[k] ? new RegExp(`(?:${L10N.re[k]})|(?:${base.source})`, base.flags) : base;
 
 const esc = t => String(t).replace(/[&<>"]/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
 const LABEL = {ok: tr("Ça colle", "It fits"), mid: tr("À préciser", "Needs proof"), no: tr("Pas dans ton CV", "Not in your CV")};
@@ -230,7 +230,7 @@ const LEX = [
   // Aide à la personne, santé, enfance
   ["Accompagnement des personnes âgées", "personnes? agees|seniors?|ehpad|personnes? dependantes|perte d'autonomie", "t", "6 personnes suivies chaque semaine"],
   ["Aide à domicile", "aide a domicile|auxiliaire de vie|aide menager\\w*|\\badvf\\b|\\bdeavs\\b|\\baes\\b", "t", "interventions chez 6 personnes"],
-  ["Aide à la toilette", "aide a la toilette|toilette|soins d'hygiene|aide au lever|aide au coucher", "t", "aide au lever et à la toilette"],
+  ["Aide à la toilette", "aide a la toilette|\\btoilette\\b|soins d'hygiene|aide au lever|aide au coucher", "t", "aide au lever et à la toilette"],
   ["Préparation des repas", "preparation des repas|aide (aux|au) repas|confection des repas", "t", "repas pour 4 personnes"],
   ["Garde d'enfants", "garde d'enfants|petite enfance|creche|periscolaire|assistante? maternelle|cap aepe|animat(eur|rice)", "t", "garde de 3 enfants de 2 à 8 ans"],
   ["Diplôme d'aide-soignant", "aide[- ]soignant\\w*|\\bdeas\\b", "l", "obtenu en 2021"],
@@ -328,6 +328,8 @@ const LEX = [
   const [xk, xo, xex, xc] = L10N?.lex?.[k] || [];
   let O2 = eo ? o + "|" + eo : o, C2 = (c || o) + (ec || eo ? "|" + (ec || eo) : "");
   if (xo) { O2 += "|" + xo; C2 += "|" + (xc || xo); }
+  // L10N.lexOnly : points où les motifs français et anglais tombent à tort sur l'autre langue (« senior », « supervisione »)
+  if (xo && L10N.lexOnly?.includes(k)) { O2 = xo; C2 = xc || xo; }
   return {k: LANG === "fr" ? k : xk || ek, o: new RegExp(O2), c: new RegExp(C2), type, ex: LANG === "fr" ? ex : xk ? xex : eex, broad: !!(c || ec || xc)};
 });
 
@@ -344,12 +346,12 @@ function makeFix(r){
     case "o": return r.st === "mid" && r.cvWord
       ? {line:"skills", find:r.cvWord, why:tr("Dis à quoi il te sert, ça parle plus qu'un nom de logiciel.", "Say what you use it for: it says more than a software name."), tpl:tr(`${r.cvWord} ({pour quoi faire ? ${ex}})`, `${r.cvWord} ({what for? ${ex}})`)}
       : {line:"skills", ask:tr(`Sais-tu utiliser ${K} ?`, `Can you use ${K}?`), tpl:tr(`, ${K} ({ton niveau ou un exemple ? ${ex}})`, `, ${K} ({your level or an example? ${ex}})`), nope:tr("Si c'est un « plus », ce n'est pas bloquant. Sinon, une formation courte peut suffire.", "If it is only a plus, it is not a deal-breaker. Otherwise, a short course may be enough.")};
-    case "l": return {line: /dipl|cap|bac|bts|licence|master|degree|qualif/i.test(K) ? "edu" : "skills", ask:tr(`As-tu : ${K} ?`, `Do you have: ${K}?`), tpl:tr(`, ${K} ({année ou détail ? ${r.ex ? "ex : " + r.ex : "ex : 2023"}})`, `, ${K} ({year or detail? ${r.ex ? "e.g. " + r.ex : "e.g. 2023"}})`), nope:tr("Certaines entreprises financent la formation. Tu peux dire dans ta lettre que tu es prêt(e) à la passer.", "Some employers pay for the training. You can say in your letter that you are ready to take it.")};
+    case "l": return {line: (/dipl|cap|bac|bts|licence|master|degree|qualif/i.test(K) || (L10N?.re?.eduWords && new RegExp(L10N.re.eduWords, "i").test(K))) ? "edu" : "skills", ask:tr(`As-tu : ${K} ?`, `Do you have: ${K}?`), tpl:tr(`, ${K} ({année ou détail ? ${r.ex ? "ex : " + r.ex : "ex : 2023"}})`, `, ${K} ({year or detail? ${r.ex ? "e.g. " + r.ex : "e.g. 2023"}})`), nope:tr("Certaines entreprises financent la formation. Tu peux dire dans ta lettre que tu es prêt(e) à la passer.", "Some employers pay for the training. You can say in your letter that you are ready to take it.")};
     case "g": return r.st === "mid" && r.cvWord
       ? {line:"skills", find:r.cvWord, tpl:tr(`${r.cvWord} ({ton niveau ? ex : scolaire, courant})`, `${r.cvWord} ({your level? e.g. basic, fluent})`)}
       : {line:"skills", ask:tr(`Tu parles ${k} ?`, `Do you speak ${k}?`), tpl:tr(`, ${k} {ton niveau ? ex : scolaire}`, `, ${k} {your level? e.g. basic}`), nope:tr("Si l'offre dit « apprécié », ce n'est pas bloquant.", "If the offer says \"a plus\", it is not a deal-breaker.")};
     case "h": return {line:"skills", ask:tr("Acceptes-tu ces horaires ?", "Are you OK with these hours?"), tpl:tr(", disponible {quand ? ex : en horaires décalés et le week-end}", ", available {when? e.g. shifts and weekends}"), nope:tr("Dis-le franchement en entretien : c'est mieux que de mauvaises surprises.", "Say it honestly at the interview: better than bad surprises.")};
-    case "d": return {line:"edu", ask:tr(`As-tu ce diplôme (${r.word}) ?`, `Do you have this qualification (${r.word})?`), tpl:tr(`${r.word.toUpperCase()} {spécialité et année ? ex : Employé de commerce, 2020}`, `${r.word} {subject and year? e.g. Business, 2020}`), nope:tr("Une expérience équivalente compte souvent autant : mets-la en avant dans ta lettre.", "Similar experience often counts as much: highlight it in your letter.")};
+    case "d": return {line:"edu", ask:tr(`As-tu ce diplôme (${r.word}) ?`, `Do you have this qualification (${r.word})?`), tpl:tr(`${LANG === "fr" ? r.word.toUpperCase() : r.word} {spécialité et année ? ex : Employé de commerce, 2020}`, `${r.word} {subject and year? e.g. Business, 2020}`), nope:tr("Une expérience équivalente compte souvent autant : mets-la en avant dans ta lettre.", "Similar experience often counts as much: highlight it in your letter.")};
     default: return r.st === "mid"
       ? {line:"exp", why:tr("C'est cité, mais sans exemple concret.", "It is mentioned, but with no real example."), tpl:tr(` {un exemple concret ? ex : où, combien, pendant combien de temps}.`, ` {a real example? e.g. where, how many, for how long}.`)}
       : {line:"exp", ask:tr("As-tu déjà fait ça ?", "Have you done this before?"), tpl:tr(` {ce que tu as fait ? ex : où, combien, pendant combien de temps}.`, ` {what you did? e.g. where, how many, for how long}.`), nope:tr("Pas grave : mets en avant ce qui s'en rapproche le plus.", "No problem: highlight what comes closest.")};
@@ -410,7 +412,7 @@ function cvYears(text){
 
 /* ---------- Mots importants d'une ligne de l'offre qui n'est pas dans le lexique ---------- */
 const STOP = new Set(("le la les un une des du de d l au aux et ou en a dans sur pour par avec sans sous chez vers entre ce cet cette ces son sa ses leur leurs votre vos notre nos vous nous il elle ils elles on qui que quoi dont est sont etre avoir sera serez etes avez ont fait faire tout tous toute toutes tres plus moins bien bon bonne bonnes bons poste postes missions mission profil recherche recherchons recherche h f h/f cdi cdd temps plein partiel salaire experience experiences ans annee annees minimum maximum souhaite souhaitee apprecie appreciee requis requise exige exigee indispensable obligatoire capacite capacites savoir connaissance connaissances maitrise maitriser assurer assurez participer participez realiser realisez effectuer effectuez gerer gerez etc ainsi selon afin lors type idealement equivalent similaire premiere premier divers diverses ensemble differentes differents garantir mettre oeuvre intervenir contribuer veiller cadre the and with for from your you our will that this have has are can able ability must should strong excellent good great knowledge including such other within across into well role job position responsibilities requirements required preferred desired years year experience working work ensure using use help").split(" ").concat(L10N?.stop ? L10N.stop.split(" ") : []));
-const tokens = s => [...new Set(fold(s).split(/[^a-z0-9+#]+/).filter(w => w.length >= 4 && !STOP.has(w)).map(w => w.slice(0, 6)))];
+const tokens = s => [...new Set(fold(s).split(/[^a-zß0-9+#]+/).filter(w => w.length >= 4 && !STOP.has(w)).map(w => w.slice(0, 6)))];
 /* Familles de mots proches : un mot de l'offre est retrouvé dans le CV par un mot de la même famille.
    Racines de 6 lettres au plus, sans accents (comme les mots importants ci-dessus). */
 const SYN = [
@@ -489,14 +491,14 @@ function analyse(offer){
     const line = raw.replace(/^\s*[-•●▪◦*–·✓✔>]+\s*/, "").replace(/[.;]+$/, "").trim(), F = fold(line);
     if (line.length < 6 || line.length > 120 || NOT_SKILL.test(F) || LEX.some(d => d.o.test(F)) || (L10N?.re?.yearsWord ? new RegExp(String.raw`\d+\+?\s*(ans?|years?|${L10N.re.yearsWord})\b`) : /\d+\+?\s*(ans?|years?)\b/).test(F) || DIPLOMA.test(F)) return;
     const tk = tokens(line); if (tk.length < 1) return;
-    const hits = T => { const ws = T.split(/[^a-z0-9+#]+/); return tk.filter(w => synOf(w).some(v => ws.some(x => x.startsWith(v)))); };
+    const hits = T => { const ws = T.split(/[^a-zß0-9+#]+/); return tk.filter(w => synOf(w).some(v => ws.some(x => x.startsWith(v)))); };
     const se = hits(E).length / tk.length, sa = hits(A).length / tk.length;
     const st = se >= .6 ? "ok" : sa >= .6 ? "mid" : "no";
     // Preuve : la ligne du CV qui partage le plus de mots avec cette ligne de l'offre
     let proof = null;
     if (st !== "no") body.filter(l => st !== "ok" || l.exp).forEach(l => {
       const F2 = fold(l.raw), h = hits(F2); if (!h.length || (proof && h.length <= proof.sc)) return;
-      const ws = h.flatMap(synOf), m = F2.split(/[^a-z0-9+#]+/).find(x => x.length >= 3 && ws.some(v => x.startsWith(v))), i = m ? F2.search(new RegExp("\\b" + m)) : 0;
+      const ws = h.flatMap(synOf), m = F2.split(/[^a-zß0-9+#]+/).find(x => x.length >= 3 && ws.some(v => x.startsWith(v))), i = m ? F2.search(new RegExp("\\b" + m)) : 0;
       proof = {t:l.raw, i:Math.max(0, i), n:m ? m.length : 0, sc:h.length, exp:!!l.exp};
     });
     const pos = O.indexOf(F);
@@ -623,7 +625,10 @@ const WEAK_FR = /\b(participer a|participation a|aider a|aide a la|s'occuper de|
 const WEAK_EN = /\b(responsible for|helped (to|with)|involved in|worked on|duties included|various tasks|assisted with|etc\.?)(?=\W|$)/;
 function cvCheck(text){
   const t = String(text || ""), out = [];
-  const words = fold(t).split(/[^a-z']+/), en = words.filter(w => /^(the|and|with|for|of|to|in)$/.test(w)).length > words.filter(w => /^(le|la|les|et|des|du|de|pour)$/.test(w)).length;
+  const words = fold(t).split(/[^a-z']+/), count = re => words.filter(w => re.test(w)).length, nEn = count(/^(the|and|with|for|of|to|in)$/);
+  // Autre langue : ses mots courants (L10N.re.langWords) l'emportent sur l'anglais (« in » est aussi italien, allemand)
+  const nOwn = L10N?.re?.langWords ? count(new RegExp(`^(${L10N.re.langWords})$`)) : 0;
+  const en = !nOwn && nEn > count(/^(le|la|les|et|des|du|de|pour)$/) || nOwn > 0 && nEn > nOwn * 2;
   const own = !!L10N && !en, typos = own ? L10N.typos || {} : en ? TYPOS_EN : TYPOS_FR;
   Object.entries(typos).forEach(([bad, good]) => {
     const re = new RegExp(`(^|[^\\p{L}])(${bad})(?=[^\\p{L}]|$)`, "iu"), m = t.match(re);

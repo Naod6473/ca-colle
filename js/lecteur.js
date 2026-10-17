@@ -13,7 +13,7 @@ let ocrWorker = null, ocrBase = 0, ocrSpan = 1;
 async function ocrWorkerGet() {
   if (ocrWorker) return ocrWorker;
   await load(LIB.tess);
-  ocrWorker = await Tesseract.createWorker(["fra", "eng"], 1, {
+  ocrWorker = await Tesseract.createWorker(L10N?.ocr ? [].concat(L10N.ocr, "eng") : ["fra", "eng"], 1, {
     workerPath: abs(LIB.tessWorker), corePath: abs(LIB.core), langPath: abs(LIB.lang), workerBlobURL: false,
     logger: (m) => {
       if (m.status === "recognizing text") progress(ocrBase + m.progress * ocrSpan, tr(`Lecture de l'image : ${Math.round(m.progress * 100)} %`, `Reading the image: ${Math.round(m.progress * 100)}%`));
@@ -80,9 +80,9 @@ async function read(f) {
     for (let i = 1; i <= pages; i++) {
       const tc = await (await pdf.getPage(i)).getTextContent();
       text += tc.items.map(it => it.str + (it.hasEOL ? "\n" : " ")).join("") + "\n\n";
-      progress(.1 + .8 * i / pages, `Page ${i} sur ${pages}`);
+      progress(.1 + .8 * i / pages, tr(`Page ${i} sur ${pages}`, `Page ${i} of ${pages}`));
     }
-    const pl = `${pdf.numPages} page${pdf.numPages > 1 ? "s" : ""}`;
+    const pl = tr(`${pdf.numPages} page${pdf.numPages > 1 ? "s" : ""}`, `${pdf.numPages} page${pdf.numPages > 1 ? "s" : ""}`);
     if (text.replace(/\s/g, "").length > 80) return { text, info: "PDF · " + pl };
     // PDF scanné : on rend les pages en image, puis OCR
     progress(.12, tr("Ce PDF est une image : lecture à l'œil (OCR)…", "This PDF is an image: reading it by eye (OCR)…"));

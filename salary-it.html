@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fdf3e3">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="alternate" hreflang="fr" href="https://ca-colle.pissits.com/salaire.html">
+<link rel="alternate" hreflang="en" href="https://ca-colle.pissits.com/salary-en.html">
+<link rel="alternate" hreflang="de" href="https://ca-colle.pissits.com/salary-de.html">
+<link rel="alternate" hreflang="es" href="https://ca-colle.pissits.com/salary-es.html">
+<link rel="alternate" hreflang="it" href="https://ca-colle.pissits.com/salary-it.html">
+<link rel="preload" href="fonts/archivo-latin-900-italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/skins.css">
+<script src="js/i18n/it.js"></script>
+<script src="js/lang.js"></script>
+<script defer src="https://stats.pissits.com/script.js" data-website-id="79e7d60a-075b-4867-9973-a2659b51101c"></script>
+<title>Stipendio lordo e netto · Calza?</title>
+<meta name="description" content="Calcola il tuo stipendio netto in Italia partendo dal lordo (orario, mensile, annuo): contributi INPS, IRPEF 2025, detrazioni e addizionali. Una stima gratuita, nel tuo browser.">
+</head>
+<body>
+<a class="skip-link" href="#contenu">Vai al contenuto</a>
+<header class="top">
+  <a class="logo" href="index-it.html"><span>Calza?</span></a>
+  <div class="top-actions">
+    <details class="comfort" id="comfortmenu">
+      <summary class="pill pill-comfort" title="Modalità comfort">Aa <span class="sr-only">Modalità comfort</span></summary>
+      <div class="comfort-menu" role="group" aria-label="Modalità comfort">
+        <div class="skins" role="group" aria-label="Aspetto"><b>Aspetto</b><button type="button" data-skin="tampon" aria-pressed="true">Timbro</button><button type="button" data-skin="fiche" aria-pressed="false">Scheda</button></div>
+        <button type="button" data-comfort="big" aria-pressed="false">Testo più grande</button>
+        <button type="button" data-comfort="contrast" aria-pressed="false">Contrasto forte</button>
+        <button type="button" data-comfort="dark" aria-pressed="false">Modalità scura</button>
+        <button type="button" data-comfort="calm" aria-pressed="false">Meno animazioni</button>
+        <small>Impostazione conservata su questo dispositivo.</small>
+      </div>
+    </details>
+    <details class="langs" id="langmenu"><summary class="pill pill-lang" title="Lingua">IT <span class="sr-only">Lingua</span></summary><div class="lang-menu" role="group" aria-label="Lingua"><a href="salaire.html" hreflang="fr" lang="fr"><b>FR</b> Français</a><a href="salary-en.html" hreflang="en" lang="en"><b>EN</b> English</a><a href="salary-de.html" hreflang="de" lang="de"><b>DE</b> Deutsch</a><a href="salary-es.html" hreflang="es" lang="es"><b>ES</b> Español</a><a href="salary-it.html" hreflang="it" lang="it" aria-current="true"><b>IT</b> Italiano</a></div></details>
+    <span class="pill pill-safe"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Gratis · senza account · senza IA</span>
+  </div>
+  <nav class="tabs" aria-label="Passi">
+    <a class="tab" href="index-it.html#etape-1" data-n="1" data-s="Offerta" style="--c: var(--blue)"><small>Passo 1</small><b>L'offerta</b></a>
+    <a class="tab" href="index-it.html#etape-2" data-n="2" data-s="CV" style="--c: var(--yellow)"><small>Passo 2</small><b>Il tuo CV</b></a>
+    <a class="tab" href="index-it.html#etape-3" data-n="3" data-s="Risultato" style="--c: var(--green)"><small>Passo 3</small><b>Il risultato</b></a>
+    <a class="tab" href="index-it.html#etape-4" data-n="4" data-s="Migliora" style="--c: var(--pink)"><small>Passo 4</small><b>Migliora il mio CV</b></a>
+    <a class="tab" href="index-it.html#etape-5" data-n="5" data-s="Lettera" style="--c: var(--violet)"><small>Passo 5</small><b>La mia lettera</b></a>
+    <span class="tab-sep" aria-hidden="true"></span>
+    <a class="tab tab-tool" href="index-it.html#suivi" data-n="≡" data-s="Segui" style="--c: var(--orange)"><small>Il mio registro</small><b>Le mie candidature</b></a>
+    <a class="tab tab-tool" href="salary-it.html" aria-current="page" data-n="€" data-s="Stipendio" style="--c: var(--teal)"><small>Strumento</small><b>Lordo → netto</b></a>
+  </nav>
+</header>
+<span id="contenu" tabindex="-1"></span>
+<main class="salary">
+<section class="panel" style="--c: var(--teal); --shadow: var(--yellow)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <span class="label">Strumento · stipendio</span>
+      <h1 class="big">Lordo → netto</h1>
+      <p class="lede" id="sum"></p>
+      <p class="notice" id="from" hidden>Retribuzione letta nell'annuncio: <b id="fromv"></b></p>
+      <div class="sal-grid">
+        <fieldset class="sal-col"><legend>Il tuo lordo</legend>
+          <label class="afield"><span>Lordo orario</span><input class="money" id="hb" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label class="afield main"><span>Lordo mensile <i class="tag" id="rate"></i></span><input class="money" id="mb" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label class="afield main"><span>Lordo annuo (RAL)</span><input class="money" id="ab" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+        </fieldset>
+        <fieldset class="sal-col"><legend>Il tuo netto</legend>
+          <label class="afield"><span>Netto orario</span><input class="money" id="hn" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label class="afield main"><span>Netto mensile</span><input class="money" id="mn" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label class="afield"><span>Netto annuo</span><input class="money" id="an" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+        </fieldset>
+        <fieldset class="sal-col"><legend>Trattenute (all'anno)</legend>
+          <p class="sal-line"><span>Contributi INPS</span><b id="inps">0 €</b></p>
+          <p class="sal-line"><span>IRPEF netta</span><b id="irpef">0 €</b></p>
+          <p class="sal-line"><span>Addizionali regionale e comunale</span><b id="addiz">0 €</b></p>
+          <p class="sal-line"><span>Bonus in busta paga</span><b id="bonus">0 €</b></p>
+        </fieldset>
+      </div>
+    </div>
+    <aside class="box">
+      <div class="box-head">Il tuo netto in busta paga</div>
+      <div class="box-body sal-res">
+        <div><small>Per mensilità</small><b id="pmn">0</b><span>€ netti</span></div>
+        <div><small>All'anno</small><b id="pan">0</b><span>€ netti</span></div>
+      </div>
+    </aside>
+  </div>
+</section>
+<div class="below" style="--c: var(--teal)">
+  <section class="group"><h2 class="section-title" style="--k: var(--yellow)">Mensilità all'anno</h2>
+    <div class="filters" role="group" aria-label="Numero di mensilità">
+      <button class="chip" type="button" data-mo="12" aria-pressed="false">12 mensilità</button><button class="chip" type="button" data-mo="13" aria-pressed="true">13 mensilità</button><button class="chip" type="button" data-mo="14" aria-pressed="false">14 mensilità</button>
+    </div>
+    <p class="hint">Molti contratti collettivi (CCNL) prevedono la tredicesima, alcuni anche la quattordicesima (per esempio commercio e turismo). Il lordo mensile è il lordo annuo diviso per le mensilità.</p>
+  </section>
+  <section class="group"><h2 class="section-title" style="--k: var(--yellow)">Ore a settimana: <span id="hoursv"></span></h2>
+    <label class="sr-only" for="hours">Ore a settimana</label><input type="range" id="hours" min="5" max="48" step="0.5" value="40">
+    <p class="hint">Serve per passare dalla paga oraria al lordo annuo. Il tempo pieno è di solito tra 36 e 40 ore.</p>
+  </section>
+  <section class="group"><h2 class="section-title" style="--k: var(--yellow)">Addizionali regionale e comunale: <span id="addv"></span></h2>
+    <label class="sr-only" for="add">Addizionali regionale e comunale</label><input type="range" id="add" min="0" max="4.5" step="0.1" value="2.5">
+    <p class="hint">Dipendono da dove abiti: in media circa 1,7 % per la regione e 0,8 % per il comune. Trovi le tue aliquote sul sito della tua regione e del tuo comune.</p>
+  </section>
+  <p class="promise"><b>È una stima</b> con le regole 2025 per un lavoratore dipendente del settore privato: contributi INPS al 9,19 % (più 1 % oltre 55.448 € all'anno), IRPEF a scaglioni (23 % fino a 28.000 €, 35 % fino a 50.000 €, 43 % oltre), detrazioni per lavoro dipendente, taglio del cuneo fiscale 2025 e trattamento integrativo fino a 15.000 € di reddito. Non tiene conto di familiari a carico, di altri redditi, del TFR, dei premi né delle regole speciali di alcuni contratti, e divide il netto annuo in parti uguali tra le mensilità. La tua busta paga fa fede. <button type="button" class="linkbtn" id="clear">Svuota le caselle</button></p>
+</div>
+</main>
+<footer class="foot">
+  <div class="foot-inner">
+    <h2>Il tuo CV resta con te.</h2>
+    <div class="foot-text">
+      <p>Il calcolo avviene nel tuo browser. Si contano solo le visite, in modo anonimo e senza cookie (Umami).</p>
+      <p><a href="index-it.html">Confronta il mio CV con un'offerta</a> · <a href="infos-it.html">Informazioni e privacy</a> · <small>Un'app di <a href="https://portfolio.pissits.com/">Simon Victor</a>.</small></p>
+    </div>
+  </div>
+</footer>
+<script src="js/salaire.js"></script>
+<script src="js/confort.js"></script>
+</body>
+</html>

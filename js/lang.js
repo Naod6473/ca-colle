@@ -11,8 +11,8 @@ const trTpl = L10N ? Object.entries(L10N.s || {}).filter(([k]) => /\{\d\}/.test(
   const parts = k.split(/\{(\d)\}/), idx = [];
   let src = "^";
   parts.forEach((p, i) => { if (i % 2) { idx.push(+p); src += "([\\s\\S]*?)"; } else src += p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); });
-  return {re: new RegExp(src + "$"), idx, v};
-}) : [];
+  return {re: new RegExp(src + "$"), idx, v, len: k.replace(/\{\d\}/g, "").length};
+}).sort((a, b) => b.len - a.len) : []; // modèle le plus précis d'abord : « {0} » n'attrape pas une phrase qui a le sien
 const tr = (fr, en) => {
   if (LANG === "fr") return fr;
   if (EN || !L10N) return en;
@@ -24,6 +24,8 @@ const tr = (fr, en) => {
   }
   return en;
 };
+// « (H/F) » dans un intitulé de poste ; autre langue : L10N.re.gender (« m/w/d »…), motif sans parenthèses
+const GENDER = (g => new RegExp(String.raw`\s*\((?:${g})\)|\s*(?:${g})\b`, "ig"))(String.raw`h\s*\/\s*f` + (L10N?.re?.gender ? "|" + L10N.re.gender : ""));
 // Pages de l'app dans chaque langue (menu des langues)
 const PAGES = {
   app:   {fr: "./", en: "index-en.html", de: "index-de.html", es: "index-es.html", it: "index-it.html"},

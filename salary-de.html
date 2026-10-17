@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fdf3e3">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="alternate" hreflang="fr" href="https://ca-colle.pissits.com/salaire.html">
+<link rel="alternate" hreflang="en" href="https://ca-colle.pissits.com/salary-en.html">
+<link rel="alternate" hreflang="de" href="https://ca-colle.pissits.com/salary-de.html">
+<link rel="alternate" hreflang="es" href="https://ca-colle.pissits.com/salary-es.html">
+<link rel="alternate" hreflang="it" href="https://ca-colle.pissits.com/salary-it.html">
+<link rel="preload" href="fonts/archivo-latin-900-italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/skins.css">
+<script src="js/i18n/de.js"></script>
+<script src="js/lang.js"></script>
+<script defer src="https://stats.pissits.com/script.js" data-website-id="79e7d60a-075b-4867-9973-a2659b51101c"></script>
+<title>Brutto-Netto-Rechner · Passt das?</title>
+<meta name="description" content="Berechne deinen Nettolohn aus dem Brutto (pro Stunde, Monat oder Jahr): Lohnsteuer, Solidaritätszuschlag, Kirchensteuer und Sozialversicherung 2025. Kostenlos, in deinem Browser.">
+</head>
+<body>
+<a class="skip-link" href="#contenu">Zum Inhalt springen</a>
+<header class="top">
+  <a class="logo" href="index-de.html"><span>Passt das?</span></a>
+  <div class="top-actions">
+    <details class="comfort" id="comfortmenu">
+      <summary class="pill pill-comfort" title="Komfortmodus">Aa <span class="sr-only">Komfortmodus</span></summary>
+      <div class="comfort-menu" role="group" aria-label="Komfortmodus">
+        <div class="skins" role="group" aria-label="Aussehen"><b>Aussehen</b><button type="button" data-skin="tampon" aria-pressed="true">Stempel</button><button type="button" data-skin="fiche" aria-pressed="false">Karteikarte</button></div>
+        <button type="button" data-comfort="big" aria-pressed="false">Größere Schrift</button>
+        <button type="button" data-comfort="contrast" aria-pressed="false">Hoher Kontrast</button>
+        <button type="button" data-comfort="dark" aria-pressed="false">Dunkelmodus</button>
+        <button type="button" data-comfort="calm" aria-pressed="false">Weniger Bewegung</button>
+        <small>Einstellung bleibt auf diesem Gerät.</small>
+      </div>
+    </details>
+    <details class="langs" id="langmenu"><summary class="pill pill-lang" title="Sprache">DE <span class="sr-only">Sprache</span></summary><div class="lang-menu" role="group" aria-label="Sprache"><a href="salaire.html" hreflang="fr" lang="fr"><b>FR</b> Français</a><a href="salary-en.html" hreflang="en" lang="en"><b>EN</b> English</a><a href="salary-de.html" hreflang="de" lang="de" aria-current="true"><b>DE</b> Deutsch</a><a href="salary-es.html" hreflang="es" lang="es"><b>ES</b> Español</a><a href="salary-it.html" hreflang="it" lang="it"><b>IT</b> Italiano</a></div></details>
+    <span class="pill pill-safe"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Kostenlos · ohne Konto · ohne KI</span>
+  </div>
+  <nav class="tabs" aria-label="Schritte">
+    <a class="tab" href="index-de.html#etape-1" data-n="1" data-s="Anzeige" style="--c: var(--blue)"><small>Schritt 1</small><b>Das Angebot</b></a>
+    <a class="tab" href="index-de.html#etape-2" data-n="2" data-s="Lebenslauf" style="--c: var(--yellow)"><small>Schritt 2</small><b>Dein Lebenslauf</b></a>
+    <a class="tab" href="index-de.html#etape-3" data-n="3" data-s="Ergebnis" style="--c: var(--green)"><small>Schritt 3</small><b>Das Ergebnis</b></a>
+    <a class="tab" href="index-de.html#etape-4" data-n="4" data-s="Besser" style="--c: var(--pink)"><small>Schritt 4</small><b>Lebenslauf verbessern</b></a>
+    <a class="tab" href="index-de.html#etape-5" data-n="5" data-s="Brief" style="--c: var(--violet)"><small>Schritt 5</small><b>Mein Anschreiben</b></a>
+    <span class="tab-sep" aria-hidden="true"></span>
+    <a class="tab tab-tool" href="index-de.html#suivi" data-n="≡" data-s="Übersicht" style="--c: var(--orange)"><small>Meine Übersicht</small><b>Meine Bewerbungen</b></a>
+    <a class="tab tab-tool" href="salary-de.html" aria-current="page" data-n="€" data-s="Gehalt" style="--c: var(--teal)"><small>Werkzeug</small><b>Brutto → Netto</b></a>
+  </nav>
+</header>
+<span id="contenu" tabindex="-1"></span>
+<main class="salary">
+<section class="panel" style="--c: var(--teal); --shadow: var(--yellow)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <span class="label">Werkzeug · Gehalt</span>
+      <h1 class="big">Brutto → Netto</h1>
+      <p class="lede" id="sum"></p>
+      <p class="notice" id="from" hidden>Gehalt aus der Anzeige: <b id="fromv"></b></p>
+      <div class="sal-grid">
+        <fieldset class="sal-col"><legend>Dein Bruttolohn</legend>
+          <label class="afield"><span>Pro Stunde brutto</span><input class="money" id="hb" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label class="afield main"><span>Pro Monat brutto</span><input class="money" id="mb" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label class="afield main"><span>Pro Jahr brutto</span><input class="money" id="ab" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+        </fieldset>
+        <fieldset class="sal-col"><legend>Dein Nettolohn</legend>
+          <label class="afield"><span>Pro Stunde netto</span><input class="money" id="hn" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label class="afield main"><span>Pro Monat netto</span><input class="money" id="mn" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label class="afield"><span>Pro Jahr netto</span><input class="money" id="an" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+        </fieldset>
+        <fieldset class="sal-col"><legend>Abzüge pro Monat</legend>
+          <p class="sal-line"><span>Lohnsteuer</span><b id="lst">0 €</b></p>
+          <p class="sal-line"><span>Solidaritäts&shy;zuschlag</span><b id="soli">0 €</b></p>
+          <p class="sal-line"><span>Kirchensteuer</span><b id="kist">0 €</b></p>
+          <p class="sal-line"><span>Renten&shy;versicherung</span><b id="rv">0 €</b></p>
+          <p class="sal-line"><span>Arbeitslosen&shy;versicherung</span><b id="av">0 €</b></p>
+          <p class="sal-line"><span>Kranken&shy;versicherung</span><b id="kv">0 €</b></p>
+          <p class="sal-line"><span>Pflege&shy;versicherung</span><b id="pv">0 €</b></p>
+          <p class="sal-line"><span><b>Zusammen</b></span><b id="abz">0 €</b></p>
+        </fieldset>
+      </div>
+    </div>
+    <aside class="box">
+      <div class="box-head">Was dir bleibt</div>
+      <div class="box-body sal-res">
+        <div><small>Pro Monat</small><b id="pmn">0</b><span>€ netto</span></div>
+        <div><small>Pro Jahr</small><b id="pan">0</b><span>€ netto</span></div>
+      </div>
+    </aside>
+  </div>
+</section>
+<div class="below" style="--c: var(--teal)">
+  <section class="group"><h2 class="section-title" style="--k: var(--yellow)">Steuerklasse</h2>
+    <div class="filters" role="group" aria-label="Steuerklasse">
+      <button class="chip" type="button" data-kl="1" aria-pressed="true">I · ledig</button>
+      <button class="chip" type="button" data-kl="2" aria-pressed="false">II · alleinerziehend</button>
+      <button class="chip" type="button" data-kl="3" aria-pressed="false">III · verheiratet, höheres Einkommen</button>
+      <button class="chip" type="button" data-kl="4" aria-pressed="false">IV · verheiratet, ähnliches Einkommen</button>
+    </div>
+    <p class="hint">Deine Steuerklasse steht auf deiner Lohnabrechnung. Klasse V und VI rechnet dieses Werkzeug nicht.</p>
+  </section>
+  <section class="group"><h2 class="section-title" style="--k: var(--yellow)">Kirchensteuer</h2>
+    <div class="filters" role="group" aria-label="Kirchensteuer">
+      <button class="chip" type="button" data-ki="0" aria-pressed="true">Keine</button>
+      <button class="chip" type="button" data-ki="8" aria-pressed="false">8 % (Bayern, Baden-Württemberg)</button>
+      <button class="chip" type="button" data-ki="9" aria-pressed="false">9 % (andere Bundesländer)</button>
+    </div>
+  </section>
+  <section class="group"><h2 class="section-title" style="--k: var(--yellow)">Kinder</h2>
+    <div class="filters" role="group" aria-label="Kinder">
+      <button class="chip" type="button" data-kid="0" aria-pressed="true">Keine Kinder · +0,6 % Pflege</button>
+      <button class="chip" type="button" data-kid="1" aria-pressed="false">Mit Kindern</button>
+    </div>
+    <p class="hint">Ohne Kinder zahlst du ab 23 Jahren einen Zuschlag zur Pflegeversicherung.</p>
+  </section>
+  <section class="group"><h2 class="section-title" style="--k: var(--yellow)">Stunden pro Woche: <span id="hoursv"></span></h2>
+    <label class="sr-only" for="hours">Stunden pro Woche</label><input type="range" id="hours" min="5" max="48" step="0.5" value="40">
+    <p class="hint">Damit wird ein Stundenlohn in einen Monatslohn umgerechnet (Stunden × 52 Wochen ÷ 12 Monate).</p>
+  </section>
+  <section class="group"><h2 class="section-title" style="--k: var(--yellow)">Zusatzbeitrag deiner Krankenkasse: <span id="zbv"></span></h2>
+    <label class="sr-only" for="zb">Zusatzbeitrag der Krankenkasse</label><input type="range" id="zb" min="0" max="4" step="0.05" value="2.5">
+    <p class="hint">Im Schnitt 2,5 % im Jahr 2025, die Hälfte zahlst du. Den genauen Wert findest du bei deiner Krankenkasse.</p>
+  </section>
+  <p class="promise"><b>Das ist eine Schätzung</b> mit den Werten von 2025: Grundtarif der Einkommensteuer (§ 32a EStG), Solidaritätszuschlag mit Freigrenze, Sozialabgaben mit Beitragsbemessungsgrenzen (Rente und Arbeitslosen 96.600 € im Jahr, Kranken und Pflege 66.150 €). Vereinfacht: Vorsorgepauschale grob geschätzt, keine Freibeträge, keine Kinderfreibeträge bei Soli und Kirchensteuer, kein Midijob oder Minijob (bis 2.000 € im Monat sind die Abzüge kleiner), Pflegeversicherung in Sachsen etwas höher, private Krankenversicherung nicht berücksichtigt. Deine Lohnabrechnung zählt. <button type="button" class="linkbtn" id="clear">Felder leeren</button></p>
+</div>
+</main>
+<footer class="foot">
+  <div class="foot-inner">
+    <h2>Dein Lebenslauf bleibt bei dir.</h2>
+    <div class="foot-text">
+      <p>Die Berechnung läuft in deinem Browser. Nur Besuche werden gezählt, anonym und ohne Cookies (Umami).</p>
+      <p><a href="index-de.html">Meinen Lebenslauf mit einer Anzeige vergleichen</a> · <a href="infos-de.html">Impressum und Datenschutz</a> · <small>Eine App von <a href="https://portfolio.pissits.com/">Simon Victor</a>.</small></p>
+    </div>
+  </div>
+</footer>
+<script src="js/salaire.js"></script>
+<script src="js/confort.js"></script>
+</body>
+</html>

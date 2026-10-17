@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fdf3e3">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="alternate" hreflang="fr" href="https://ca-colle.pissits.com/salaire.html">
+<link rel="alternate" hreflang="en" href="https://ca-colle.pissits.com/salary-en.html">
+<link rel="alternate" hreflang="de" href="https://ca-colle.pissits.com/salary-de.html">
+<link rel="alternate" hreflang="es" href="https://ca-colle.pissits.com/salary-es.html">
+<link rel="alternate" hreflang="it" href="https://ca-colle.pissits.com/salary-it.html">
+<link rel="preload" href="fonts/archivo-latin-900-italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/skins.css">
+<script src="js/i18n/es.js"></script>
+<script src="js/lang.js"></script>
+<script defer src="https://stats.pissits.com/script.js" data-website-id="79e7d60a-075b-4867-9973-a2659b51101c"></script>
+<title>Sueldo bruto a neto · ¿Encaja?</title>
+<meta name="description" content="Calcula tu sueldo neto en España a partir del bruto (por hora, por paga, al año): Seguridad Social e IRPF, en 12 o 14 pagas. Gratis, en tu navegador.">
+</head>
+<body>
+<a class="skip-link" href="#contenu">Ir al contenido</a>
+<header class="top">
+  <a class="logo" href="index-es.html"><span>¿Encaja?</span></a>
+  <div class="top-actions">
+    <details class="comfort" id="comfortmenu">
+      <summary class="pill pill-comfort" title="Modo confort">Aa <span class="sr-only">Modo confort</span></summary>
+      <div class="comfort-menu" role="group" aria-label="Modo confort">
+        <div class="skins" role="group" aria-label="Aspecto"><b>Aspecto</b><button type="button" data-skin="tampon" aria-pressed="true">Sello</button><button type="button" data-skin="fiche" aria-pressed="false">Ficha</button></div>
+        <button type="button" data-comfort="big" aria-pressed="false">Texto más grande</button>
+        <button type="button" data-comfort="contrast" aria-pressed="false">Contraste alto</button>
+        <button type="button" data-comfort="dark" aria-pressed="false">Modo oscuro</button>
+        <button type="button" data-comfort="calm" aria-pressed="false">Menos animaciones</button>
+        <small>Ajuste guardado en este dispositivo.</small>
+      </div>
+    </details>
+    <details class="langs" id="langmenu"><summary class="pill pill-lang" title="Idioma">ES <span class="sr-only">Idioma</span></summary><div class="lang-menu" role="group" aria-label="Idioma"><a href="salaire.html" hreflang="fr" lang="fr"><b>FR</b> Français</a><a href="salary-en.html" hreflang="en" lang="en"><b>EN</b> English</a><a href="salary-de.html" hreflang="de" lang="de"><b>DE</b> Deutsch</a><a href="salary-es.html" hreflang="es" lang="es" aria-current="true"><b>ES</b> Español</a><a href="salary-it.html" hreflang="it" lang="it"><b>IT</b> Italiano</a></div></details>
+    <span class="pill pill-safe"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Gratis · sin cuenta · sin IA</span>
+  </div>
+  <nav class="tabs" aria-label="Pasos">
+    <a class="tab" href="index-es.html#etape-1" data-n="1" data-s="Oferta" style="--c: var(--blue)"><small>Paso 1</small><b>La oferta</b></a>
+    <a class="tab" href="index-es.html#etape-2" data-n="2" data-s="CV" style="--c: var(--yellow)"><small>Paso 2</small><b>Tu CV</b></a>
+    <a class="tab" href="index-es.html#etape-3" data-n="3" data-s="Resultado" style="--c: var(--green)"><small>Paso 3</small><b>El resultado</b></a>
+    <a class="tab" href="index-es.html#etape-4" data-n="4" data-s="Mejorar" style="--c: var(--pink)"><small>Paso 4</small><b>Mejorar mi CV</b></a>
+    <a class="tab" href="index-es.html#etape-5" data-n="5" data-s="Carta" style="--c: var(--violet)"><small>Paso 5</small><b>Mi carta</b></a>
+    <span class="tab-sep" aria-hidden="true"></span>
+    <a class="tab tab-tool" href="index-es.html#suivi" data-n="≡" data-s="Seguir" style="--c: var(--orange)"><small>Mi seguimiento</small><b>Mis candidaturas</b></a>
+    <a class="tab tab-tool" href="salary-es.html" aria-current="page" data-n="€" data-s="Salario" style="--c: var(--teal)"><small>Herramienta</small><b>Bruto → neto</b></a>
+  </nav>
+</header>
+<span id="contenu" tabindex="-1"></span>
+<main class="salary">
+<section class="panel" style="--c: var(--teal); --shadow: var(--yellow)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <span class="label">Herramienta · salario</span>
+      <h1 class="big">Bruto → neto</h1>
+      <p class="lede" id="sum"></p>
+      <p class="notice" id="from" hidden>Salario leído en el anuncio: <b id="fromv"></b></p>
+      <div class="sal-grid">
+        <fieldset class="sal-col"><legend>Tu sueldo bruto</legend>
+          <label class="afield"><span>Bruto por hora</span><input class="money" id="ha" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label class="afield main"><span>Bruto por paga</span><input class="money" id="ma" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label class="afield main"><span>Bruto al año</span><input class="money" id="ya" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+        </fieldset>
+        <fieldset class="sal-col"><legend>Tu sueldo neto</legend>
+          <label class="afield"><span>Neto por hora</span><input class="money" id="hn" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label class="afield main"><span>Neto por paga</span><input class="money" id="mn" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label class="afield"><span>Neto al año</span><input class="money" id="yn" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+        </fieldset>
+        <fieldset class="sal-col"><legend>Descuentos al año</legend>
+          <p class="sal-line"><span>Seguridad Social</span><b id="ss">0 €</b></p>
+          <p class="sal-line"><span>IRPF estimado</span><b id="irpf">0 €</b></p>
+          <p class="sal-line"><span>Tipo medio de IRPF</span><b id="rate">0 %</b></p>
+        </fieldset>
+      </div>
+    </div>
+    <aside class="box">
+      <div class="box-head">Lo que cobras</div>
+      <div class="box-body sal-res">
+        <div><small>Por paga</small><b id="pmn">0</b><span>€ netos</span></div>
+        <div><small>Al año</small><b id="pan">0</b><span>€ netos</span></div>
+        <p class="hint">De media al mes, contando las pagas extra: <b id="pmn12">0</b> € netos.</p>
+      </div>
+    </aside>
+  </div>
+</section>
+<div class="below" style="--c: var(--teal)">
+  <section class="group"><h2 class="section-title" style="--k: var(--yellow)">Pagas al año</h2>
+    <div class="filters" role="group" aria-label="Número de pagas">
+      <button class="chip" type="button" data-pg="14" aria-pressed="true">14 pagas</button><button class="chip" type="button" data-pg="12" aria-pressed="false">12 pagas (extras prorrateadas)</button>
+    </div>
+    <p class="hint">Con 14 pagas cobras 12 mensualidades y 2 pagas extra (normalmente en verano y en Navidad). El total del año no cambia.</p>
+  </section>
+  <section class="group"><h2 class="section-title" style="--k: var(--yellow)">Tipo de contrato</h2>
+    <div class="filters" role="group" aria-label="Tipo de contrato">
+      <button class="chip" type="button" data-ct="ind" aria-pressed="true">Indefinido · −6,48 %</button><button class="chip" type="button" data-ct="tmp" aria-pressed="false">Temporal · −6,53 %</button>
+    </div>
+    <p class="hint">Es lo que pagas tú a la Seguridad Social: contingencias comunes, desempleo, formación profesional y MEI (2025), hasta la base máxima de 4.909,50 € al mes.</p>
+  </section>
+  <section class="group"><h2 class="section-title" style="--k: var(--yellow)">Horas por semana: <span id="hoursv"></span></h2>
+    <label class="sr-only" for="hours">Horas por semana</label><input type="range" id="hours" min="10" max="48" step="0.5" value="40">
+    <p class="hint">Sirve para pasar del precio por hora al sueldo anual (se cuentan 52 semanas al año). Jornada completa = 40 horas.</p>
+  </section>
+  <p class="promise"><b>Es una estimación</b> con las reglas de 2025 para una persona soltera, sin hijos ni otros ingresos: Seguridad Social del trabajador, reducción por rendimientos del trabajo, 2.000 € de gastos deducibles, mínimo personal de 5.550 € y la escala del IRPF estatal más una escala autonómica media (del 19 % al 47 %). No tiene en cuenta tu comunidad autónoma (País Vasco y Navarra tienen su propio impuesto), tu familia, la cuota de solidaridad ni otras deducciones. La retención de tu nómina puede ser distinta: tu nómina y tu declaración de la renta son lo que cuenta. <button type="button" class="linkbtn" id="clear">Borrar las casillas</button></p>
+</div>
+</main>
+<footer class="foot">
+  <div class="foot-inner">
+    <h2>Tu CV se queda contigo.</h2>
+    <div class="foot-text">
+      <p>El cálculo se hace en tu navegador. Solo se cuentan las visitas, de forma anónima y sin cookies (Umami).</p>
+      <p><a href="index-es.html">Comparar mi CV con una oferta</a> · <a href="infos-es.html">Información y privacidad</a> · <small>Una app de <a href="https://portfolio.pissits.com/">Simon Victor</a>.</small></p>
+    </div>
+  </div>
+</footer>
+<script src="js/salaire.js"></script>
+<script src="js/confort.js"></script>
+</body>
+</html>
