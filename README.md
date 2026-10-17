@@ -57,4 +57,4 @@ puis ouvrir http://localhost:8000.
 
 - Grand public : français courant, pas de jargon RH.
 - Les statuts s'affichent en texte, pas seulement en couleur.
-- Rien n'est envoyé à un serveur. Une réécriture par IA demanderait un serveur : à décider plus tard, en option.
+- Le CV et l'offre ne sont jamais envoyés à un serveur. Seules des statistiques anonymes passent par Umami (stats.pissits.com, sans cookie) : visites et noms d'actions via `stat()` dans `js/lang.js`, jamais de contenu. Une réécriture par IA demanderait un serveur : à décider plus tard, en option.

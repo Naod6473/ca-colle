@@ -207,9 +207,9 @@ function prepText(o){
 /* ---------- Événements ---------- */
 document.addEventListener("click", e => {
   const t = e.target.closest("button, a"); if (!t) return;
-  if (t.id === "trackbtn") return showTrack();
+  if (t.id === "trackbtn") { stat("suivi-ouvrir"); return showTrack(); }
   if (t.dataset.trackthis !== undefined) {
-    syncOffer(); ensureApp(cur, t.dataset.trackthis || null); save();
+    syncOffer(); stat("suivi-ajout", {from: t.dataset.trackthis || "resultat"}); ensureApp(cur, t.dataset.trackthis || null); save();
     toast(t.dataset.trackthis === "sent" ? tr("Candidature notée comme envoyée", "Application marked as sent") : tr("Ajoutée à ton suivi", "Added to your applications"));
     return showTrack(cur.id);
   }
@@ -218,7 +218,7 @@ document.addEventListener("click", e => {
   if (t.dataset.sort) { trackSort = {k: t.dataset.sort, dir: trackSort.k === t.dataset.sort ? -trackSort.dir : 1}; return renderTrack(); }
   if (t.dataset.openapp) { openApp = t.dataset.openapp; trackView = "cards"; trackFilter = "all"; renderTrack(); return document.getElementById("app-" + openApp)?.scrollIntoView({block: "start", behavior: "smooth"}); }
   if (t.dataset.openoffer) return loadOffer(t.dataset.openoffer);
-  if (t.dataset.prep) { prepFor = t.dataset.prep; renderTrack(); return $("#trackbelow").scrollIntoView({behavior: "smooth"}); }
+  if (t.dataset.prep) { stat("entretien-prep"); prepFor = t.dataset.prep; renderTrack(); return $("#trackbelow").scrollIntoView({behavior: "smooth"}); }
   if (t.id === "prepback") { prepFor = null; return renderTrack(); }
   if (t.dataset.prepdl) {
     const o = offers.find(x => x.id === t.dataset.prepo), txt = prepText(o), how = t.dataset.prepdl;
@@ -233,17 +233,18 @@ document.addEventListener("click", e => {
     save(); return renderTrack();
   }
   if (t.id === "addapp") {
+    stat("suivi-ajout", {from: "manuel"});
     const o = {id: newId(), text: "", fixes: {}, over: {}, letter: {}}; offers.push(o); ensureApp(o);
     openApp = o.id; trackView = "cards"; trackFilter = "all"; save(); renderTrack();
     const el = document.querySelector(`#app-${o.id} [data-fld="job"]`); el?.scrollIntoView({block: "center", behavior: "smooth"}); el?.focus({preventScroll: true});
     return;
   }
-  if (t.id === "csv") return csvExport();
+  if (t.id === "csv") { stat("suivi-csv"); return csvExport(); }
   if (t.id === "keepon") { $("#keep").checked = true; $("#keep").dispatchEvent(new Event("change", {bubbles: true})); return renderTrack(); }
 });
 document.addEventListener("change", e => {
   const t = e.target;
-  if (t.dataset.app && t.dataset.fld === "status") { const o = offers.find(x => x.id === t.dataset.app); setStatus(o, t.value); save(); return renderTrack(); }
+  if (t.dataset.app && t.dataset.fld === "status") { const o = offers.find(x => x.id === t.dataset.app); setStatus(o, t.value); stat("suivi-etat", {s: t.value}); save(); return renderTrack(); }
   if (t.dataset.app && /Date$|^next$/.test(t.dataset.fld)) renderTrack();
 });
 document.addEventListener("input", e => {

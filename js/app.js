@@ -57,6 +57,7 @@ function gates(){
 function go(n){
   if (!canReach(n)) return;
   if (typeof hideTrack === "function") hideTrack();
+  if (step !== n) stat("etape-" + n);
   step = n;
   if (n >= 2) syncOffer();
   results = analyse($("#offer").value);
@@ -153,7 +154,9 @@ function renderResult(){
   const notice = t < 4 ? `<p class="notice">${tr(`Je n'ai repéré que ${plural(t, "point")} dans cette offre. Vérifie que tu as collé l'annonce en entier, avec les missions et le profil recherché.`, `I only found ${plural(t, "point")} in this offer. Check that you pasted the whole ad, with the tasks and the profile wanted.`)}</p>` : "";
   const vocab = results.filter(r => r.vocab);
   const ats = atsCheck($("#cvraw").value, cvFile.info), atsOk = ats.filter(a => a.ok).length;
-  $("#groups").innerHTML = adHTML(adCheck($("#offer").value)) + notice + groups.map(s => {
+  const ad = adCheck($("#offer").value);
+  if (ad.flags.some(f => f.level === "red") && cur && !cur.flagged) { cur.flagged = true; stat("annonce-suspecte"); }
+  $("#groups").innerHTML = adHTML(ad) + notice + groups.map(s => {
     const list = results.filter(r => r.st === s).sort((a, b) => urgency(a) - urgency(b)); if (!list.length) return "";
     return `<section class="group"><h2 class="section-title" style="--k: ${s === "ok" ? "var(--green)" : s === "mid" ? "var(--yellow)" : "var(--pink)"}">${LABEL[s]} (${list.length})</h2><div class="points">${list.map(r => `
       <article class="point">
@@ -436,10 +439,11 @@ document.addEventListener("click", e => {
   if (t.dataset.yes) { fixes[t.dataset.yes].state = "yes"; renderRewrite(); $(`.blank[data-k="${CSS.escape(t.dataset.yes)}"]`)?.focus(); return save(); }
   if (t.dataset.no) { fixes[t.dataset.no].state = "skipped"; renderRewrite(); return save(); }
   if (t.dataset.undo) { const f = fixes[t.dataset.undo]; f.state = f.fix.ask ? "open" : "yes"; return refresh(); }
-  if (t.dataset.add) { fixes[t.dataset.add].state = "accepted"; refresh(); return toast(tr("Ajouté à ton CV", "Added to your CV")); }
+  if (t.dataset.add) { stat("ajout-cv"); fixes[t.dataset.add].state = "accepted"; refresh(); return toast(tr("Ajouté à ton CV", "Added to your CV")); }
   if (t.dataset.over !== undefined) {
     const k = t.dataset.over, v = t.dataset.v;
     if (v) over[k] = v; else delete over[k];
+    stat("tampon-corrige", {v: v || "auto"});
     results = analyse($("#offer").value); syncOffer(); renderResult(); save();
     return toast(v === "skip" ? tr("Point retiré du score", "Point removed from the score") : v ? tr("Tampon corrigé", "Stamp corrected") : tr("Revenu au calcul", "Back to the analysis"));
   }
@@ -449,18 +453,20 @@ document.addEventListener("click", e => {
     if (cur && cur.id === t.dataset.deloffer) { cur = null; $("#offer").value = ""; newOffer(); gates(); }
     renderOffers(); return save();
   }
-  if (t.dataset.share) return exportSummary(t.dataset.share);
+  if (t.dataset.share) { stat("bilan", {how: t.dataset.share}); return exportSummary(t.dataset.share); }
   if (t.dataset.typo) {
     const re = new RegExp(`(^|[^\\p{L}])${t.dataset.typo}(?=[^\\p{L}]|$)`, "gu");
-    setCV($("#cvraw").value.replace(re, `$1${t.dataset.to}`)); refresh();
+    setCV($("#cvraw").value.replace(re, `$1${t.dataset.to}`)); refresh(); stat("relecture-faute");
     return toast(tr(`Corrigé : « ${t.dataset.to} »`, `Fixed: "${t.dataset.to}"`));
   }
   if (t.dataset.dl) {
     const [kind, how] = t.dataset.dl.split("-"), k = kind === "l" ? "letter" : "cv";
+    stat("export", {what: k, how});
     return how === "docx" ? exportDocx(k) : how === "pdf" ? exportPdf(k) : exportCopy(k);
   }
   switch (t.id) {
     case "demo":
+      stat("exemple");
       syncOffer(); if (cur.text.trim() && cur.text !== OFFER) newOffer();
       $("#offer").value = OFFER; cvFile = {name: tr("Exemple : CV de Camille Martin", "Sample: Sam Taylor's CV"), info: tr("CV fictif pour essayer", "Made-up CV to try the app"), conf: 0}; me = {name: "", contact: ""};
       setCV(SAMPLE_CV); showFile(cvFile.name, cvFile.info);
@@ -530,7 +536,7 @@ window.addEventListener("drop", e => { e.preventDefault(); const f = e.dataTrans
 if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) navigator.serviceWorker.register("sw.js").catch(() => {});
 let installEvt = null;
 addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; $("#install").hidden = false; });
-$("#install").addEventListener("click", async () => { if (!installEvt) return; installEvt.prompt(); await installEvt.userChoice.catch(() => {}); installEvt = null; $("#install").hidden = true; });
+$("#install").addEventListener("click", async () => { if (!installEvt) return; installEvt.prompt(); const ch = await installEvt.userChoice.catch(() => ({})); if (ch.outcome === "accepted") stat("installation"); installEvt = null; $("#install").hidden = true; });
 addEventListener("appinstalled", () => { $("#install").hidden = true; toast(tr("App installée", "App installed")); });
 $("#ioshint").hidden = !(/iphone|ipad/i.test(navigator.userAgent) && !navigator.standalone);
 

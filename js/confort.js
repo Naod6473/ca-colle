@@ -13,7 +13,7 @@ function initComfort(){
   menu.addEventListener("click", e => {
     const b = e.target.closest("[data-comfort]"); if (!b) return;
     const k = b.dataset.comfort; comfort[k] = !comfort[k];
-    b.setAttribute("aria-pressed", comfort[k]); applyComfort();
+    b.setAttribute("aria-pressed", comfort[k]); applyComfort(); if (comfort[k]) stat("confort", {k});
     try { localStorage.setItem(COMFORT_KEY, JSON.stringify(comfort)); } catch {}
   });
   document.addEventListener("click", e => { if (menu.open && !menu.contains(e.target)) menu.open = false; });
@@ -34,7 +34,7 @@ function initComfort(){
     const u = new SpeechSynthesisUtterance(text);
     u.lang = tr("fr-FR", "en-GB"); u.rate = .95;
     u.onend = u.onerror = () => say.setAttribute("aria-pressed", "false");
-    say.setAttribute("aria-pressed", "true");
+    say.setAttribute("aria-pressed", "true"); stat("ecouter");
     speechSynthesis.speak(u);
   });
 }
