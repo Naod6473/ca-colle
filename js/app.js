@@ -5,7 +5,8 @@ const MIN_WORDS = 25;
 let step = 1, filter = "all", results = [], cvReady = false;
 
 const words = t => t.trim() ? t.trim().split(/\s+/).length : 0;
-const offerOk = () => words($("#offer").value) >= MIN_WORDS;
+const isLink = t => /^\s*(https?:\/\/|www\.)\S+\s*$/i.test(t);
+const offerOk = () => words($("#offer").value) >= MIN_WORDS && !isLink($("#offer").value);
 const canReach = n => n === 1 || (n === 2 && offerOk()) || (n >= 3 && offerOk() && cvReady);
 
 function toast(t){ const el = $("#toast"); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 2000); }
@@ -14,7 +15,8 @@ function toast(t){ const el = $("#toast"); el.textContent = t; el.hidden = false
 function gates(){
   const w = words($("#offer").value);
   $("#next1").disabled = !offerOk();
-  $("#hint1").textContent = w === 0 ? "Colle au moins quelques lignes de l'annonce." : offerOk() ? `${w} mots, c'est bon.` : `${w} mots : colle l'annonce en entier, il en faut au moins ${MIN_WORDS}.`;
+  $("#linkhelp").hidden = !isLink($("#offer").value);
+  $("#hint1").textContent = isLink($("#offer").value) ? "Colle le texte de l'annonce, pas son lien." : w === 0 ? "Colle au moins quelques lignes de l'annonce." : offerOk() ? `${w} mots, c'est bon.` : `${w} mots : colle l'annonce en entier, il en faut au moins ${MIN_WORDS}.`;
   $("#next2").disabled = !cvReady;
   $$(".tab").forEach(t => {
     const n = +t.dataset.step;
@@ -136,6 +138,26 @@ async function useFile(f){
   } finally { $("#job").hidden = true; $("#file").value = ""; }
 }
 
+/* ---------- Étape 1 : offre jointe en fichier ---------- */
+async function useOfferFile(f){
+  if (!f) return;
+  $("#oerr").hidden = true; $("#ojob").hidden = false;
+  try {
+    const r = await readCV(f, (p, m) => { $("#ojbar").style.width = Math.round(p * 100) + "%"; $("#ojobtxt").textContent = m; });
+    $("#offer").value = r.text; gates();
+    toast("Offre lue");
+    if (r.conf && r.conf < 75) { $("#oerr").textContent = "La capture n'était pas très nette : relis le texte de l'offre avant de continuer."; $("#oerr").hidden = false; }
+  } catch (e) {
+    $("#oerr").textContent = (e.message || "Je n'ai pas réussi à lire ce fichier.").replace(/ton CV/g, "l'offre");
+    $("#oerr").hidden = false;
+  } finally { $("#ojob").hidden = true; $("#offerfile").value = ""; }
+}
+$("#offerfile").addEventListener("change", e => useOfferFile(e.target.files[0]));
+const offerBox = $("#offer");
+["dragenter", "dragover"].forEach(ev => offerBox.addEventListener(ev, e => { e.preventDefault(); offerBox.classList.add("over"); }));
+["dragleave", "drop"].forEach(ev => offerBox.addEventListener(ev, e => { e.preventDefault(); offerBox.classList.remove("over"); }));
+offerBox.addEventListener("drop", e => { e.stopPropagation(); if (e.dataTransfer.files[0]) useOfferFile(e.dataTransfer.files[0]); });
+
 /* ---------- Événements ---------- */
 document.addEventListener("click", e => {
   const t = e.target.closest("button"); if (!t) return;
@@ -175,6 +197,6 @@ const drop = $("#drop");
 ["dragleave", "drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("over"); }));
 drop.addEventListener("drop", e => { e.stopPropagation(); useFile(e.dataTransfer.files[0]); });
 window.addEventListener("dragover", e => e.preventDefault());
-window.addEventListener("drop", e => { e.preventDefault(); if (canReach(2)) useFile(e.dataTransfer.files[0]); });
+window.addEventListener("drop", e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (!f) return; if (step === 1) useOfferFile(f); else if (canReach(2)) useFile(f); });
 
 go(1);

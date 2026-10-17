@@ -35,9 +35,26 @@
     <div class="main-col">
       <span class="label">Étape 1 sur 4</span>
       <h1 class="big">Colle l'offre</h1>
-      <p class="lede">Copie tout le texte de l'annonce qui t'intéresse, depuis le site d'emploi ou le mail, et colle-le ici.</p>
+      <p class="lede">Copie le texte de l'annonce qui t'intéresse et colle-le ici, ou joins-la en fichier.</p>
       <label class="sr-only" for="offer">Texte de l'annonce</label>
-      <textarea id="offer" class="sheet-input" spellcheck="false" placeholder="Exemple : « Nous recherchons un(e) employé(e) logistique… Missions : préparation de commandes… Profil : permis B… »"></textarea>
+      <textarea id="offer" class="sheet-input" spellcheck="false" placeholder="Colle ici le texte de l'annonce, ou glisse un fichier dessus (PDF, Word, capture d'écran)."></textarea>
+      <div class="attach">
+        <span class="hint">L'annonce est dans un fichier ?</span>
+        <label class="btn light small" for="offerfile">Joindre l'offre</label>
+        <span class="hint">PDF, Word ou capture d'écran</span>
+        <input type="file" id="offerfile" accept=".pdf,.docx,.odt,.txt,.md,image/*" class="sr-only">
+      </div>
+      <div class="job" id="ojob" hidden><p id="ojobtxt">Lecture…</p><div class="jbar"><i id="ojbar"></i></div></div>
+      <p class="err" id="oerr" role="alert" hidden></p>
+      <div class="linkhelp" id="linkhelp" hidden>
+        <b>C'est un lien : on ne peut pas ouvrir les sites d'emploi depuis l'app.</b>
+        <ol>
+          <li>Ouvre l'annonce dans ton navigateur.</li>
+          <li>Sélectionne tout le texte de l'annonce et copie-le (sur ordinateur : Ctrl+A puis Ctrl+C).</li>
+          <li>Reviens ici et colle-le à la place du lien.</li>
+        </ol>
+        <p>Sur téléphone, le plus simple est souvent une <b>capture d'écran</b> de l'annonce, à joindre avec le bouton ci-dessus.</p>
+      </div>
       <div class="next-row">
         <button class="btn" id="next1" data-go="2" disabled>Étape suivante : ton CV →</button>
         <span class="hint" id="hint1">Colle au moins quelques lignes de l'annonce.</span>
@@ -47,7 +64,7 @@
       <div class="box-head">Comment ça marche</div>
       <div class="box-body">
         <ol class="how">
-          <li><b>Tu colles l'offre</b> d'emploi.</li>
+          <li><b>Tu colles l'offre</b> d'emploi, ou tu la joins en PDF ou en capture.</li>
           <li><b>Tu ajoutes ton CV</b> : PDF, Word ou photo.</li>
           <li><b>Tu vois ce qui colle</b>, ce qui manque et ce qu'il faut prouver.</li>
           <li><b>Tu améliores ton CV</b> avec des phrases à compléter.</li>
