@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ça colle ? · your CV vs a job offer</title>
+<meta name="description" content="Paste a job offer, add your CV and see what matches. Free, and your CV never leaves your device.">
+<meta name="theme-color" content="#fdf3e3">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest-en.webmanifest">
+<link rel="alternate" hreflang="fr" href="https://ca-colle.pissits.com/">
+<link rel="alternate" hreflang="en" href="https://ca-colle.pissits.com/index-en.html">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Ça colle ?">
+<link rel="preload" href="fonts/archivo-latin-900-italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<a class="skip-link" href="#contenu">Skip to content</a>
+
+<header class="top">
+  <a class="logo" href="index-en.html"><span>Ça colle ?</span></a>
+  <div class="top-actions">
+    <button class="pill pill-install" id="install" type="button" hidden>Install the app</button>
+    <a class="pill pill-lang" href="./" hreflang="fr" lang="fr" title="Version française">FR</a>
+    <span class="pill pill-safe"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Nothing is sent</span>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="Steps">
+    <button class="tab" role="tab" data-step="1" style="--c: var(--blue)"><small>Step 1</small><b>The offer</b></button>
+    <button class="tab" role="tab" data-step="2" style="--c: var(--yellow)"><small>Step 2</small><b>Your CV</b></button>
+    <button class="tab" role="tab" data-step="3" style="--c: var(--green)"><small>Step 3</small><b>The result</b></button>
+    <button class="tab" role="tab" data-step="4" style="--c: var(--pink)"><small>Step 4</small><b>Improve my CV</b></button>
+    <button class="tab" role="tab" data-step="5" style="--c: var(--violet)"><small>Step 5</small><b>My letter</b></button>
+  </nav>
+</header>
+<span id="contenu" tabindex="-1"></span>
+
+<main>
+<!-- ============ 1. L'OFFRE ============ -->
+<section class="panel" data-p="1" style="--c: var(--blue); --shadow: var(--orange)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <div class="resume" id="resume" hidden><b>Your session is back.</b> <span id="resumetxt"></span> <button class="btn light small" id="wipe2" type="button">Erase everything</button></div>
+      <span class="label">Step 1 of 5</span>
+      <h1 class="big">Paste the offer</h1>
+      <p class="lede">Copy the text of the job ad you like and paste it here, or attach it as a file.</p>
+      <label class="sr-only" for="offer">Text of the job ad</label>
+      <textarea id="offer" class="sheet-input" spellcheck="false" placeholder="Paste the text of the job ad here, or drop a file on it (PDF, Word, screenshot)."></textarea>
+      <div class="attach">
+        <span class="hint">Is the ad in a file?</span>
+        <label class="btn light small" for="offerfile">Attach the offer</label>
+        <span class="hint">PDF, Word or screenshot</span>
+        <input type="file" id="offerfile" accept=".pdf,.docx,.odt,.txt,.md,image/*" class="sr-only">
+      </div>
+      <div class="job" id="ojob" hidden><p id="ojobtxt">Reading…</p><div class="jbar"><i id="ojbar"></i></div></div>
+      <p class="err" id="oerr" role="alert" hidden></p>
+      <div class="linkhelp" id="linkhelp" hidden>
+        <b>This is a link: the app cannot open job websites.</b>
+        <ol>
+          <li>Open the ad in your browser.</li>
+          <li>Select all the text of the ad and copy it (on a computer: Ctrl+A then Ctrl+C).</li>
+          <li>Come back here and paste it instead of the link.</li>
+        </ol>
+        <p>On a phone, the easiest is often a <b>screenshot</b> of the ad, attached with the button above.</p>
+      </div>
+      <p class="cleaned" id="cleaned" hidden><span id="cleanedtxt"></span> <button type="button" class="linkbtn" id="unclean">Put back the original text</button></p>
+      <details class="copyhelp">
+        <summary>How do I copy an ad from a job website?</summary>
+        <div class="copyhelp-body">
+          <div class="mini" aria-hidden="true">
+            <div class="mini-bar"><i></i><i></i><i></i><span>job website</span></div>
+            <div class="mini-page">
+              <span class="mini-btn">Apply</span>
+              <p class="sel"><b>Retail assistant</b><br>Tasks: greeting customers, till, shelf stocking…<br>Profile: driving licence, teamwork…</p>
+              <span class="mini-junk">Similar jobs · Privacy policy</span>
+            </div>
+            <span class="mini-keys">Ctrl + C</span>
+          </div>
+          <ol>
+            <li><b>Open the full ad.</b> On Indeed, click the job title to have it alone on the page. On LinkedIn, first click "See more" under the description.</li>
+            <li><b>Select the text</b> from the job title down to the profile wanted.</li>
+            <li><b>Copy</b> (Ctrl + C, or Cmd + C on a Mac) then <b>paste here</b> (Ctrl + V).</li>
+            <li><b>On a phone:</b> long-press the text, "Select all", "Copy". Or take a screenshot and attach it.</li>
+          </ol>
+          <p class="hint">No problem if you copy too much: the app removes the website's buttons, menus and notices by itself.</p>
+        </div>
+      </details>
+      <div class="next-row">
+        <button class="btn" id="next1" data-go="2" disabled>Next step: your CV →</button>
+        <span class="hint" id="hint1">Paste at least a few lines of the ad.</span>
+      </div>
+    </div>
+    <div class="side">
+    <aside class="box" id="offersbox" hidden>
+      <div class="box-head">My offers <button type="button" id="newoffer">+ New offer</button></div>
+      <div class="box-body"><ul class="offers" id="offers"></ul><p class="hint">Your CV stays the same: compare it with several offers.</p></div>
+    </aside>
+    <aside class="box">
+      <div class="box-head">How it works</div>
+      <div class="box-body">
+        <ol class="how">
+          <li><b>You paste the job offer</b>, or attach it as a PDF or screenshot.</li>
+          <li><b>You add your CV</b>: PDF, Word or photo.</li>
+          <li><b>You see what fits</b>, what is missing and what needs proof.</li>
+          <li><b>You improve your CV</b> with sentences to fill in.</li>
+          <li><b>You write your cover letter</b> from your strengths.</li>
+        </ol>
+        <p class="safe">Your CV never leaves your device: everything is read in your browser.</p>
+        <button class="btn light wide" id="demo" type="button">Try with a sample</button>
+      </div>
+    </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2. TON CV ============ -->
+<section class="panel" data-p="2" hidden style="--c: var(--yellow); --shadow: var(--blue)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <span class="label">Step 2 of 5</span>
+      <h1 class="big">Add your CV</h1>
+      <p class="lede">Drop your file or choose it. Its text is read right here: nothing is sent or stored.</p>
+      <label class="drop" id="drop" for="file">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>
+        <b>Drop your CV here</b>
+        <span class="btn light small">Choose a file</span>
+        <input type="file" id="file" accept=".pdf,.docx,.odt,.txt,.md,image/*" class="sr-only">
+      </label>
+      <div class="job" id="job" hidden><p id="jobtxt">Reading…</p><div class="jbar"><i id="jbar"></i></div></div>
+      <p class="err" id="ferr" role="alert" hidden></p>
+      <div class="filecard" id="filecard" hidden>
+        <span class="ok-dot" aria-hidden="true">✓</span>
+        <div><b id="fname"></b><small id="finfo"></small></div>
+        <label class="btn light small" for="file">Change</label>
+      </div>
+      <div class="next-row">
+        <button class="btn ghost" data-go="1">← The offer</button>
+        <button class="btn" id="next2" data-go="3" disabled>See if it fits →</button>
+      </div>
+    </div>
+    <aside class="box">
+      <div class="box-head">What we can read</div>
+      <div class="box-body">
+        <ul class="formats">
+          <li><b>PDF</b> most reliable</li>
+          <li><b>Word</b> .docx or .odt</li>
+          <li><b>Photo</b> straight and sharp</li>
+          <li><b>Text</b> .txt</li>
+        </ul>
+        <p>For a good result, keep section headings in your CV: <b>Experience</b>, <b>Skills</b>, <b>Education</b>.</p>
+      </div>
+    </aside>
+  </div>
+</section>
+<div class="below" data-for="2" hidden style="--c: var(--yellow)">
+  <details class="check" id="check">
+    <summary><span class="section-title" style="--k: var(--yellow)">Check the text read</span> <span class="hint" id="cvsum"></span></summary>
+    <p class="hint">If the reading went wrong (especially from a photo), fix it right here.</p>
+    <label class="sr-only" for="cvraw">Text read from your CV</label>
+    <textarea id="cvraw" class="sheet-input" spellcheck="false"></textarea>
+  </details>
+</div>
+
+<!-- ============ 3. LE RÉSULTAT ============ -->
+<section class="panel" data-p="3" hidden style="--c: var(--green); --shadow: var(--yellow)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <span class="label">Step 3 of 5 · the result</span>
+      <h1 class="big"><span id="pct">0</span> % <small id="verdict">it fits</small></h1>
+      <p class="lede" id="sum"></p>
+      <div class="filters" role="group" aria-label="Show">
+        <button class="chip" data-f="all" aria-pressed="true">All <span id="n-all"></span></button>
+        <button class="chip" data-f="no" aria-pressed="false" style="--k: var(--pink)">✕ Not in your CV <span id="n-no"></span></button>
+        <button class="chip" data-f="mid" aria-pressed="false" style="--k: var(--yellow)">? Needs proof <span id="n-mid"></span></button>
+        <button class="chip" data-f="ok" aria-pressed="false" style="--k: #fff">✓ It fits <span id="n-ok"></span></button>
+      </div>
+      <button class="btn light small" id="compare" type="button">Compare with another offer</button>
+    </div>
+    <aside class="box">
+      <div class="box-head">Do this first</div>
+      <div class="box-body" id="prio"></div>
+    </aside>
+  </div>
+</section>
+<div class="below" data-for="3" hidden style="--c: var(--green)">
+  <div class="legend">
+    <span><i class="stamp ok">It fits</i> it is in your CV, with a real example</span>
+    <span><i class="stamp mid">Needs proof</i> it is mentioned, but nothing proves it</span>
+    <span><i class="stamp no">Not in your CV</i> the offer asks for it, your CV does not mention it</span>
+  </div>
+  <div id="groups"></div>
+</div>
+
+<!-- ============ 4. AMÉLIORER ============ -->
+<section class="panel" data-p="4" hidden style="--c: var(--pink); --shadow: var(--violet)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <span class="label">Step 4 of 5</span>
+      <h1 class="big">Improve your CV</h1>
+      <p class="lede">For each point, complete the sentence with your real numbers, then click "Add".</p>
+      <p class="promise"><b>Nothing is made up for you.</b> A line only goes into your CV if you complete it yourself.</p>
+    </div>
+    <aside class="box">
+      <div class="box-head">Your score</div>
+      <div class="box-body score-box">
+        <b id="score4">0 %</b>
+        <span id="score4txt"></span>
+        <div class="meter" aria-hidden="true"><i id="meter4"></i></div>
+      </div>
+    </aside>
+  </div>
+</section>
+<div class="below" data-for="4" hidden style="--c: var(--pink)">
+  <div class="rewrite">
+    <div class="sugs" id="sugs"></div>
+    <aside class="box preview">
+      <div class="box-head">Your new CV</div>
+      <div class="box-body cvdoc" id="cv4"></div>
+      <div class="export">
+        <button class="btn small" type="button" data-dl="cv-docx">Download as Word</button>
+        <button class="btn light small" type="button" data-dl="cv-pdf">As PDF</button>
+        <button class="btn light small" type="button" data-dl="cv-copy">Copy the text</button>
+      </div>
+      <p class="preview-foot"><ins>Highlighted</ins> = your additions. The Word file has the text: put your own layout back afterwards if you like.</p>
+    </aside>
+  </div>
+  <div class="next-row"><button class="btn" data-go="5">Next step: my letter →</button></div>
+</div>
+
+<!-- ============ 5. MA LETTRE ============ -->
+<section class="panel" data-p="5" hidden style="--c: var(--violet); --shadow: var(--yellow)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <span class="label">Step 5 of 5</span>
+      <h1 class="big">Your letter</h1>
+      <p class="lede">We prepare your cover letter with the strengths found in your CV. Fill in the boxes and the letter writes itself next to them.</p>
+      <p class="promise"><b>Still nothing made up:</b> the letter only uses what is in your CV and what you type here.</p>
+    </div>
+    <aside class="box">
+      <div class="box-head">Tip</div>
+      <div class="box-body"><p>A good letter fits on one page: why this job, what you can already do (with examples), and when you are available.</p></div>
+    </aside>
+  </div>
+</section>
+<div class="below" data-for="5" hidden style="--c: var(--violet)">
+  <div class="rewrite">
+    <form class="letter-form" id="lform" autocomplete="on">
+      <div class="field"><label for="l-name">Your name</label><input id="l-name" autocomplete="name"></div>
+      <div class="field"><label for="l-contact">Your email and phone</label><input id="l-contact"></div>
+      <div class="field"><label for="l-company">Company name</label><input id="l-company" placeholder="e.g. Northern Logistics"></div>
+      <div class="field"><label for="l-job">Job title</label><input id="l-job"></div>
+      <div class="field"><label for="l-why">Why this job or this company?</label><textarea id="l-why" rows="3" placeholder="e.g. I enjoy teamwork and your warehouse is 10 minutes from my home."></textarea></div>
+      <fieldset class="field"><legend>Your strengths to highlight</legend><div id="l-strengths" class="strengths"></div></fieldset>
+      <div class="field"><label for="l-when">When are you available?</label><input id="l-when" placeholder="e.g. right away"></div>
+    </form>
+    <aside class="box preview">
+      <div class="box-head">Your letter <button type="button" id="l-edit">Edit the text</button></div>
+      <div class="box-body letter" id="letter"></div>
+      <textarea id="letteredit" class="letteredit" hidden aria-label="Text of the letter"></textarea>
+      <div class="export">
+        <button class="btn small" type="button" data-dl="l-docx">Download as Word</button>
+        <button class="btn light small" type="button" data-dl="l-pdf">As PDF</button>
+        <button class="btn light small" type="button" data-dl="l-copy">Copy the text</button>
+      </div>
+    </aside>
+  </div>
+</div>
+</main>
+<div id="printzone" aria-hidden="true"></div>
+
+<footer class="foot">
+  <div class="foot-inner">
+    <h2>Nothing is sent.</h2>
+    <div class="foot-text">
+      <p>Your CV and the offer stay in your browser. No account, nothing on a server.</p>
+      <p class="hint-foot" id="ioshint" hidden>On iPhone: Share button, then "Add to Home Screen" to get the app, even offline.</p>
+      <label class="keep"><input type="checkbox" id="keep"> Keep my session on this device to come back later</label>
+      <p><button type="button" class="linkbtn" id="wipe">Erase my data from this device</button> · <small>An app by <a href="https://portfolio.pissits.com/index-en.html">Simon Victor</a>.</small></p>
+    </div>
+  </div>
+</footer>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="js/lang.js"></script>
+<script src="js/lecteur.js"></script>
+<script src="js/moteur.js"></script>
+<script src="js/export.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

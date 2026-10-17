@@ -7,6 +7,11 @@
 <meta name="description" content="Colle une offre d'emploi, ajoute ton CV et vois ce qui correspond. Gratuit, et ton CV ne quitte jamais ton appareil.">
 <meta name="theme-color" content="#fdf3e3">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="alternate" hreflang="fr" href="https://ca-colle.pissits.com/">
+<link rel="alternate" hreflang="en" href="https://ca-colle.pissits.com/index-en.html">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Ça colle ?">
 <link rel="preload" href="fonts/archivo-latin-900-italic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="fonts/fonts.css">
 <link rel="stylesheet" href="css/app.css">
@@ -17,6 +22,8 @@
 <header class="top">
   <a class="logo" href="./"><span>Ça colle ?</span></a>
   <div class="top-actions">
+    <button class="pill pill-install" id="install" type="button" hidden>Installer l'app</button>
+    <a class="pill pill-lang" href="index-en.html" hreflang="en" lang="en" title="English version">EN</a>
     <span class="pill pill-safe"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Rien n'est envoyé</span>
   </div>
   <nav class="tabs" role="tablist" aria-label="Étapes">
@@ -57,6 +64,28 @@
         </ol>
         <p>Sur téléphone, le plus simple est souvent une <b>capture d'écran</b> de l'annonce, à joindre avec le bouton ci-dessus.</p>
       </div>
+      <p class="cleaned" id="cleaned" hidden><span id="cleanedtxt"></span> <button type="button" class="linkbtn" id="unclean">Remettre le texte d'origine</button></p>
+      <details class="copyhelp">
+        <summary>Comment copier une annonce depuis un site d'emploi ?</summary>
+        <div class="copyhelp-body">
+          <div class="mini" aria-hidden="true">
+            <div class="mini-bar"><i></i><i></i><i></i><span>site d'emploi</span></div>
+            <div class="mini-page">
+              <span class="mini-btn">Postuler</span>
+              <p class="sel"><b>Employé(e) polyvalent(e)</b><br>Missions : accueil, encaissement, mise en rayon…<br>Profil : permis B, travail en équipe…</p>
+              <span class="mini-junk">Offres similaires · Mentions légales</span>
+            </div>
+            <span class="mini-keys">Ctrl + C</span>
+          </div>
+          <ol>
+            <li><b>Ouvre l'annonce en entier.</b> Sur Indeed, clique sur le titre de l'offre pour l'avoir seule sur la page. Sur LinkedIn, clique d'abord sur « Voir plus » sous la description.</li>
+            <li><b>Sélectionne le texte</b> du titre jusqu'au profil recherché (sur France Travail, jusqu'à « Profil souhaité » inclus).</li>
+            <li><b>Copie</b> (Ctrl + C, ou Cmd + C sur Mac) puis <b>colle ici</b> (Ctrl + V).</li>
+            <li><b>Sur téléphone :</b> appui long sur le texte, « Tout sélectionner », « Copier ». Ou fais une capture d'écran et joins-la.</li>
+          </ol>
+          <p class="hint">Pas grave si tu copies trop : l'app retire toute seule les boutons, menus et mentions du site.</p>
+        </div>
+      </details>
       <div class="next-row">
         <button class="btn" id="next1" data-go="2" disabled>Étape suivante : ton CV →</button>
         <span class="hint" id="hint1">Colle au moins quelques lignes de l'annonce.</span>
@@ -245,6 +274,7 @@
     <h2>Rien n'est envoyé.</h2>
     <div class="foot-text">
       <p>Ton CV et l'offre restent dans ton navigateur. Aucun compte, rien sur un serveur.</p>
+      <p class="hint-foot" id="ioshint" hidden>Sur iPhone : bouton Partager puis « Sur l'écran d'accueil » pour avoir l'app, même sans réseau.</p>
       <label class="keep"><input type="checkbox" id="keep"> Garder ma session sur cet appareil pour revenir plus tard</label>
       <p><button type="button" class="linkbtn" id="wipe">Effacer mes données de cet appareil</button> · <small>Une app de <a href="https://portfolio.pissits.com/">Simon Victor</a>.</small></p>
     </div>
@@ -252,6 +282,7 @@
 </footer>
 <div class="toast" id="toast" role="status" hidden></div>
 
+<script src="js/lang.js"></script>
 <script src="js/lecteur.js"></script>
 <script src="js/moteur.js"></script>
 <script src="js/export.js"></script>

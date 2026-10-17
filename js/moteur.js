@@ -2,7 +2,7 @@
 // mots différents entre CV et offre, test « robot recruteur », réécritures à trous.
 // Aucune interface ici : js/app.js s'en charge.
 
-const OFFER = `Employé(e) logistique polyvalent(e) – CDI – Caen (exemple fictif)
+const OFFER_FR = `Employé(e) logistique polyvalent(e) – CDI – Caen (exemple fictif)
 
 Au sein de notre entrepôt, vous préparez les commandes et participez à la réception des marchandises.
 
@@ -21,7 +21,7 @@ Profil recherché :
 - Horaires en 2x8`;
 
 /* CV fictif de démonstration, remplacé par le texte lu dans le vrai CV */
-const SAMPLE_CV = `Camille Martin · Caen · camille.martin@exemple.fr · 06 00 00 00 00
+const SAMPLE_CV_FR = `Camille Martin · Caen · camille.martin@exemple.fr · 06 00 00 00 00
 Expériences
 Préparatrice de commandes, Drive Super U (2022-2025) : 120 commandes par jour, contrôle qualité des produits frais, travail en équipe de 6.
 Vendeuse, boulangerie du centre (2020-2022) : ouverture à 6h, caisse, rangement des livraisons chaque matin.
@@ -32,18 +32,48 @@ Tableur, gestion des stocks, rigueur, ponctualité
 Divers
 Permis B, véhicule personnel`;
 
+const OFFER_EN = `Warehouse operative – permanent – Manchester (sample offer)
+
+In our warehouse, you will pick orders and help receive goods.
+
+Your tasks:
+- Order picking and quality control
+- Receiving and putting away deliveries
+- Stock management and stock counts
+- Driving a forklift (counterbalance and reach)
+- Data entry in Excel
+
+What we are looking for:
+- 2 years of experience in a warehouse
+- Driving licence essential
+- Teamwork, punctuality, attention to detail
+- Basic Spanish a plus
+- Shift work (early and late)`;
+
+const SAMPLE_CV_EN = `Sam Taylor · Manchester · sam.taylor@example.com · 07700 900123
+Experience
+Order picker, FreshMart online (2022-2025): 120 orders a day, quality checks on fresh products, team of 6.
+Shop assistant, town centre bakery (2020-2022): 6 am opening, till, putting away deliveries every morning.
+Education
+GCSEs, Manchester High School (2020)
+Skills
+Spreadsheets, stock management, attention to detail, punctuality
+Other
+Driving licence, own car`;
+const OFFER = EN ? OFFER_EN : OFFER_FR, SAMPLE_CV = EN ? SAMPLE_CV_EN : SAMPLE_CV_FR;
+
 const esc = t => String(t).replace(/[&<>"]/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
-const LABEL = {ok:"Ça colle", mid:"À préciser", no:"Pas dans ton CV"};
+const LABEL = EN ? {ok:"It fits", mid:"Needs proof", no:"Not in your CV"} : {ok:"Ça colle", mid:"À préciser", no:"Pas dans ton CV"};
 // Texte sans accents ni majuscules, de même longueur que l'original (les positions restent valables)
 const fold = s => [...String(s)].map(ch => { const d = ch.normalize("NFD"); return d.length > 1 && /^[̀-ͯ]+$/.test(d.slice(1)) ? d[0] : ch; }).join("").toLowerCase();
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
 
 /* ---------- Découpage du CV ---------- */
 const SECS = [
-  ["exp", /^(experiences?( professionnelles?)?|parcours( professionnel)?|emplois?|postes? occupes|work experience|experience)$/],
-  ["skills", /^(competences( cles| techniques)?|savoir[- ]faire|savoir[- ]etre|qualites|outils|informatique|langues|skills|atouts)$/],
-  ["edu", /^((formations?|diplomes?|certifications?)( et (formations?|diplomes?|certifications?))*|etudes|scolarite|education|cursus)$/],
-  ["misc", /^(divers|loisirs|centres? d'interets?|informations?( complementaires)?|autres|interets|hobbies|resume( professionnel)?|profil( professionnel)?|a propos( de moi)?|objectif professionnel)$/]
+  ["exp", /^(experiences?( professionnelles?)?|parcours( professionnel)?|emplois?|postes? occupes|(work |professional |relevant )?experience|employment( history)?|work history|career history)$/],
+  ["skills", /^(competences( cles| techniques)?|savoir[- ]faire|savoir[- ]etre|qualites|outils|informatique|langues|(key |technical |core )?skills|competencies|languages|strengths)$/],
+  ["edu", /^((formations?|diplomes?|certifications?)( et (formations?|diplomes?|certifications?))*|etudes|scolarite|cursus|education( and training)?|qualifications|training|certifications? and training)$/],
+  ["misc", /^(divers|loisirs|centres? d'interets?|informations?( complementaires)?|autres|interets|hobbies|resume( professionnel)?|profil( professionnel)?|a propos( de moi)?|objectif professionnel|interests|hobbies( and interests)?|additional information|profile|(professional )?summary|about me|personal statement|references|other)$/]
 ];
 function parseCV(text){
   const out = []; let kind = null, n = 0, named = false;
@@ -67,6 +97,115 @@ let CV = parseCV(SAMPLE_CV);
 /* ---------- Lexique des métiers ----------
    [nom, motif (texte sans accents), type, exemple pour les trous, motif côté CV si plus large]
    Types : t = tâche, s = qualité, o = outil ou logiciel, l = permis, diplôme ou habilitation, g = langue, h = horaires */
+/* Version anglaise du lexique : [nom anglais, motif anglais ajouté au motif français, exemple anglais].
+   Les deux langues sont cherchées dans l'offre comme dans le CV : un CV anglais face à une offre française marche aussi. */
+const LEX_EN = {
+  "Préparation de commandes": ["Order picking", "order (picking|preparation|fulfil\\w*)|pick(ing)? and pack\\w*", "120 orders a day", "order pick\\w*|pick(ing)? and pack\\w*|\\bpick(er|ing)\\b|fulfil\\w*"],
+  "Contrôle qualité": ["Quality control", "quality (control|checks?|assurance)", "checking dates and quantities"],
+  "Réception des marchandises": ["Goods receiving", "goods (in|inwards|receiving|receipt)|receiving (goods|deliveries|stock)|receiving and put(ting)? away|put(ting)? away (deliveries|stock)|unloading", "30 pallets a day", "receiv\\w*|deliver(y|ies)|put(ting)? away|unloading|goods in"],
+  "Gestion des stocks": ["Stock management", "stock (management|control|rotation)|inventory (management|control)|replenish\\w*", "weekly reordering"],
+  "Inventaires": ["Stock counts", "stock ?(counts?|takes?)|stocktak\\w*|inventory counts?", "annual count of 3,000 items"],
+  "CACES (chariot élévateur)": ["Forklift licence", "forklift|reach truck|pallet (truck|jack)", "counterbalance and reach truck, 2023"],
+  "Expédition et emballage": ["Shipping and packing", "shipping|dispatch|\\bpacking\\b|packaging", "200 parcels a day"],
+  "Manutention": ["Manual handling", "manual handling|heavy lifting|loading and unloading", "loading trucks"],
+  "Encaissement": ["Cash handling", "cashier|cash (handling|register|desk)|\\btill\\b|checkout|point of sale", "up to 300 customers a day"],
+  "Accueil des clients": ["Welcoming customers", "(greet|welcom)\\w* (customers|guests|visitors|patients)|front desk|reception desk", "80 customers a day", "greet\\w*|welcom\\w*|front desk|reception"],
+  "Conseil client": ["Customer advice", "advis\\w* customers|customer advice|product advice", "advice on fresh products", "advi[sc]\\w*"],
+  "Vente": ["Sales", "\\bsales\\b|\\bselling\\b|sales targets|retail assistant", "monthly target met 10 months out of 12", "sales|selling|sold|retail"],
+  "Mise en rayon": ["Shelf stocking", "shelf (stocking|filling)|stock(ing)? shelves|merchandis\\w*|restock\\w*", "fresh aisle every morning"],
+  "Relation client": ["Customer service", "customer (service|relations|satisfaction|complaints|care)|complaints|returns", "handling complaints"],
+  "Prospection": ["Business development", "prospect\\w*|business development|lead generation|new clients|cold call\\w*", "20 new clients in a year"],
+  "Négociation": ["Negotiation", "negotiat\\w*", "negotiation with 15 suppliers"],
+  "Accompagnement des personnes âgées": ["Elderly care", "elderly|older (people|adults)|care homes?|nursing homes?", "6 people a week"],
+  "Aide à domicile": ["Home care", "home care|care worker|\\bcarer\\b|caregiver|domestic help", "visits to 6 clients"],
+  "Aide à la toilette": ["Personal care", "personal care|washing and dressing|bathing", "help getting up and washing"],
+  "Préparation des repas": ["Meal preparation", "meal (preparation|prep)|preparing meals|cooking meals", "meals for 4 people"],
+  "Garde d'enfants": ["Childcare", "child ?care|nanny|babysit\\w*|nursery|early years", "3 children aged 2 to 8"],
+  "Diplôme d'aide-soignant": ["Healthcare assistant qualification", "healthcare assistant|nursing assistant|care assistant", "qualified 2021"],
+  "Soins infirmiers": ["Nursing", "\\bnurs(e|es|ing)\\b|registered nurse", "registered 2019"],
+  "Service en salle": ["Table service", "\\bwaiter\\b|waitress|waiting staff|table service|front of house", "60 covers a night"],
+  "Cuisine": ["Cooking", "\\bcook\\b|line cook|head chef|sous[- ]chef|commis chef|\\bkitchen\\b|food prep\\w*", "prep for 80 covers"],
+  "Règles d'hygiène (HACCP)": ["Food hygiene (HACCP)", "food (hygiene|safety)", "food hygiene level 2, 2022"],
+  "Plonge": ["Dishwashing", "dishwash\\w*|kitchen porter|washing up", "100 covers"],
+  "Bar": ["Bar", "bartend\\w*", "hot drinks"],
+  "Réception hôtelière": ["Hotel reception", "hotel recept\\w*|receptionist|bookings", "40 rooms"],
+  "Entretien et nettoyage": ["Cleaning", "cleaning|cleaner|housekeep\\w*|janitor\\w*|custodian", "800 m² of offices"],
+  "Lecture de plans": ["Reading drawings", "read(ing)? (plans|drawings|blueprints)|technical drawings|blueprints", "site drawings"],
+  "Habilitation électrique": ["Electrical certification", "electrical (certification|clearance|authori[sz]ation)|18th edition", "2024"],
+  "Électricité": ["Electrical work", "electrician|electrical (work|installation)|wiring", "wiring consumer units"],
+  "Plomberie et chauffage": ["Plumbing and heating", "plumb\\w*|heating engineer|gas safe", "bathroom fitting"],
+  "Maçonnerie": ["Masonry", "mason\\w*|bricklay\\w*|concrete|formwork", "pouring slabs"],
+  "Peinture": ["Painting", "painter|painting|decorat(ing|or)", "10 flats renovated"],
+  "Travail en hauteur": ["Working at height", "work(ing)? at height|scaffold\\w*|\\bmewp\\b|cherry picker|\\bipaf\\b", "IPAF, 2023"],
+  "Règles de sécurité": ["Health and safety", "health and safety|safety (rules|procedures)|\\bppe\\b|risk assessments?", "zero accidents in 3 years"],
+  "Conduite de machines": ["Machine operation", "machine operat\\w*|production (line|operative)|\\bcnc\\b", "packaging line"],
+  "Soudure": ["Welding", "weld\\w*", "MIG and TIG"],
+  "Maintenance": ["Maintenance", "repair\\w*|troubleshoot\\w*", "preventive maintenance of 20 machines"],
+  "Mécanique": ["Mechanics", "mechanic\\w*", "light vehicle servicing"],
+  "Accueil téléphonique": ["Phone handling", "(answering|handling) (the )?(phone|calls)|switchboard|telephone|phone calls", "50 calls a day", "phone|calls|switchboard|telephone"],
+  "Pack Office": ["Microsoft Office", "ms office", "letters in Word, emails in Outlook"],
+  "Excel": ["Excel", "spreadsheets?", "order tracking sheet"],
+  "Outils informatiques": ["Computer skills", "computer (skills|literate)|it skills|digital skills", "Word, email, simple spreadsheets", "computer|software|\\bword\\b|excel|spreadsheet|office"],
+  "Saisie de données": ["Data entry", "data (entry|input)|keying", "delivery notes"],
+  "Gestion d'agenda": ["Diary management", "(diary|calendar) management|scheduling|appointments?", "3 doctors' diaries"],
+  "Rédaction de courriers": ["Writing letters", "(writing|drafting) (letters|correspondence|reports|minutes)|correspondence|(taking|writing) minutes", "letters to customers"],
+  "Facturation": ["Invoicing", "invoic\\w*|billing|quotes", "100 invoices a month"],
+  "Comptabilité": ["Bookkeeping", "bookkeep\\w*|accounting|accounts (payable|receivable)|bank reconciliation", "ledger entries"],
+  "Paie": ["Payroll", "payroll|payslips?", "payroll for 40 staff"],
+  "Classement et archivage": ["Filing and archiving", "\\bfiling\\b|record(s)? management|document management", "archiving files"],
+  "Logiciel de gestion (ERP)": ["ERP software", "erp software", "SAP, orders and stock"],
+  "Recrutement": ["Recruitment", "recruit\\w*|hiring|human resources|talent acquisition", "20 hires a year"],
+  "Support utilisateurs": ["User support", "(end[- ])?user support|help ?desk|service desk|(first|second|1st|2nd)[- ]line|it support|technical support", "30 tickets a day", "support|help ?desk|service desk"],
+  "Windows": ["Windows", "windows", "rolling out Windows 11"],
+  "Linux": ["Linux", "linux", "Debian servers"],
+  "Réseaux informatiques": ["Networking", "network(s|ing)?\\b|routers?|wi-?fi", "VLANs and switches for 50 workstations"],
+  "Active Directory": ["Active Directory", "active directory", "accounts and rights for 300 users"],
+  "Cybersécurité": ["Cybersecurity", "information security|firewalls?|antivirus", "firewall roll-out"],
+  "Administration des serveurs": ["Server administration", "server (administration|management)|administer\\w* (servers|systems)|sysadmin|system administration", "15 Windows and Linux servers", "servers?|sysadmin|system administration|vmware|hyper-v"],
+  "Virtualisation": ["Virtualisation", "virtuali[sz]\\w*", "VMware, 20 virtual machines"],
+  "Sauvegardes et restauration": ["Backup and restore", "backups?|restor(e|ing)\\b", "daily backup of 10 servers"],
+  "Supervision": ["Monitoring", "(system|network|infrastructure) monitoring|monitor(ing)? (systems|networks|infrastructure)", "50 devices monitored", "monitor\\w*"],
+  "Gestion des incidents (ITIL)": ["Incident management (ITIL)", "incident management|service desk|tickets?", "30 tickets a day", "incidents?|tickets?|service desk|support"],
+  "Comptes et droits d'accès": ["User accounts and access", "user accounts?|access (rights|control|management)|permissions|identity management", "accounts and rights for 300 users", "accounts?|access|permissions|active directory|entra|\\bmfa\\b"],
+  "Déploiement de logiciels": ["Software deployment", "deploy\\w* (software|applications|devices|laptops)|software (deployment|rollout)|roll-?out|imaging", "300 laptops deployed", "deploy\\w*|roll-?out|intune|imaging"],
+  "Gestion de parc": ["IT asset management", "(it )?asset management|hardware inventory|device fleet", "fleet of 500 devices"],
+  "Documentation technique": ["Technical documentation", "(technical )?documentation|knowledge base", "procedures for the support team", "documentation|procedures?|knowledge base|wiki"],
+  "Veille technologique": ["Technology watch", "technology watch|tech watch|keep(ing)? up to date", "weekly security watch"],
+  "Relation avec les prestataires": ["Vendor management", "vendors?|suppliers?|contractors?|third[- ]part(y|ies)|service providers?", "10 suppliers managed"],
+  "Politique de sécurité (PSSI)": ["Security policy", "(information )?security polic(y|ies)|\\bisms\\b", "wrote the security policy", "security polic(y|ies)|\\bisms\\b|nis ?2"],
+  "Conformité (RGPD, NIS2…)": ["Compliance (GDPR, NIS2…)", "\\bgdpr\\b|compliance|soc ?2", "NIS2 compliance", "\\bgdpr\\b|compliance|nis ?2|iso ?27001|soc ?2"],
+  "Sensibilisation des utilisateurs": ["Security awareness", "awareness|phishing (training|simulations?)", "awareness training for 300 staff"],
+  "Continuité d'activité (PCA/PRA)": ["Business continuity (BCP/DRP)", "business continuity|disaster recovery|\\bbcp\\b|\\bdrp\\b", "DRP tested every year"],
+  "Gestion de crise": ["Crisis management", "crisis (management|situations?)|incident response", "crisis unit during a cyberattack"],
+  "Transformation numérique": ["Digital transformation", "digital (transformation|tools)|digiti[sz]\\w*|digitali[sz]\\w*", "paperless invoicing", "digital|digiti[sz]\\w*|moderni[sz]\\w*"],
+  "Python": ["Python", "python", "automation scripts"],
+  "JavaScript": ["JavaScript", "javascript", "React website"],
+  "HTML / CSS": ["HTML / CSS", "\\bhtml\\b", "responsive pages"],
+  "SQL": ["SQL", "databases?", "queries on a customer database"],
+  "Cloud": ["Cloud", "\\bcloud\\b", "move to Microsoft 365"],
+  "Gestion de projet": ["Project management", "project (management|manager|lead\\w*)|manag(e|ing) projects|lead(ing)? projects", "6-month project, 3 people", "projects?"],
+  "Management d'équipe": ["Team management", "team (lead\\w*|manag\\w*)|managing (a team|staff)|supervis(e|ing) (staff|a team)|line manag\\w*|\\bmanager\\b", "team of 5"],
+  "Permis B": ["Driving licence", "driving licen[cs]e|driver'?s licen[cs]e|full (uk )?licen[cs]e|own (car|transport)", "since 2018", "driving licen[cs]e|driver'?s licen[cs]e|full (uk )?licen[cs]e|own (car|transport)"],
+  "Travail en équipe": ["Teamwork", "team ?work|team player|work(ing)? (well )?in a team|collaborat\\w*", "team of 6", "team|collaborat\\w*"],
+  "Autonomie": ["Autonomy", "independen\\w*|self-motivated|own initiative|on your own", "alone at store opening"],
+  "Rigueur": ["Attention to detail", "attention to detail|detail[- ]oriented|accura\\w*|thorough\\w*", "zero order errors in 2024"],
+  "Ponctualité": ["Punctuality", "punctual\\w*|reliab(le|ility)|timekeeping", "6 am opening for 2 years", "punctual|reliab|opening|[4-7] ?am\\b"],
+  "Sens de l'organisation": ["Organisation skills", "organi[sz]ational skills|(well[- ])?organi[sz]ed|time management|prioriti[sz]\\w*", "schedule for 4 people", "organi[sz]\\w*|prioriti[sz]\\w*"],
+  "Sens du contact": ["People skills", "people skills|interpersonal|friendly|outgoing|approachable|customer[- ]facing", "80 customers a day"],
+  "Polyvalence": ["Versatility", "versatil\\w*|multi-?skilled|all-rounder", "till, shelves and deliveries"],
+  "Dynamisme": ["Energy", "energetic|enthusias\\w*", "Saturday rush"],
+  "Gestion du stress": ["Working under pressure", "under pressure|fast[- ]paced|busy (periods|environment)", "Saturday night service"],
+  "Écoute": ["Listening and empathy", "listening|empath\\w*|caring|compassion\\w*", "supporting older people"],
+  "Discrétion": ["Discretion", "discre(et|tion)|confidential\\w*", "medical records"],
+  "Adaptabilité": ["Adaptability", "adaptab\\w*|adapt to|flexib\\w*", "new post every week"],
+  "Communication": ["Communication skills", "communication skills|written and verbal|verbal and written|good communicat\\w*", "weekly report"],
+  "Anglais": ["English", "english", "intermediate"],
+  "Espagnol": ["Spanish", "spanish", "basic"],
+  "Allemand": ["German", "german", "basic"],
+  "Horaires décalés": ["Shift work", "shifts?\\b|night (work|shifts)|weekends?|bank holidays|on[- ]call|\\brota\\b", "", "shifts?|nights?|weekends?|on[- ]call|rota|opening|closing|[4-7] ?am\\b"],
+  "Premiers secours (SST)": ["First aid", "first aid(er)?", "first aid, 2023"],
+  "BAFA": ["Youth work certificate", "youth work(er)?|camp counsel+or", "2022"]
+};
 const LEX = [
   // Logistique, entrepôt
   ["Préparation de commandes", "prepar\\w* (de |des )?commandes?|picking", "t", "120 commandes par jour"],
@@ -101,7 +240,7 @@ const LEX = [
   ["Plonge", "\\bplonge\\b|plongeu(r|se)|vaisselle", "t", "plonge pour 100 couverts"],
   ["Bar", "\\bbar\\b|barman|barmaid|barista|cocktails?", "t", "préparation des boissons chaudes"],
   ["Réception hôtelière", "reception hoteliere|receptionniste|check[- ]?in|reservations?", "t", "accueil et réservations, 40 chambres"],
-  ["Entretien et nettoyage", "menage|nettoyage|entretien des locaux|agent d'entretien|proprete|bionettoyage", "t", "entretien de 800 m² de bureaux"],
+  ["Entretien et nettoyage", "menage|nettoyage|entretien (des locaux|du logement|de la maison|du domicile|du linge|des bureaux)|agent d'entretien|proprete|bionettoyage", "t", "entretien de 800 m² de bureaux"],
   // BTP, industrie, technique
   ["Lecture de plans", "lecture de plans?|lire (un |des |les )?plans?|plans techniques", "o", "plans d'exécution sur chantier"],
   ["Habilitation électrique", "habilitations? electriques?|\\bb0\\b|\\bh0v?\\b|\\bbr\\b|\\bb1v?\\b|\\bb2v?\\b", "l", "B1V, 2024"],
@@ -118,7 +257,7 @@ const LEX = [
   // Bureau, administratif
   ["Accueil téléphonique", "accueil telephonique|standard telephonique|standardiste|appels? telephoniques?|au telephone", "t", "50 appels par jour", "telephon|standard|appels?"],
   ["Pack Office", "pack office|microsoft office|suite office|office 365|microsoft 365|\\bword\\b|powerpoint|outlook", "o", "courriers sur Word, mails sur Outlook"],
-  ["Excel", "excel|tableur", "o", "tableau de suivi des commandes"],
+  ["Excel", "\\bexcel\\b|tableur", "o", "tableau de suivi des commandes"],
   ["Outils informatiques", "outils? informatiques?|bureautique|maitrise de l'informatique", "o", "Word, mails, tableaux simples", "informatique|bureautique|\\bword\\b|excel|tableur|office|ordinateur|logiciels?"],
   ["Saisie de données", "saisie|encodage", "t", "saisie des bons de livraison"],
   ["Gestion d'agenda", "gestion (de l'|d'|des |du )?(agendas?|plannings?)|prise de rendez-vous|rendez-vous", "t", "agenda de 3 médecins"],
@@ -159,14 +298,14 @@ const LEX = [
   ["SQL", "\\bsql\\b|mysql|postgre\\w*|bases? de donnees", "o", "requêtes sur une base clients"],
   ["Cloud", "\\bcloud\\b|\\bazure\\b|\\baws\\b", "o", "migration vers Microsoft 365"],
   ["Gestion de projet", "gestion de projets?|chefs? de projets?|pilot\\w* (de |des )?projets?|conduite de projets?|participer (aux|au) (deploiement des )?projets?|projets? informatiques?", "t", "projet de 6 mois, 3 personnes", "gestion de projets?|chefs? de projets?|pilot\\w* (de |des )?projets?|conduite de projets?|projets?"],
-  ["Management d'équipe", "management|manag(er|eur)|encadr\\w*|chef d'equipe|responsable d'equipe|animer (une |l')equipe", "t", "équipe de 5 personnes"],
+  ["Management d'équipe", "(?<!(stock|project|risk|asset|incident|identity|access|diary|calendar|time|crisis|server|change|records?|document|vendor|supplier|account|data|quality|des stocks|de projets?|de crise|de parc) )\\bmanagement\\b(?! (de|des|du) (stocks?|projets?|crise|parc|la qualite))|\\bmanag(er|eur)s?\\b|encadr\\w*|chef d'equipe|responsable d'equipe|animer (une |l')equipe", "t", "équipe de 5 personnes"],
   // Qualités et conditions, tous métiers
   ["Permis B", "permis b\\b|permis de conduire|permis vl", "l", "depuis 2018", "permis b\\b|permis de conduire|permis vl|vehicule"],
   ["Travail en équipe", "travail(ler)? en equipe|esprit d'equipe|sens du travail en equipe", "s", "équipe de 6 personnes", "en equipe|equipe de|esprit d'equipe"],
   ["Autonomie", "autonom\\w*", "s", "seule à l'ouverture du magasin"],
   ["Rigueur", "rigueur|rigoureu(x|se)|minutie|minutieu(x|se)|precision", "s", "aucune erreur de commande en 2024"],
   ["Ponctualité", "ponctu\\w*|assiduite|assidu\\w*", "s", "ouverture à 6h pendant 2 ans", "ponctu|assidu|ouverture|[4-7] ?h\\b"],
-  ["Sens de l'organisation", "sens de l'organisation|organise(e)?\\b|bonne organisation|methodique|capacite d'organisation", "s", "planning de 4 personnes"],
+  ["Sens de l'organisation", "sens de l'organisation|organise(e)?\\b|bonne organisation|methodique|capacite d'organisation", "s", "planning de 4 personnes", "organis\\w*|methodique"],
   ["Sens du contact", "sens du contact|relationnel\\w*|aisance relationnelle|sociable|souriant\\w*|sourire|bonne presentation", "s", "accueil de 80 clients par jour"],
   ["Polyvalence", "polyvalen\\w*", "s", "caisse, rayon et réception selon les jours"],
   ["Dynamisme", "dynamisme", "s", "rush du samedi"],
@@ -181,32 +320,38 @@ const LEX = [
   ["Horaires décalés", "horaires decales|2x8|3x8|travail de nuit|de nuit\\b|week-?ends?|dimanches?|jours feries|astreintes?", "h", "", "horaires decales|2x8|3x8|nuit|week-?end|dimanche|ouverture|fermeture|[4-7] ?h\\b"],
   ["Premiers secours (SST)", "\\bsst\\b|sauveteur secouriste|premiers secours|\\bpsc ?1\\b", "l", "SST, 2023"],
   ["BAFA", "\\bbafa\\b|\\bbafd\\b", "l", "obtenu en 2022"]
-].map(([k, o, type, ex, c]) => ({k, o: new RegExp(o), c: new RegExp(c || o), type, ex, broad: !!c}));
+].map(([k, o, type, ex, c]) => {
+  const [ek, eo, eex, ec] = LEX_EN[k] || [k, "", ex];
+  const O2 = eo ? o + "|" + eo : o, C2 = (c || o) + (ec || eo ? "|" + (ec || eo) : "");
+  return {k: EN ? ek : k, o: new RegExp(O2), c: new RegExp(C2), type, ex: EN ? eex : ex, broad: !!(c || ec)};
+});
 
 /* ---------- Réécritures à trous, selon le type de point ---------- */
-const ART = {s: "cette qualité", t: "ça", o: "cet outil", l: "ça", g: "cette langue", h: "ces horaires"};
+const ART = EN ? {s: "this quality"} : {s: "cette qualité"};
 function makeFix(r){
-  const ex = r.ex ? `ex : ${r.ex}` : "ex : …", K = r.k, k = r.k.toLowerCase();
+  const ex = r.ex ? tr(`ex : ${r.ex}`, `e.g. ${r.ex}`) : tr("ex : …", "e.g. …"), K = r.k, k = EN ? r.k : r.k.toLowerCase();
+  const learn = tr("Pas grave. Si tu es prêt(e) à apprendre, dis-le dans ta lettre de motivation.", "No problem. If you are ready to learn, say so in your cover letter.");
   switch (r.type) {
     case "t": return r.st === "mid"
-      ? {line:"exp", why:"C'est cité, mais aucune expérience ne le montre. Dis où tu l'as fait.", tpl:` ${K} : {où et combien ? ${ex}}.`}
-      : {line:"exp", ask:`As-tu déjà fait ça : ${k} ?`, tpl:` ${K} : {où et combien ? ${ex}}.`, nope:"Pas grave. Si tu es prêt(e) à apprendre, dis-le dans ta lettre de motivation."};
-    case "s": return {line:"exp", why: r.st === "mid" ? "Un mot seul ne prouve rien : ajoute un fait concret." : "L'offre le demande : prouve-le par un fait, pas par un adjectif.", tpl:` {un fait qui montre ${ART.s} ? ${ex}}.`};
+      ? {line:"exp", why:tr("C'est cité, mais aucune expérience ne le montre. Dis où tu l'as fait.", "It is mentioned, but no job shows it. Say where you did it."), tpl:tr(` ${K} : {où et combien ? ${ex}}.`, ` ${K}: {where and how much? ${ex}}.`)}
+      : {line:"exp", ask:tr(`As-tu déjà fait ça : ${k} ?`, `Have you done this before: ${k}?`), tpl:tr(` ${K} : {où et combien ? ${ex}}.`, ` ${K}: {where and how much? ${ex}}.`), nope:learn};
+    case "s": return {line:"exp", why: r.st === "mid" ? tr("Un mot seul ne prouve rien : ajoute un fait concret.", "A word alone proves nothing: add a real example.") : tr("L'offre le demande : prouve-le par un fait, pas par un adjectif.", "The offer asks for it: prove it with a fact, not an adjective."), tpl:tr(` {un fait qui montre ${ART.s} ? ${ex}}.`, ` {a fact that shows ${ART.s}? ${ex}}.`)};
     case "o": return r.st === "mid" && r.cvWord
-      ? {line:"skills", find:r.cvWord, why:"Dis à quoi il te sert, ça parle plus qu'un nom de logiciel.", tpl:`${r.cvWord} ({pour quoi faire ? ${ex}})`}
-      : {line:"skills", ask:`Sais-tu utiliser ${K} ?`, tpl:`, ${K} ({ton niveau ou un exemple ? ${ex}})`, nope:"Si c'est un « plus », ce n'est pas bloquant. Sinon, une formation courte peut suffire."};
-    case "l": return {line: /dipl|cap|bac|bts|licence|master/i.test(K) ? "edu" : "skills", ask:`As-tu : ${K} ?`, tpl:`, ${K} ({année ou détail ? ${r.ex ? "ex : " + r.ex : "ex : 2023"}})`, nope:"Certaines entreprises financent la formation. Tu peux dire dans ta lettre que tu es prêt(e) à la passer."};
+      ? {line:"skills", find:r.cvWord, why:tr("Dis à quoi il te sert, ça parle plus qu'un nom de logiciel.", "Say what you use it for: it says more than a software name."), tpl:tr(`${r.cvWord} ({pour quoi faire ? ${ex}})`, `${r.cvWord} ({what for? ${ex}})`)}
+      : {line:"skills", ask:tr(`Sais-tu utiliser ${K} ?`, `Can you use ${K}?`), tpl:tr(`, ${K} ({ton niveau ou un exemple ? ${ex}})`, `, ${K} ({your level or an example? ${ex}})`), nope:tr("Si c'est un « plus », ce n'est pas bloquant. Sinon, une formation courte peut suffire.", "If it is only a plus, it is not a deal-breaker. Otherwise, a short course may be enough.")};
+    case "l": return {line: /dipl|cap|bac|bts|licence|master|degree|qualif/i.test(K) ? "edu" : "skills", ask:tr(`As-tu : ${K} ?`, `Do you have: ${K}?`), tpl:tr(`, ${K} ({année ou détail ? ${r.ex ? "ex : " + r.ex : "ex : 2023"}})`, `, ${K} ({year or detail? ${r.ex ? "e.g. " + r.ex : "e.g. 2023"}})`), nope:tr("Certaines entreprises financent la formation. Tu peux dire dans ta lettre que tu es prêt(e) à la passer.", "Some employers pay for the training. You can say in your letter that you are ready to take it.")};
     case "g": return r.st === "mid" && r.cvWord
-      ? {line:"skills", find:r.cvWord, tpl:`${r.cvWord} ({ton niveau ? ex : scolaire, courant})`}
-      : {line:"skills", ask:`Tu parles ${k} ?`, tpl:`, ${k} {ton niveau ? ex : scolaire}`, nope:"Si l'offre dit « apprécié », ce n'est pas bloquant."};
-    case "h": return {line:"skills", ask:"Acceptes-tu ces horaires ?", tpl:", disponible {quand ? ex : en horaires décalés et le week-end}", nope:"Dis-le franchement en entretien : c'est mieux que de mauvaises surprises."};
-    case "d": return {line:"edu", ask:`As-tu ce diplôme (${r.word}) ?`, tpl:`${r.word.toUpperCase()} {spécialité et année ? ex : Employé de commerce, 2020}`, nope:"Une expérience équivalente compte souvent autant : mets-la en avant dans ta lettre."};
+      ? {line:"skills", find:r.cvWord, tpl:tr(`${r.cvWord} ({ton niveau ? ex : scolaire, courant})`, `${r.cvWord} ({your level? e.g. basic, fluent})`)}
+      : {line:"skills", ask:tr(`Tu parles ${k} ?`, `Do you speak ${k}?`), tpl:tr(`, ${k} {ton niveau ? ex : scolaire}`, `, ${k} {your level? e.g. basic}`), nope:tr("Si l'offre dit « apprécié », ce n'est pas bloquant.", "If the offer says \"a plus\", it is not a deal-breaker.")};
+    case "h": return {line:"skills", ask:tr("Acceptes-tu ces horaires ?", "Are you OK with these hours?"), tpl:tr(", disponible {quand ? ex : en horaires décalés et le week-end}", ", available {when? e.g. shifts and weekends}"), nope:tr("Dis-le franchement en entretien : c'est mieux que de mauvaises surprises.", "Say it honestly at the interview: better than bad surprises.")};
+    case "d": return {line:"edu", ask:tr(`As-tu ce diplôme (${r.word}) ?`, `Do you have this qualification (${r.word})?`), tpl:tr(`${r.word.toUpperCase()} {spécialité et année ? ex : Employé de commerce, 2020}`, `${r.word} {subject and year? e.g. Business, 2020}`), nope:tr("Une expérience équivalente compte souvent autant : mets-la en avant dans ta lettre.", "Similar experience often counts as much: highlight it in your letter.")};
     default: return r.st === "mid"
-      ? {line:"exp", why:"C'est cité, mais sans exemple concret.", tpl:` {un exemple concret ? ex : où, combien, pendant combien de temps}.`}
-      : {line:"exp", ask:"As-tu déjà fait ça ?", tpl:` {ce que tu as fait ? ex : où, combien, pendant combien de temps}.`, nope:"Pas grave : mets en avant ce qui s'en rapproche le plus."};
+      ? {line:"exp", why:tr("C'est cité, mais sans exemple concret.", "It is mentioned, but with no real example."), tpl:tr(` {un exemple concret ? ex : où, combien, pendant combien de temps}.`, ` {a real example? e.g. where, how many, for how long}.`)}
+      : {line:"exp", ask:tr("As-tu déjà fait ça ?", "Have you done this before?"), tpl:tr(` {ce que tu as fait ? ex : où, combien, pendant combien de temps}.`, ` {what you did? e.g. where, how many, for how long}.`), nope:tr("Pas grave : mets en avant ce qui s'en rapproche le plus.", "No problem: highlight what comes closest.")};
   }
 }
 
+let over = {}, skipped = [];  // nom du point -> "ok" | "mid" | "no" | "skip" : tampon corrigé à la main
 let fixes = {}; // nom du point -> {vals:{}, state:"open"|"yes"|"accepted"|"skipped", fix}
 const blanksOf = tpl => [...tpl.matchAll(/\{([^}]+)\}/g)].map(m => m[1]);
 const filled = k => { const f = fixes[k]; return blanksOf(f.fix.tpl).every((b, i) => (f.vals[i] || "").trim()); };
@@ -247,7 +392,7 @@ function cvLines(withIns){
 /* ---------- Années d'expérience écrites dans le CV ---------- */
 function cvYears(text){
   const now = new Date().getFullYear(), iv = [];
-  for (const m of fold(text).matchAll(/\b((?:19|20)\d\d)\s*(?:-|–|—|à|a|au|\/)\s*((?:19|20)\d\d|aujourd'hui|auj\.?|present|actuel\w*|maintenant|en cours|ce jour)/g)) {
+  for (const m of fold(text).matchAll(/\b((?:19|20)\d\d)\s*(?:-|–|—|à|a|au|to|\/)\s*((?:19|20)\d\d|aujourd'hui|auj\.?|present|actuel\w*|maintenant|en cours|ce jour|current\w*|now|today|ongoing|date)/g)) {
     const a = +m[1], b = /^\d/.test(m[2]) ? +m[2] : now;
     if (b >= a && b - a < 45) iv.push([a, Math.max(b, a + .5)]);
   }
@@ -259,20 +404,44 @@ function cvYears(text){
 }
 
 /* ---------- Mots importants d'une ligne de l'offre qui n'est pas dans le lexique ---------- */
-const STOP = new Set(("le la les un une des du de d l au aux et ou en a dans sur pour par avec sans sous chez vers entre ce cet cette ces son sa ses leur leurs votre vos notre nos vous nous il elle ils elles on qui que quoi dont est sont etre avoir sera serez etes avez ont fait faire tout tous toute toutes tres plus moins bien bon bonne bonnes bons poste postes missions mission profil recherche recherchons recherche h f h/f cdi cdd temps plein partiel salaire experience experiences ans annee annees minimum maximum souhaite souhaitee apprecie appreciee requis requise exige exigee indispensable obligatoire capacite capacites savoir connaissance connaissances maitrise maitriser assurer assurez participer participez realiser realisez effectuer effectuez gerer gerez etc ainsi selon afin lors type idealement equivalent similaire premiere premier divers diverses ensemble differentes differents garantir mettre oeuvre intervenir contribuer veiller cadre").split(" "));
+const STOP = new Set(("le la les un une des du de d l au aux et ou en a dans sur pour par avec sans sous chez vers entre ce cet cette ces son sa ses leur leurs votre vos notre nos vous nous il elle ils elles on qui que quoi dont est sont etre avoir sera serez etes avez ont fait faire tout tous toute toutes tres plus moins bien bon bonne bonnes bons poste postes missions mission profil recherche recherchons recherche h f h/f cdi cdd temps plein partiel salaire experience experiences ans annee annees minimum maximum souhaite souhaitee apprecie appreciee requis requise exige exigee indispensable obligatoire capacite capacites savoir connaissance connaissances maitrise maitriser assurer assurez participer participez realiser realisez effectuer effectuez gerer gerez etc ainsi selon afin lors type idealement equivalent similaire premiere premier divers diverses ensemble differentes differents garantir mettre oeuvre intervenir contribuer veiller cadre the and with for from your you our will that this have has are can able ability must should strong excellent good great knowledge including such other within across into well role job position responsibilities requirements required preferred desired years year experience working work ensure using use help").split(" "));
 const tokens = s => [...new Set(fold(s).split(/[^a-z0-9+#]+/).filter(w => w.length >= 4 && !STOP.has(w)).map(w => w.slice(0, 6)))];
-const NOT_SKILL = /salaire|remuneration|€|euros?|\bcdi\b|\bcdd\b|contrat|temps (plein|partiel)|avantages|mutuelle|tickets? resto|primes?|postuler|candidature|envoy|\bcv\b|lieu de travail|poste base|prise de poste|date de debut|horaires? :|rejoignez|nous sommes|notre (entreprise|societe|groupe)|entreprise de|leader|\bdes que possible\b|vous aurez|principales missions|en lien direct/;
+/* Familles de mots proches : un mot de l'offre est retrouvé dans le CV par un mot de la même famille.
+   Racines de 6 lettres au plus, sans accents (comme les mots importants ci-dessus). */
+const SYN = [
+  "restau brasse bistro cafete pizzer snack traite hotel cantin", "vente vendre vendeu commer", "encais caisse caissi",
+  "magasi boutiq superm hyperm enseig", "entrep logist platef", "client cliente", "livrai livreu livrer", "conduc chauff",
+  "nettoy entret menage propre", "patien malade reside usager benefi", "enfant jeune eleve", "equipe collab collegu",
+  "ordina inform numeri digita", "docume proced wiki", "superv monito", "sauveg backup", "instal deploi deploy",
+  "config parame", "reseau networ", "serveu server", "securi cyber", "incide panne depann ticket", "utilis usager user",
+  "projet project", "manage encadr", "budget financ couts", "crise crisis", "chanti travau batime", "ponctu assidu",
+  "commun relati", "accomp suivi", "repara depann", "prepar confec", "rangem range ordonn", "plann agenda calend", "wareho entrep logist", "custom client", "deliv livrai", "cleani nettoy entret", "repair repara", "kitche cuisin cook", "childr enfant", "colleag equipe team staff", "sales vente selling retail", "shop magasi store", "patien resident", "elderl agees senior"
+].map(g => g.split(" "));
+const synOf = w => [w, ...SYN.filter(g => g.some(x => w.startsWith(x) || x.startsWith(w))).flat()];
+const NOT_SKILL = /salaire|remuneration|€|euros?|\bcdi\b|\bcdd\b|contrat|temps (plein|partiel)|avantages|mutuelle|tickets? resto|primes?|postuler|candidature|envoy|\bcv\b|lieu de travail|poste base|prise de poste|date de debut|horaires? :|rejoignez|nous sommes|notre (entreprise|societe|groupe)|entreprise de|leader|\bdes que possible\b|vous aurez|principales missions|en lien direct|salary|£|\$|per (hour|annum|year)|benefits|pension|holidays?|apply now|how to apply|application process|full[- ]time|part[- ]time|permanent (contract|role|position)|about us|we are|our (company|team is)|equal opportunit|start date|location/;
 
-const DIPLOMA = /\b(cap|bep|bac ?\+ ?\d|bac pro|bac|bts|dut|but|licence|master|titre professionnel|diplome d'etat)\b/;
+const DIPLOMA = EN ? /\b(bachelor'?s degree|master'?s degree|degree|phd|high school diploma|gcses?|a[- ]levels?|nvq level \d|hnd|hnc|bac ?\+ ?\d|bts)\b/ : /\b(cap|bep|bac ?\+ ?\d|bac pro|bac|bts|dut|but|licence|master|titre professionnel|diplome d'etat)\b/;
 
 /* ---------- Analyse : chaque point de l'offre reçoit ok (prouvé par une expérience), mid (cité sans preuve) ou no (absent) ---------- */
 function analyse(offer){
   const lines = cvLines(false), O = fold(offer);
   const expTxt = lines.filter(l => l.exp).map(l => l.raw).join("\n"), allTxt = lines.filter(l => l.raw).map(l => l.raw).join("\n");
   const E = fold(expTxt), A = fold(allTxt);
+  const body = lines.filter(l => l.raw && !l.sec);
+  // Meilleure ligne du CV pour un point : le motif exact de l'offre vaut plus que le motif large, une ligne longue (avec du détail) plus qu'un mot seul
+  const bestLine = (ls, d) => {
+    let best = null;
+    ls.forEach(l => {
+      const F = fold(l.raw), m = F.match(d.o) || F.match(d.c); if (!m) return;
+      const sc = (d.o.test(F) ? 4 : 0) + (l.exp ? 2 : 0) + Math.min(2, l.raw.length / 80);
+      if (!best || sc > best.sc) best = {t:l.raw, i:m.index, n:m[0].length, word:l.raw.substr(m.index, m[0].length), sc, exp:!!l.exp};
+    });
+    return best;
+  };
+  const ctxAt = i => { const a = Math.max(O.lastIndexOf("\n", i) + 1, i - 70), b0 = O.indexOf("\n", i), b = Math.min(b0 < 0 ? O.length : b0, i + 90); return (a > O.lastIndexOf("\n", i) + 1 ? "…" : "") + offer.slice(a, b).trim().replace(/^[-•●▪◦*–·✓✔>]+\s*/, "") + (b < (b0 < 0 ? O.length : b0) ? "…" : ""); };
   const lineAt = i => { const a = O.lastIndexOf("\n", i) + 1, b = O.indexOf("\n", i); return O.slice(a, b < 0 ? O.length : b); };
   const clauseAt = i => { const l = O.slice(0, i).search(/[^,;.\n:]*$/), m = O.slice(i).search(/[,;.\n]/); return O.slice(l, m < 0 ? O.length : i + m); };
-  const weight = i => { const l = clauseAt(i); return /indispensable|exige|obligatoire|imperati|requis/.test(l) ? "must" : /apprecie|un plus|souhait|serait un|idealement|atout/.test(l) ? "nice" : ""; };
+  const weight = i => { const l = clauseAt(i); return /indispensable|exige|obligatoire|imperati|requis|\brequired\b|essential|mandatory|must have/.test(l) ? "must" : /apprecie|un plus|souhait|serait un|idealement|atout|desirable|preferred|nice to have|a plus\b|bonus|ideally|advantage/.test(l) ? "nice" : ""; };
   const out = [];
 
   // Points du lexique
@@ -280,25 +449,27 @@ function analyse(offer){
     const mo = O.match(d.o); if (!mo) return;
     const offerWord = offer.substr(mo.index, mo[0].length);
     let st = "no", cvWord = "";
-    const me = E.match(d.c), ma = A.match(d.c);
-    if (me) { st = "ok"; cvWord = expTxt.substr(me.index, me[0].length); }
-    else if (ma) { st = (d.type === "l" || d.type === "h") ? "ok" : "mid"; cvWord = allTxt.substr(ma.index, ma[0].length); }
-    out.push({k:d.k, type:d.type, ex:d.ex, st, pos:mo.index, prio:weight(mo.index), offerWord, cvWord, re:d.c, broad:d.broad});
+    const pe = bestLine(body.filter(l => l.exp), d), pa = pe || bestLine(body, d);
+    if (pe) st = "ok"; else if (pa) st = (d.type === "l" || d.type === "h") ? "ok" : "mid";
+    if (pa) cvWord = pa.word;
+    out.push({k:d.k, type:d.type, ex:d.ex, st, pos:mo.index, prio:weight(mo.index), offerWord, offerCtx:ctxAt(mo.index), cvWord, proof:pa, re:d.c, broad:d.broad});
   });
 
   // Années d'expérience demandées
-  const my = O.match(/(\d{1,2})\s*(?:a|à)?\s*\d{0,2}\s*ans? (?:minimum )?(?:d'|d’|de )?experience|experience (?:de |d'au moins |minimum (?:de )?)?(\d{1,2}) ans?/);
+  const my = O.match(/(\d{1,2})\s*(?:a|à)?\s*\d{0,2}\s*ans? (?:minimum )?(?:d'|d’|de )?experience|experience (?:de |d'au moins |minimum (?:de )?)?(\d{1,2}) ans?|(\d{1,2})\+?\s*(?:years?|yrs?)(?:'|’)?\s*(?:of\s+)?(?:[a-z-]+\s+){0,3}?experience|at least (\d{1,2}) years?|experience of (\d{1,2})\+? years?/);
   if (my) {
-    const need = +(my[1] || my[2]), have = cvYears(allTxt);
-    out.push({k:`${need} an${need > 1 ? "s" : ""} d'expérience`, type:"y", st: have === null ? "mid" : have >= need ? "ok" : "no", pos:my.index, prio:weight(my.index), need, have});
+    const need = +(my[1] || my[2] || my[3] || my[4] || my[5]), have = cvYears(allTxt);
+    out.push({k: EN ? `${need} year${need > 1 ? "s" : ""} of experience` : `${need} an${need > 1 ? "s" : ""} d'expérience`, type:"y", st: have === null ? "mid" : have >= need ? "ok" : "no", pos:my.index, prio:weight(my.index), need, have, offerCtx:ctxAt(my.index)});
   }
 
   // Diplôme demandé
   const md = O.match(DIPLOMA);
   if (md && !out.some(r => r.type === "l" && /dipl/i.test(r.k))) {
     const w = offer.substr(md.index, md[0].length), base = fold(w).replace(/\s/g, "");
-    const inCv = new RegExp("\\b" + base.replace(/\+/g, " ?\\+ ?").replace("bac", "bac ?") + "\\b").test(A.replace(/\s+/g, " ")) || (base.startsWith("bac") && /\b(bac|bts|dut|but|licence|master)\b/.test(A));
-    out.push({k:`Diplôme : ${w.toUpperCase()}`, type:"d", word:w, st: inCv ? "ok" : "no", pos:md.index, prio:weight(md.index), re:new RegExp("\\b(" + base.slice(0, 3) + "\\w*)")});
+    const pat = fold(w).replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s*");
+    const inCv = new RegExp("\\b" + pat + "\\b").test(A) || (base.startsWith("bac") && /\b(bac|bts|dut|but|licence|master)\b/.test(A));
+    const dre = new RegExp("\\b(" + base.slice(0, 3) + "\\w*)"), dl = inCv && bestLine(body.filter(l => l.kind === "edu").concat(body), {o:dre, c:dre});
+    out.push({k: /^dipl/i.test(fold(w)) ? cap(w) : EN ? `Qualification: ${w.length > 4 ? cap(w) : w.toUpperCase()}` : `Diplôme : ${w.toUpperCase()}`, type:"d", word:w, st: inCv ? "ok" : "no", pos:md.index, prio:weight(md.index), offerWord:w, offerCtx:ctxAt(md.index), proof:dl || null, re:dre});
   }
 
   // Lignes à puces de l'offre que le lexique ne connaît pas : on compare leurs mots importants
@@ -310,12 +481,20 @@ function analyse(offer){
   rows.forEach((raw, idx) => {
     if (generic >= 15 || !(useBullets ? BUL.test(raw) : listy(idx))) return;
     const line = raw.replace(/^\s*[-•●▪◦*–·✓✔>]+\s*/, "").replace(/[.;]+$/, "").trim(), F = fold(line);
-    if (line.length < 6 || line.length > 120 || NOT_SKILL.test(F) || LEX.some(d => d.o.test(F)) || /\d+\s*ans?\b/.test(F) || DIPLOMA.test(F)) return;
+    if (line.length < 6 || line.length > 120 || NOT_SKILL.test(F) || LEX.some(d => d.o.test(F)) || /\d+\+?\s*(ans?|years?)\b/.test(F) || DIPLOMA.test(F)) return;
     const tk = tokens(line); if (tk.length < 1) return;
-    const share = T => tk.filter(w => T.split(/[^a-z0-9+#]+/).some(x => x.startsWith(w))).length / tk.length;
-    const se = share(E), sa = share(A);
+    const hits = T => { const ws = T.split(/[^a-z0-9+#]+/); return tk.filter(w => synOf(w).some(v => ws.some(x => x.startsWith(v)))); };
+    const se = hits(E).length / tk.length, sa = hits(A).length / tk.length;
+    const st = se >= .6 ? "ok" : sa >= .6 ? "mid" : "no";
+    // Preuve : la ligne du CV qui partage le plus de mots avec cette ligne de l'offre
+    let proof = null;
+    if (st !== "no") body.filter(l => st !== "ok" || l.exp).forEach(l => {
+      const F2 = fold(l.raw), h = hits(F2); if (!h.length || (proof && h.length <= proof.sc)) return;
+      const ws = h.flatMap(synOf), m = F2.split(/[^a-z0-9+#]+/).find(x => x.length >= 3 && ws.some(v => x.startsWith(v))), i = m ? F2.search(new RegExp("\\b" + m)) : 0;
+      proof = {t:l.raw, i:Math.max(0, i), n:m ? m.length : 0, sc:h.length, exp:!!l.exp};
+    });
     const pos = O.indexOf(F);
-    out.push({k: cap(line.length > 70 ? line.slice(0, 67).replace(/\s\S*$/, "") + "…" : line), type:"x", st: se >= .6 ? "ok" : sa >= .6 ? "mid" : "no", pos: pos < 0 ? 1e6 + idx : pos, prio:weight(Math.max(0, pos)), tk});
+    out.push({k: cap(line.length > 70 ? line.slice(0, 67).replace(/\s\S*$/, "") + "…" : line), type:"x", st, pos: pos < 0 ? 1e6 + idx : pos, prio:weight(Math.max(0, pos)), tk, found:hits(A), offerCtx:line, proof});
     generic++;
   });
 
@@ -327,13 +506,15 @@ function analyse(offer){
   });
 
   out.sort((a, b) => a.pos - b.pos);
+  out.forEach(r => { r.auto = r.st; if (over[r.k] && over[r.k] !== "skip") { r.st = over[r.k]; r.manual = true; } });
   out.forEach(r => {
     const f = fixes[r.k];
     r.fixedNow = f?.state === "accepted";
     if (r.fixedNow) r.st = "ok";
     if (r.type !== "y" && (r.st !== "ok" || r.fixedNow)) r.fix = f?.fix && (f.state === "accepted" || f.state === "skipped") ? f.fix : makeFix(r);
   });
-  return out;
+  skipped = out.filter(r => over[r.k] === "skip");
+  return out.filter(r => over[r.k] !== "skip");
 }
 const W = r => r.prio === "must" ? 2 : r.prio === "nice" ? .5 : 1;
 const countOf = rs => ({ok:rs.filter(r => r.st === "ok").length, mid:rs.filter(r => r.st === "mid").length, no:rs.filter(r => r.st === "no").length});
@@ -345,15 +526,45 @@ function atsCheck(text, info){
   const has = k => cv.some(l => l.sec && !l.auto && l.kind === k);
   const expDated = cv.filter(l => l.exp).some(l => /\b(19|20)\d\d\b/.test(l.t));
   const img = /scann|photo/i.test(info || "");
+  const phone = /(\+33|0)\s*[1-9](?:[\s.-]*\d{2}){4}/.test(t) || (EN && /(\+\d{1,3}[\s.-]?)?\(?\d{2,5}\)?[\s.-]?\d{3,4}[\s.-]?\d{3,4}/.test(t));
   return [
-    {ok: !img, label: img ? "Ton CV est une image" : "Ton CV contient du vrai texte", help: img ? "Beaucoup de logiciels de tri ne lisent pas les images. Envoie plutôt un PDF enregistré depuis Word ou Google Docs." : "Les logiciels de tri peuvent le lire."},
-    {ok: /[\w.+-]+@[\w-]+\.[a-z.]{2,}/i.test(t), label: "Adresse email", help: "Mets ton email en haut du CV, en texte (pas dans une image)."},
-    {ok: /(\+33|0)\s*[1-9](?:[\s.-]*\d{2}){4}/.test(t), label: "Numéro de téléphone", help: "Ajoute ton numéro en haut du CV, au format 06 12 34 56 78."},
-    {ok: has("exp"), label: "Titre « Expériences »", help: "Écris un titre clair « Expériences professionnelles » au-dessus de tes postes."},
-    {ok: has("skills"), label: "Titre « Compétences »", help: "Ajoute une rubrique « Compétences » avec les mots de l'offre."},
-    {ok: has("edu"), label: "Titre « Formation »", help: "Ajoute une rubrique « Formation » avec tes diplômes, même s'il n'y en a qu'un."},
-    {ok: expDated, label: "Dates sur tes expériences", help: "Mets les années de début et de fin de chaque poste (ex : 2022 - 2025)."},
-    {ok: w >= 120 && w <= 1000, label: w < 120 ? "CV un peu court" : w > 1000 ? "CV très long" : "Longueur correcte", help: w < 120 ? "Détaille un peu plus tes expériences : ce que tu faisais, avec des chiffres." : "Garde l'essentiel sur 1 ou 2 pages."},
-    {ok: !/[-]|□|�/.test(t), label: "Pas de caractères bizarres", help: "Certains symboles ou icônes ne sont pas lus. Remplace-les par du texte (ex : « Tél : »)."}
+    {ok: !img, label: img ? tr("Ton CV est une image", "Your CV is an image") : tr("Ton CV contient du vrai texte", "Your CV contains real text"), help: img ? tr("Beaucoup de logiciels de tri ne lisent pas les images. Envoie plutôt un PDF enregistré depuis Word ou Google Docs.", "Many screening tools cannot read images. Send a PDF saved from Word or Google Docs instead.") : tr("Les logiciels de tri peuvent le lire.", "Screening tools can read it.")},
+    {ok: /[\w.+-]+@[\w-]+\.[a-z.]{2,}/i.test(t), label: tr("Adresse email", "Email address"), help: tr("Mets ton email en haut du CV, en texte (pas dans une image).", "Put your email at the top of your CV, as text (not in an image).")},
+    {ok: phone, label: tr("Numéro de téléphone", "Phone number"), help: tr("Ajoute ton numéro en haut du CV, au format 06 12 34 56 78.", "Add your phone number at the top of your CV.")},
+    {ok: has("exp"), label: tr("Titre « Expériences »", "\"Experience\" heading"), help: tr("Écris un titre clair « Expériences professionnelles » au-dessus de tes postes.", "Write a clear \"Work experience\" heading above your jobs.")},
+    {ok: has("skills"), label: tr("Titre « Compétences »", "\"Skills\" heading"), help: tr("Ajoute une rubrique « Compétences » avec les mots de l'offre.", "Add a \"Skills\" section with the words from the offer.")},
+    {ok: has("edu"), label: tr("Titre « Formation »", "\"Education\" heading"), help: tr("Ajoute une rubrique « Formation » avec tes diplômes, même s'il n'y en a qu'un.", "Add an \"Education\" section with your qualifications, even if there is only one.")},
+    {ok: expDated, label: tr("Dates sur tes expériences", "Dates on your jobs"), help: tr("Mets les années de début et de fin de chaque poste (ex : 2022 - 2025).", "Give the start and end year of each job (e.g. 2022 - 2025).")},
+    {ok: w >= 120 && w <= 1000, label: w < 120 ? tr("CV un peu court", "CV a bit short") : w > 1000 ? tr("CV très long", "Very long CV") : tr("Longueur correcte", "Good length"), help: w < 120 ? tr("Détaille un peu plus tes expériences : ce que tu faisais, avec des chiffres.", "Say a bit more about your jobs: what you did, with numbers.") : tr("Garde l'essentiel sur 1 ou 2 pages.", "Keep it to 1 or 2 pages.")},
+    {ok: !/[\uf000-\uf8ff]|□|�/.test(t), label: tr("Pas de caractères bizarres", "No odd characters"), help: tr("Certains symboles ou icônes ne sont pas lus. Remplace-les par du texte (ex : « Tél : »).", "Some symbols or icons cannot be read. Replace them with text (e.g. \"Phone:\").")}
   ];
+}
+
+/* ---------- Nettoyage d'une annonce copiée depuis un site (France Travail, Indeed, LinkedIn…) ----------
+   On retire seulement les lignes courtes qui sont des boutons, menus ou mentions du site. */
+const JUNK = new RegExp("^(" + [
+  "accueil", "menu", "rechercher?", "recherche avancee", "se connecter", "connexion", "s'inscrire", "inscription", "mon compte", "mon espace",
+  "creer (un compte|une alerte|mon cv)", "postuler( maintenant| a cette offre| sur le site de l'entreprise)?", "candidater", "je postule",
+  "candidature (simplifiee|facile|rapide)", "postulez (facilement|en 1 clic)", "sauvegarder( l'offre)?", "enregistrer( l'offre)?", "partager( l'offre)?",
+  "imprimer( l'offre)?", "signaler( l'offre| cette offre| un probleme)?", "voir (plus|moins|l'offre|toutes les offres|le profil|l'entreprise)",
+  "afficher (plus|moins)", "lire la suite", "retour( aux resultats| a la liste)?", "retour en haut", "offres? similaires?", "offres? proches?",
+  "vous pourriez aussi aimer", "a propos de (nous|l'entreprise)", "mentions legales", "politique de confidentialite", "conditions generales.*",
+  "plan du site", "aide", "faq", "contact", "nous contacter", "telecharger l'application", "suivez-nous.*", "cookies?.*", "(tout )?accepter.*",
+  "(tout )?refuser.*", "parametrer.*cookies.*", "gerer (mes|les) (choix|cookies).*", "©.*", "copyright.*", "tous droits reserves.*",
+  "publie (il y a|le|aujourd'hui|hier).*", "(mis a jour|actualise) (le|il y a).*", "il y a \\d+ (minutes?|heures?|jours?|mois)", "aujourd'hui", "hier",
+  "offre n° ?\\w+", "offre (numero|no) ?\\w+", "reference ?:? ?[\\w-]+", "ref ?:? ?[\\w-]+", "\\d+ candidat(ure)?s?.*", "nouveau", "nouvelle offre", "urgent",
+  "france travail", "pole emploi", "indeed", "linkedin", "hellowork", "welcome to the jungle", "apec", "meteojob", "jobteaser", "monster",
+  "vous etes (recruteur|employeur).*", "espace (recruteur|employeur|candidat)", "employeurs?", "candidats?", "page \\d+( sur \\d+)?", "suivant", "precedent",
+  "\\d+ ?/ ?\\d+", "[^a-z0-9]+",
+  // English job sites
+  "apply( now)?", "easy apply", "save( job)?", "share", "report( job)?", "sign in", "log in", "show (more|less)", "see more", "similar jobs",
+  "posted \\d+ \\w+ ago", "\\d+ applicants?", "accept( all)?( cookies)?", "reject all", "privacy policy", "terms.*"
+].join("|") + ")[ .!:…]*$");
+function cleanOffer(text){
+  const kept = [], removed = [];
+  String(text).replace(/\r/g, "").split("\n").forEach(l => {
+    const t = l.trim(), F = fold(t);
+    if (t && t.length <= 60 && JUNK.test(F)) removed.push(t); else kept.push(l.replace(/\s+$/, ""));
+  });
+  return {text: kept.join("\n").replace(/\n{3,}/g, "\n\n").trim(), removed};
 }

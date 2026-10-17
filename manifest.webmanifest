@@ -1,0 +1,16 @@
+{
+  "name": "Ça colle ? · ton CV face à une offre",
+  "short_name": "Ça colle ?",
+  "description": "Compare ton CV à une offre d'emploi, améliore-le et prépare ta lettre. Rien n'est envoyé.",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fdf3e3",
+  "theme_color": "#fdf3e3",
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}

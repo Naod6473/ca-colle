@@ -18,7 +18,12 @@ Tout se passe dans le navigateur : le CV ne quitte jamais l'appareil de la perso
 - `js/lecteur.js` : lecture du CV ou de l'offre dans le navigateur. PDF (pdf.js), Word `.docx` et `.odt` (petit lecteur ZIP intégré), texte, photo ou PDF scanné (OCR Tesseract, français et anglais).
 - `js/moteur.js` : dictionnaire tous métiers (compétences, savoir-être, permis, horaires, langues, diplômes, années d'expérience) plus repérage des autres lignes de l'annonce, comparaison avec le CV, phrases à trous, mots de l'annonce, test robot recruteur.
 - `js/export.js` : fabrique le fichier Word (.docx) dans le navigateur, impression PDF, copie.
-- `js/app.js` : l'interface, les offres multiples, la lettre, la session gardée.
+- `js/app.js` : l'interface, les offres multiples, la lettre, la session gardée, « Pourquoi ce tampon ? » (avec correction à la main d'un tampon ou retrait d'un point).
+- `js/lang.js` : langue de l'app. `index.html` en français, `index-en.html` en anglais ; le lexique cherche les deux langues dans l'offre et le CV.
+- Synonymes (`SYN` dans `js/moteur.js`) : « restauration » retrouve « brasserie », etc. La preuve affichée est la ligne du CV qui colle le mieux.
+- `cleanOffer` : retire d'une annonce collée les boutons, menus et mentions des sites d'emploi.
+- `manifest.webmanifest`, `sw.js`, `icons/` : app installable sur téléphone et utilisable sans réseau après la première visite.
+- `tests/` : banc de test (offres et CV fictifs, résultats attendus). `node tests/run.js` (ou `node tests/run.js en`), ou ouvrir `/tests/` dans le navigateur. À lancer après chaque changement du moteur.
 - Session : rien n'est gardé par défaut. Si la case du pied de page est cochée, le CV, les offres et les réponses restent dans le navigateur (localStorage) ; un bouton efface tout.
 - `fonts/` : Archivo et Figtree (licence OFL), hébergées avec l'app.
 - `vendor/` : pdf.js 6.4.299 et tesseract.js 5.1.1 avec leurs licences (voir `vendor/README.txt`). Aucune requête vers un autre site.
