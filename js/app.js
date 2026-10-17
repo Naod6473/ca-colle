@@ -47,7 +47,7 @@ function gates(){
   $("#linkhelp").hidden = !isLink(v);
   $("#hint1").textContent = isLink(v) ? tr("Colle le texte de l'annonce, pas son lien.", "Paste the text of the ad, not its link.") : w === 0 ? tr("Colle au moins quelques lignes de l'annonce.", "Paste at least a few lines of the ad.") : offerOk() ? tr(`${w} mots, c'est bon.`, `${w} words, that's fine.`) : tr(`${w} mots : colle l'annonce en entier, il en faut au moins ${MIN_WORDS}.`, `${w} words: paste the whole ad, at least ${MIN_WORDS} are needed.`);
   $("#next2").disabled = !cvReady;
-  $$(".tab").forEach(t => {
+  $$(".tab[data-step]").forEach(t => {
     const n = +t.dataset.step;
     t.disabled = !canReach(n);
     t.title = t.disabled ? (n === 2 ? tr("Colle d'abord l'offre", "Paste the offer first") : tr("Ajoute d'abord l'offre et ton CV", "Add the offer and your CV first")) : "";

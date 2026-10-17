@@ -22,7 +22,6 @@
 <header class="top">
   <a class="logo" href="./"><span>Ça colle ?</span></a>
   <div class="top-actions">
-    <a class="pill pill-track" href="./">← Retour à l'app</a>
     <details class="comfort" id="comfortmenu">
       <summary class="pill pill-comfort" title="Mode confort">Aa <span class="sr-only">Mode confort</span></summary>
       <div class="comfort-menu" role="group" aria-label="Mode confort">
@@ -39,12 +38,14 @@
   </div>
   <nav class="tabs" aria-label="Pages">
     <a class="tab" href="./" style="--c: var(--blue)"><small>L'app</small><b>Comparer CV et offre</b></a>
-    <a class="tab" href="salaire.html" aria-current="page" style="--c: var(--orange)"><small>Outil</small><b>Brut → net</b></a>
+    <span class="tab-sep" aria-hidden="true"></span>
+    <a class="tab tab-tool" href="./#suivi" style="--c: var(--orange)"><small>Mon suivi</small><b>Mes candidatures</b></a>
+    <a class="tab tab-tool" href="salaire.html" aria-current="page" style="--c: var(--teal)"><small>Outil</small><b>Brut → net</b></a>
   </nav>
 </header>
 <span id="contenu" tabindex="-1"></span>
 <main class="salary">
-<section class="panel" style="--c: var(--orange); --shadow: var(--yellow)">
+<section class="panel" style="--c: var(--teal); --shadow: var(--yellow)">
   <div class="panel-inner">
     <div class="main-col">
       <span class="label">Outil · salaire</span>
@@ -78,7 +79,7 @@
     </aside>
   </div>
 </section>
-<div class="below" style="--c: var(--orange)">
+<div class="below" style="--c: var(--teal)">
   <section class="group"><h2 class="section-title" style="--k: var(--yellow)">Ton statut</h2>
     <div class="filters" role="group" aria-label="Statut">
       <button class="chip" type="button" data-st="nc" aria-pressed="true">Salarié non-cadre · −22 %</button>

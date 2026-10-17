@@ -13,6 +13,7 @@
   --pink: #ffa8d9;
   --green: #74e3a6;
   --red: #ff5a5f;
+  --teal: #7fd8cf;
   --violet: #c9a2ff;
   --ok: #1d7a4b; --ok-bg: #d9f7e6;
   --mid: #7a5a00; --mid-bg: #fff1b8;
@@ -373,7 +374,7 @@ mark.miss { background: var(--yellow); padding: 0 3px; border: 1px dashed var(--
 /* ---------- Suivi des candidatures ---------- */
 .pill-track { background: var(--orange); cursor: pointer; color: var(--ink); }
 .pill-track[aria-pressed="true"] { transform: translate(2px, 2px); box-shadow: none; }
-.pill-track span { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 999px; background: var(--red); color: var(--on-ink); font: 800 11px/1 var(--body); }
+.pill-track span, .tab #trackn { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 999px; background: var(--red); color: var(--on-ink); font: 800 11px/1 var(--body); }
 .next-row.tight { margin-top: 4px; gap: 8px; }
 .track-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
 .todo { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
@@ -512,6 +513,9 @@ a.pill { color: var(--ink); text-decoration: none; }
 .sal-res > div small { width: 100%; font: 700 12px/1 var(--body); text-transform: uppercase; color: var(--ink-soft); }
 .sal-res > div b { font: italic 900 40px/1 var(--display); color: var(--ink); }
 a.tab { text-decoration: none; color: inherit; }
+/* Accès rapides (suivi, salaire) après les étapes, séparés par un trait */
+.tab-sep { flex: none; align-self: stretch; width: 0; margin: 10px 8px 6px; border-left: 2px dashed var(--ink); opacity: .45; }
+.tab #trackn { margin-left: 4px; height: 16px; min-width: 16px; vertical-align: 2px; font-style: normal; font-size: 10px; }
 /* Curseurs : à 0 tout à gauche, au maximum tout à droite ; la partie remplie suit la valeur (--r, posé par js/salaire.js) */
 .salary input[type="range"] { --r: 0; --fill: var(--ink); width: 100%; max-width: 520px; height: 28px; margin: 4px 0; padding: 0; background: transparent; -webkit-appearance: none; appearance: none; cursor: pointer; }
 .salary input[type="range"]::-webkit-slider-runnable-track { height: 12px; border: 2px solid var(--ink); border-radius: 999px; background: linear-gradient(90deg, var(--fill) calc(11px + (100% - 22px) * var(--r)), var(--track, var(--card)) 0); }

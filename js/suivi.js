@@ -62,14 +62,16 @@ function showTrack(focusId){
   syncOffer();
   $$("[data-p]").forEach(p => p.hidden = true); $$("[data-for]").forEach(p => p.hidden = true);
   $$(".tab").forEach(t => t.setAttribute("aria-selected", "false"));
-  $("#track").hidden = false; $("#trackbelow").hidden = false; $("#trackbtn").setAttribute("aria-pressed", "true");
+  $("#track").hidden = false; $("#trackbelow").hidden = false; $("#trackbtn").setAttribute("aria-selected", "true");
   prepFor = null; mailFor = null;
   if (focusId) { openApp = focusId; trackView = "cards"; trackFilter = "all"; }
   renderTrack();
   if (focusId) setTimeout(() => document.getElementById("app-" + focusId)?.scrollIntoView({block: "start", behavior: "smooth"}), 60);
   else if (window.scrollY > 120) $(".top").scrollIntoView({behavior: "smooth"});
 }
-function hideTrack(){ $("#track").hidden = true; $("#trackbelow").hidden = true; $("#trackbtn").setAttribute("aria-pressed", "false"); }
+function hideTrack(){ $("#track").hidden = true; $("#trackbelow").hidden = true; $("#trackbtn").setAttribute("aria-selected", "false"); }
+// Lien direct vers le suivi (onglet « Mes candidatures » des pages outils)
+if (location.hash === "#suivi") setTimeout(() => { showTrack(); history.replaceState(null, "", location.pathname + location.search); }, 0);
 function renderBadge(){
   const n = apps().reduce((s, o) => s + todosOf(o).filter(t => t.urgent).length, 0);
   $("#trackn").hidden = !n; $("#trackn").textContent = n;

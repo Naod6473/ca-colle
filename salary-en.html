@@ -22,7 +22,6 @@
 <header class="top">
   <a class="logo" href="index-en.html"><span>Ça colle?</span></a>
   <div class="top-actions">
-    <a class="pill pill-track" href="index-en.html">← Back to the app</a>
     <details class="comfort" id="comfortmenu">
       <summary class="pill pill-comfort" title="Comfort mode">Aa <span class="sr-only">Comfort mode</span></summary>
       <div class="comfort-menu" role="group" aria-label="Comfort mode">
@@ -39,12 +38,14 @@
   </div>
   <nav class="tabs" aria-label="Pages">
     <a class="tab" href="index-en.html" style="--c: var(--blue)"><small>The app</small><b>Compare CV and job ad</b></a>
-    <a class="tab" href="salary-en.html" aria-current="page" style="--c: var(--orange)"><small>Tool</small><b>Gross → net</b></a>
+    <span class="tab-sep" aria-hidden="true"></span>
+    <a class="tab tab-tool" href="index-en.html#suivi" style="--c: var(--orange)"><small>My tracker</small><b>My applications</b></a>
+    <a class="tab tab-tool" href="salary-en.html" aria-current="page" style="--c: var(--teal)"><small>Tool</small><b>Gross → net</b></a>
   </nav>
 </header>
 <span id="contenu" tabindex="-1"></span>
 <main class="salary">
-<section class="panel" style="--c: var(--orange); --shadow: var(--yellow)">
+<section class="panel" style="--c: var(--teal); --shadow: var(--yellow)">
   <div class="panel-inner">
     <div class="main-col">
       <span class="label">Tool · salary</span>
@@ -71,7 +72,7 @@
     </aside>
   </div>
 </section>
-<div class="below" style="--c: var(--orange)">
+<div class="below" style="--c: var(--teal)">
   <section class="group"><h2 class="section-title" style="--k: var(--yellow)">Hours per week: <span id="hoursv"></span></h2>
     <label class="sr-only" for="hours">Hours per week</label><input type="range" id="hours" min="5" max="48" step="0.5" value="37.5">
     <p class="hint">Used to turn an hourly rate into a yearly salary.</p>

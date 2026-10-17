@@ -15,6 +15,7 @@
   --green: #7FB69B;
   --red: #C9432B;
   --violet: #B9A7E0;
+  --teal: #8CCFC6;
   --ok: #1f6b48; --ok-bg: #dcefe4;
   --mid: #7a5300; --mid-bg: #fbe9bf;
   --no: #a8301d; --no-bg: #fbe0d8;
@@ -51,6 +52,7 @@ html[data-skin="fiche"] {
   --green: #DDF5C2;
   --red: #B3123F;
   --violet: #E4DCFF;
+  --teal: #CFF1EC;
   --ok: #2c6a12; --ok-bg: #DDF5C2;
   --mid: #7a5600; --mid-bg: #FFEDB3;
   --no: #a3123a; --no-bg: #FFD9E2;
@@ -75,7 +77,7 @@ html[data-skin="fiche"] .logo::before { content: "✓"; display: grid; place-ite
 html[data-skin="fiche"] .logo span { padding: 0; border: 0; font-weight: 800; font-size: 26px; color: var(--ink); }
 html[data-skin="fiche"] .pill { border: 0; background: var(--card); font-weight: 700; font-size: 13px; box-shadow: var(--soft) !important; }
 html[data-skin="fiche"] .pill-safe { background: var(--lime); }
-html[data-skin="fiche"] .pill-track { background: var(--accent); color: #fff; }
+html[data-skin="fiche"] .tab-sep { margin: 8px 4px; border-left: 1.5px solid var(--hair); opacity: 1; }
 html[data-skin="fiche"] .top::after { content: ""; order: 2; flex-basis: 100%; height: 0; margin-top: -18px; }
 html[data-skin="fiche"] .tabs { gap: 4px; padding: 5px; margin: 6px 16px 0 0; background: var(--card); border-radius: 16px; align-items: stretch; flex-basis: auto; width: fit-content; max-width: 100%; box-shadow: var(--soft) !important; }
 html[data-skin="fiche"] .tab { border: 0; border-radius: 11px; background: transparent; transform: none; padding: 9px 14px; margin: 0; }
@@ -176,7 +178,7 @@ html[data-skin="fiche"] [data-p="3"] .big { color: var(--accent); }
   html.c-dark {
     --paper: #141A2E; --card: #1E2642; --card-a: rgba(30, 38, 66, .75); --on-ink: #141A2E;
     --ink: #E9E3D5; --ink-soft: #B8B2A5;
-    --blue: #2E4C78; --yellow: #765510; --orange: #7A4A2A; --pink: #7A3B33; --green: #2D5E4A; --red: #E2674E; --violet: #4E4580;
+    --blue: #2E4C78; --yellow: #765510; --orange: #7A4A2A; --pink: #7A3B33; --green: #2D5E4A; --red: #E2674E; --violet: #4E4580; --teal: #2A5E5A;
     --ok: #8FDDB0; --ok-bg: #1F3D30; --mid: #F2C565; --mid-bg: #43361A; --no: #FF9A86; --no-bg: #4A2620;
     --grid: rgba(233, 227, 213, .05); --hair: #343C5C; --grey: #2C3350; --sky-bg: #1D2E48;
     color-scheme: dark;
@@ -190,7 +192,7 @@ html[data-skin="fiche"] [data-p="3"] .big { color: var(--accent); }
   html.c-dark[data-skin="fiche"] {
     --paper: #0F1020; --card: #1B1C34; --card-a: rgba(27, 28, 52, .75); --on-ink: #0F1020;
     --ink: #ECEBFA; --ink-soft: #A9A8C8; --accent: #5F5CF5; --accent-t: #A3A1FF; --lime: #C6EB55;
-    --blue: #26305A; --yellow: #4A3D14; --orange: #4A3020; --pink: #4D2333; --green: #263F1C; --violet: #362C5E; --red: #FF6F91;
+    --blue: #26305A; --yellow: #4A3D14; --orange: #4A3020; --pink: #4D2333; --green: #263F1C; --violet: #362C5E; --teal: #1D3F3C; --red: #FF6F91;
     --ok: #A6E07F; --ok-bg: #263F1C; --mid: #F5CD6A; --mid-bg: #4A3D14; --no: #FF8FA8; --no-bg: #4D2333;
     --hair: #2E3052; --grey: #2A2B45; --sky-bg: #26305A;
     --soft: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 28px rgba(0, 0, 0, .35);

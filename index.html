@@ -25,7 +25,6 @@
 <header class="top">
   <a class="logo" href="./"><span>Ça colle ?</span></a>
   <div class="top-actions">
-    <button class="pill pill-track" id="trackbtn" type="button">Mes candidatures <span id="trackn" hidden></span></button>
     <details class="comfort" id="comfortmenu">
       <summary class="pill pill-comfort" title="Mode confort">Aa <span class="sr-only">Mode confort</span></summary>
       <div class="comfort-menu" role="group" aria-label="Mode confort">
@@ -47,6 +46,9 @@
     <button class="tab" role="tab" data-step="3" style="--c: var(--green)"><small>Étape 3</small><b>Le résultat</b></button>
     <button class="tab" role="tab" data-step="4" style="--c: var(--pink)"><small>Étape 4</small><b>Améliorer mon CV</b></button>
     <button class="tab" role="tab" data-step="5" style="--c: var(--violet)"><small>Étape 5</small><b>Ma lettre</b></button>
+    <span class="tab-sep" aria-hidden="true"></span>
+    <button class="tab tab-tool" id="trackbtn" type="button" aria-selected="false" style="--c: var(--orange)"><small>Mon suivi</small><b>Mes candidatures <span id="trackn" hidden></span></b></button>
+    <a class="tab tab-tool" href="salaire.html" style="--c: var(--teal)"><small>Outil</small><b>Brut → net</b></a>
   </nav>
 </header>
 <span id="contenu" tabindex="-1"></span>
