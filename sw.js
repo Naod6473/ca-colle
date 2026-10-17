@@ -1,12 +1,12 @@
 // Ça colle ? hors connexion : l'app est gardée sur l'appareil après la première visite.
 // Pages, styles et scripts : réseau d'abord (pour avoir la dernière version), cache si pas de réseau.
 // Bibliothèques de lecture (vendor/) : cache d'abord, elles ne changent pas.
-const VERSION = "cacolle-2026-10-17b";
+const VERSION = "cacolle-2026-10-17c";
 const SHELL = [
   "./", "index.html", "index-en.html", "css/app.css", "fonts/fonts.css",
   "fonts/archivo-latin-700-normal.woff2", "fonts/archivo-latin-800-italic.woff2", "fonts/archivo-latin-900-italic.woff2", "fonts/archivo-latin-900-normal.woff2",
   "fonts/figtree-latin-400-normal.woff2", "fonts/figtree-latin-500-normal.woff2", "fonts/figtree-latin-600-normal.woff2", "fonts/figtree-latin-700-normal.woff2",
-  "js/lecteur.js", "js/moteur.js", "js/export.js", "js/app.js", "favicon.svg", "manifest.webmanifest", "manifest-en.webmanifest",
+  "js/lang.js", "js/lecteur.js", "js/moteur.js", "js/suivi.js", "js/confort.js", "js/export.js", "js/app.js", "favicon.svg", "manifest.webmanifest", "manifest-en.webmanifest",
   "icons/icon-192.png", "icons/icon-512.png", "vendor/pdf/pdf.min.js", "vendor/pdf/pdf.worker.min.js"
 ];
 self.addEventListener("install", e => e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())));

@@ -15,6 +15,7 @@
 <link rel="preload" href="fonts/archivo-latin-900-italic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="fonts/fonts.css">
 <link rel="stylesheet" href="css/app.css">
+<script src="js/lang.js"></script>
 </head>
 <body>
 <a class="skip-link" href="#contenu">Skip to content</a>
@@ -22,6 +23,16 @@
 <header class="top">
   <a class="logo" href="index-en.html"><span>Ça colle ?</span></a>
   <div class="top-actions">
+    <button class="pill pill-track" id="trackbtn" type="button">My applications <span id="trackn" hidden></span></button>
+    <details class="comfort" id="comfortmenu">
+      <summary class="pill pill-comfort" title="Comfort mode">Aa <span class="sr-only">Comfort mode</span></summary>
+      <div class="comfort-menu" role="group" aria-label="Comfort mode">
+        <button type="button" data-comfort="big" aria-pressed="false">Bigger text</button>
+        <button type="button" data-comfort="contrast" aria-pressed="false">High contrast</button>
+        <button type="button" data-comfort="calm" aria-pressed="false">Less motion</button>
+        <small>Setting kept on this device.</small>
+      </div>
+    </details>
     <button class="pill pill-install" id="install" type="button" hidden>Install the app</button>
     <a class="pill pill-lang" href="./" hreflang="fr" lang="fr" title="Version française">FR</a>
     <span class="pill pill-safe"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Nothing is sent</span>
@@ -175,7 +186,23 @@
         <button class="chip" data-f="mid" aria-pressed="false" style="--k: var(--yellow)">? Needs proof <span id="n-mid"></span></button>
         <button class="chip" data-f="ok" aria-pressed="false" style="--k: #fff">✓ It fits <span id="n-ok"></span></button>
       </div>
-      <button class="btn light small" id="compare" type="button">Compare with another offer</button>
+      <div class="next-row tight">
+        <button class="btn light small" id="compare" type="button">Compare with another offer</button>
+        <button class="btn light small" type="button" data-trackthis>Track this application</button>
+        <button class="btn light small" type="button" id="listen" aria-pressed="false">Listen to the result</button>
+      </div>
+      <details class="share">
+        <summary class="btn light small">Share the summary</summary>
+        <div class="share-body">
+          <p class="hint">A summary to send to your job coach, adviser or a friend: the score, what fits, what is missing and the ad.</p>
+          <div class="export">
+            <button class="btn small" type="button" data-share="pdf">As PDF</button>
+            <button class="btn light small" type="button" data-share="docx">As Word</button>
+            <button class="btn light small" type="button" data-share="copy">Copy the text</button>
+            <button class="btn light small" type="button" data-share="mail">By email</button>
+          </div>
+        </div>
+      </details>
     </div>
     <aside class="box">
       <div class="box-head">Do this first</div>
@@ -213,7 +240,7 @@
 </section>
 <div class="below" data-for="4" hidden style="--c: var(--pink)">
   <div class="rewrite">
-    <div class="sugs" id="sugs"></div>
+    <div class="sugs-col"><div class="sugs" id="sugs"></div><section class="group" id="review"></section></div>
     <aside class="box preview">
       <div class="box-head">Your new CV</div>
       <div class="box-body cvdoc" id="cv4"></div>
@@ -263,8 +290,41 @@
         <button class="btn light small" type="button" data-dl="l-pdf">As PDF</button>
         <button class="btn light small" type="button" data-dl="l-copy">Copy the text</button>
       </div>
+      <p class="preview-foot">Letter sent? <button class="linkbtn" type="button" data-trackthis="sent">Note it in your tracker</button></p>
     </aside>
   </div>
+</div>
+<!-- ============ APPLICATION TRACKER ============ -->
+<section class="panel" id="track" hidden style="--c: var(--orange); --shadow: var(--yellow)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <span class="label">My tracker</span>
+      <h1 class="big">My applications</h1>
+      <p class="lede">Note where you applied, where each application stands and when to follow up.</p>
+      <div class="track-bar">
+        <div class="filters" role="group" aria-label="View">
+          <button class="chip" type="button" data-view="cards" aria-pressed="true">By offer</button>
+          <button class="chip" type="button" data-view="table" aria-pressed="false">Table</button>
+        </div>
+        <button class="btn small" id="addapp" type="button">+ Add an application</button>
+        <button class="btn light small" id="csv" type="button">Export for a spreadsheet</button>
+      </div>
+      <p class="notice" id="tracknokeep" hidden>Your tracker is not kept on this device yet: it will disappear when you close the page. <button class="btn small" id="keepon" type="button">Keep it on this device</button></p>
+    </div>
+    <aside class="box">
+      <div class="box-head">To do</div>
+      <div class="box-body" id="tracktodo"></div>
+    </aside>
+  </div>
+</section>
+<div class="below" id="trackbelow" hidden style="--c: var(--orange)">
+  <div class="filters" role="group" aria-label="Filter" id="trackfilters">
+    <button class="chip" type="button" data-tf="all" aria-pressed="true">All <span id="tf-all"></span></button>
+    <button class="chip" type="button" data-tf="active" aria-pressed="false" style="--k: var(--yellow)">Ongoing <span id="tf-active"></span></button>
+    <button class="chip" type="button" data-tf="talk" aria-pressed="false" style="--k: var(--violet)">Interviews <span id="tf-talk"></span></button>
+    <button class="chip" type="button" data-tf="done" aria-pressed="false" style="--k: #fff">Closed <span id="tf-done"></span></button>
+  </div>
+  <div id="trackout"></div>
 </div>
 </main>
 <div id="printzone" aria-hidden="true"></div>
@@ -282,10 +342,11 @@
 </footer>
 <div class="toast" id="toast" role="status" hidden></div>
 
-<script src="js/lang.js"></script>
 <script src="js/lecteur.js"></script>
 <script src="js/moteur.js"></script>
 <script src="js/export.js"></script>
 <script src="js/app.js"></script>
+<script src="js/suivi.js"></script>
+<script src="js/confort.js"></script>
 </body>
 </html>

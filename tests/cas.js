@@ -248,5 +248,63 @@ BTEC Level 3 IT, 2018`,
   ok: ["User support", "User accounts and access", "Software deployment", "3 years of experience", "Active Directory"],
   mid: ["Backup and restore", "Windows"], absent: ["Excel", "Qualification: Licence"], no: ["Technical documentation", "Communication skills", "Driving licence"]
 },
+{
+  name: "Annonce arnaque (vérif annonce)",
+  offer: `Agent de saisie à domicile – Lyon
+Travail depuis chez vous, sans expérience. Gagnez 300 € par jour !
+Frais d'inscription de 49 € pour recevoir votre kit de démarrage.
+Envoyez votre RIB et une copie de votre pièce d'identité sur WhatsApp ou à recrutement.express@gmail.com`,
+  cv: `Alex Exemple
+Expériences
+Agent d'accueil (2021 - 2023) : accueil de 80 visiteurs par jour`,
+  ad: {facts: {place: "Lyon"}, missing: ["contract", "hours"], flags: ["pay", "data", "chat", "tooGood", "mail"]}
+},
+{
+  name: "Annonce complète (vérif annonce)",
+  offer: `Vendeur / Vendeuse en boulangerie – CDD de 6 mois – Rouen
+Lieu de travail : Rouen centre
+Salaire : 1 850 € brut par mois, 35 h par semaine, poste à pourvoir dès que possible.
+Vos missions : accueil et conseil des clients, encaissement, mise en rayon.
+Candidature par mail à recrutement@exemple.fr`,
+  cv: `Alex Exemple
+Expériences
+Vendeur (2021 - 2023) : encaissement de 150 clients par jour, mise en rayon`,
+  ad: {facts: {contract: "CDD de 6 mois", place: "Rouen centre", salary: "1 850 € brut par mois", hours: "35 h par semaine", start: "dès que possible"}, missing: [], noFlags: true}
+},
+{
+  name: "Relecture : fautes et verbes faibles",
+  offer: `Employé(e) de magasin
+Accueil des clients, mise en rayon`,
+  cv: `Alex Exemple
+Expériences professionelles
+Employée polyvalente, Magasin Exemple (2020 - 2023) : participer à l'acceuil des clients et diverses tâches en magasin
+Compétences
+Rigeur, polyvalance, travail en équipe`,
+  review: {typos: [["professionelles", "professionnelles"], ["acceuil", "accueil"], ["Rigeur", "Rigueur"], ["polyvalance", "polyvalence"]], types: ["weak", "nonum"]}
+},
+{
+  name: "Relecture : CV propre",
+  offer: `Préparateur de commandes
+Préparation des commandes`,
+  cv: `Alex Exemple
+Expériences
+Préparateur de commandes, Entrepôt Exemple (2019 - 2024) : préparé 180 commandes par jour, contrôlé 40 palettes
+Compétences
+CACES 1, rigueur, accueil`,
+  review: {notTypes: ["typo", "weak", "nonum", "long", "style"]}
+},
+{
+  name: "Ad check and proofreading (English)", lang: "en",
+  offer: `Retail Assistant – part-time – Bristol
+£11.50 per hour, 20 hours a week, fixed-term contract until January.
+Earn up to £500 a day! Pay a registration fee to get started. Contact us on Telegram.`,
+  cv: `Robin Sample
+Experience
+Sales Assistant, Sample Shop (2021 - 2024): responsible for the till and custumer service, various tasks
+Skills
+Communcation, teamwork`,
+  ad: {facts: {salary: "£11.50 per hour", hours: "part-time", place: "Bristol", contract: "fixed-term"}, flags: ["pay", "tooGood", "chat"]},
+  review: {typos: [["custumer", "customer"], ["Communcation", "Communication"]], types: ["weak", "nonum"]}
+},
 ];
 if (typeof module !== "undefined") module.exports = CASES;

@@ -22,6 +22,11 @@ Tout se passe dans le navigateur : le CV ne quitte jamais l'appareil de la perso
 - `js/lang.js` : langue de l'app. `index.html` en français, `index-en.html` en anglais ; le lexique cherche les deux langues dans l'offre et le CV.
 - Synonymes (`SYN` dans `js/moteur.js`) : « restauration » retrouve « brasserie », etc. La preuve affichée est la ligne du CV qui colle le mieux.
 - `cleanOffer` : retire d'une annonce collée les boutons, menus et mentions des sites d'emploi.
+- `js/suivi.js` : « Mes candidatures », suivi par fiche ou en tableau (date de l'offre, date de candidature, état, relance, contact, notes, historique), liste « À faire », export CSV pour un tableur, et préparation d'entretien (questions probables avec méthode STAR, export Word/PDF).
+- `adCheck` (`js/moteur.js`) : « L'annonce en bref » à l'étape 3 (contrat, lieu, salaire, horaires, télétravail, début ; ce qui manque) et signaux d'arnaque (paiement, RIB ou papiers, WhatsApp, gains trop beaux, vente en réseau, adresse Gmail).
+- `cvCheck` (`js/moteur.js`) : « Relecture du CV » à l'étape 4 (fautes fréquentes corrigeables en un clic, verbes faibles, phrases trop longues, expériences sans chiffre, « je » répété).
+- Bilan à partager (étape 3) : résumé pour un conseiller ou un proche, en PDF, Word, texte ou mail. Pas de lien de partage : il faudrait un serveur.
+- `js/confort.js` : mode confort (texte plus gros, contraste fort, moins d'animations ; réglage gardé sur l'appareil) et « Écouter le résultat » avec la voix du navigateur.
 - `manifest.webmanifest`, `sw.js`, `icons/` : app installable sur téléphone et utilisable sans réseau après la première visite.
 - `tests/` : banc de test (offres et CV fictifs, résultats attendus). `node tests/run.js` (ou `node tests/run.js en`), ou ouvrir `/tests/` dans le navigateur. À lancer après chaque changement du moteur.
 - Session : rien n'est gardé par défaut. Si la case du pied de page est cochée, le CV, les offres et les réponses restent dans le navigateur (localStorage) ; un bouton efface tout.

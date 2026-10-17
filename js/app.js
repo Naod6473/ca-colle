@@ -56,6 +56,7 @@ function gates(){
 }
 function go(n){
   if (!canReach(n)) return;
+  if (typeof hideTrack === "function") hideTrack();
   step = n;
   if (n >= 2) syncOffer();
   results = analyse($("#offer").value);
@@ -152,7 +153,7 @@ function renderResult(){
   const notice = t < 4 ? `<p class="notice">${tr(`Je n'ai repéré que ${plural(t, "point")} dans cette offre. Vérifie que tu as collé l'annonce en entier, avec les missions et le profil recherché.`, `I only found ${plural(t, "point")} in this offer. Check that you pasted the whole ad, with the tasks and the profile wanted.`)}</p>` : "";
   const vocab = results.filter(r => r.vocab);
   const ats = atsCheck($("#cvraw").value, cvFile.info), atsOk = ats.filter(a => a.ok).length;
-  $("#groups").innerHTML = notice + groups.map(s => {
+  $("#groups").innerHTML = adHTML(adCheck($("#offer").value)) + notice + groups.map(s => {
     const list = results.filter(r => r.st === s).sort((a, b) => urgency(a) - urgency(b)); if (!list.length) return "";
     return `<section class="group"><h2 class="section-title" style="--k: ${s === "ok" ? "var(--green)" : s === "mid" ? "var(--yellow)" : "var(--pink)"}">${LABEL[s]} (${list.length})</h2><div class="points">${list.map(r => `
       <article class="point">
@@ -175,6 +176,17 @@ function renderResult(){
   + `<section class="group"><h2 class="section-title" style="--k: var(--orange)">${tr("Test robot recruteur", "Recruiter robot test")} · ${atsOk} ${tr("sur", "of")} ${ats.length}</h2>
       <p class="hint">${tr("Beaucoup d'entreprises trient les CV avec un logiciel avant qu'une personne les lise. Voici ce qui peut le gêner.", "Many employers sort CVs with software before a person reads them. Here is what can trip it up.")}</p>
       <ul class="ats">${ats.map(a => `<li class="${a.ok ? "ok" : "ko"}"><b><span aria-hidden="true">${a.ok ? "✓" : "✕"}</span> ${esc(a.label)}</b>${a.ok ? "" : `<span>${esc(a.help)}</span>`}<span class="sr-only">${a.ok ? tr(" : bon", ": good") : tr(" : à corriger", ": to fix")}</span></li>`).join("")}</ul></section>`;
+}
+
+// L'annonce en bref : infos clés, infos absentes, signaux d'arnaque
+function adHTML(ad){
+  const red = ad.flags.filter(f => f.level === "red");
+  return `<section class="group adcheck"><h2 class="section-title" style="--k: ${red.length ? "var(--pink)" : "var(--blue)"}">${tr("L'annonce en bref", "The ad at a glance")}</h2>
+    ${ad.flags.length ? `<div class="alert ${red.length ? "red" : "amber"}" role="note"><b>${red.length ? tr("Attention, cette annonce ressemble à une arnaque.", "Careful, this ad looks like a scam.") : tr("Quelques points à vérifier avant de postuler.", "A few things to check before applying.")}</b>
+      <ul>${ad.flags.map(f => `<li class="${f.level}"><b>${esc(f.label)}</b> <q>${esc(f.v)}</q><span>${esc(f.why)}</span></li>`).join("")}</ul>
+      ${red.length ? `<p>${tr("Ne paie jamais pour postuler et ne donne pas tes papiers avant un contrat signé. En cas de doute, signale l'annonce au site qui la publie.", "Never pay to apply and do not hand over your papers before a signed contract. If in doubt, report the ad to the site that posted it.")}</p>` : ""}</div>` : ""}
+    <ul class="facts">${ad.facts.map(f => `<li><small>${esc(f.label)}</small><b>${esc(f.v)}</b></li>`).join("")}${ad.missing.map(f => `<li class="miss"><small>${esc(f.label)}</small><b>${tr("pas indiqué", "not given")}</b></li>`).join("")}</ul>
+    ${ad.missing.length ? `<p class="hint">${tr("Ce qui n'est pas écrit, demande-le avant ou pendant l'entretien : c'est normal de poser la question.", "Whatever is not written, ask about it before or during the interview: it is normal to ask.")}</p>` : ""}</section>`;
 }
 
 /* ---------- Étape 4 : améliorer le CV ---------- */
@@ -207,6 +219,18 @@ function renderRewrite(){
   $("#score4").textContent = p + " %"; $("#meter4").style.width = p + "%";
   $("#score4txt").textContent = tr(`${c.ok} point${c.ok > 1 ? "s" : ""} sur ${results.length} prouvé${c.ok > 1 ? "s" : ""} dans ton CV.`, `${c.ok} of ${results.length} points proven in your CV.`);
   $("#cv4").innerHTML = cvHTML(true);
+  renderReview();
+}
+// Relecture : fautes fréquentes (corrigeables en un clic), verbes faibles, phrases longues, chiffres
+function renderReview(){
+  const list = cvCheck($("#cvraw").value), box = $("#review");
+  if (!box) return;
+  box.innerHTML = `<h2 class="section-title" style="--k: var(--yellow)">${tr("Relecture du CV", "CV proofreading")}${list.length ? ` · ${list.length}` : ""}</h2>`
+    + (list.length ? `<ul class="review">${list.map(c => `<li class="${c.type}"><i class="tag">${{typo: tr("Faute", "Typo"), weak: tr("Verbe faible", "Weak verb"), long: tr("Trop long", "Too long"), nonum: tr("Sans chiffre", "No number"), style: tr("Style", "Style")}[c.type]}</i>
+        <span>${esc(c.msg)}${c.line && c.type !== "typo" ? `<small>${tr("« ", "\"")}${esc(c.line.length > 140 ? c.line.slice(0, 140) + "…" : c.line)}${tr(" »", "\"")}</small>` : ""}</span>
+        ${c.type === "typo" ? `<button type="button" class="btn small" data-typo="${esc(c.word)}" data-to="${esc(c.to)}">${tr("Corriger", "Fix")}</button>` : ""}</li>`).join("")}</ul>
+        <p class="hint">${tr("Seules les fautes sont corrigées en un clic. Pour le reste, modifie le texte de ton CV à l'étape 2 (« Vérifier le texte lu »).", "Only typos are fixed in one click. For the rest, edit your CV text in step 2 (\"Check the text read\").")}</p>`
+      : `<p class="hint">${tr("Rien à signaler : pas de faute courante, de verbe faible ni de phrase trop longue.", "Nothing to report: no common typo, weak verb or overlong sentence.")}</p>`);
 }
 const splitName = t => { const i = t.indexOf(" · "); return i > 0 ? [t.slice(0, i), t.slice(i + 3)] : [t, ""]; };
 const cvHTML = withIns => cvLines(withIns).map(l => l.name ? (([n, r]) => `<div class="name">${esc(n)}</div>${r ? `<p>${esc(r)}</p>` : ""}`)(splitName(l.t)) : l.sec ? `<div class="sec">${esc(l.sec)}</div>` : `<p>${l.html}</p>`).join("");
@@ -298,6 +322,35 @@ async function exportCopy(kind){
   toast(await Export.copy(kind === "cv" ? cvText() : currentLetter()) ? tr("Texte copié", "Text copied") : tr("Copie impossible : sélectionne le texte", "Copy failed: select the text"));
 }
 
+/* ---------- Bilan à partager (conseiller, proche, coach) ---------- */
+// Structure commune : [{h: titre} | {t: texte, b: gras}] → Word, PDF ou texte
+function summaryParts(){
+  const c = countOf(results), p = scoreOf(results), ad = adCheck($("#offer").value), out = [];
+  const list = s => results.filter(r => r.st === s).sort((a, b) => urgency(a) - urgency(b)).map(r => ({t: "- " + r.k + (r.prio === "must" ? tr(" (indispensable)", " (essential)") : "") + (s === "ok" && r.type !== "y" && excerpt(r, false) ? tr(" : ", ": ") + clip(excerpt(r, false)) : "")}));
+  out.push({title: tr("Bilan Ça colle ?", "Ça colle? summary")});
+  out.push({t: (personName() ? personName() + " · " : "") + titleOf($("#offer").value) + " · " + new Date().toLocaleDateString(tr("fr-FR", "en-GB"))});
+  out.push({t: tr(`Score : ${p} % (${$("#verdict").textContent}). ${c.ok} point${c.ok > 1 ? "s" : ""} prouvé${c.ok > 1 ? "s" : ""}, ${c.mid} à préciser, ${c.no} absent${c.no > 1 ? "s" : ""} du CV, sur ${results.length}.`, `Score: ${p}% (${$("#verdict").textContent}). ${c.ok} proven, ${c.mid} to clarify, ${c.no} missing from the CV, out of ${results.length}.`), b: true});
+  if (cur && cur.app) out.push({t: tr("Suivi : ", "Tracking: ") + stLabel(cur.app.status) + (cur.app.appliedDate ? tr(" · envoyée le ", " · sent on ") + fmtDate(cur.app.appliedDate) : "")});
+  [["no", tr("Pas dans le CV", "Not in the CV")], ["mid", tr("À préciser avec un exemple", "Needs an example")], ["ok", tr("Ça colle", "It fits")]].forEach(([s, h]) => { const l = list(s); if (l.length) out.push({h: `${h} (${l.length})`}, ...l); });
+  out.push({h: tr("L'annonce", "The ad")}, ...ad.facts.map(f => ({t: `- ${f.label}${tr(" : ", ": ")}${f.v}`})), ...ad.missing.map(f => ({t: `- ${f.label}${tr(" : pas indiqué", ": not given")}`})), ...ad.flags.map(f => ({t: `- ⚠ ${f.label} (« ${f.v} »)`})));
+  const ats = atsCheck($("#cvraw").value, cvFile.info).filter(a => !a.ok);
+  if (ats.length) out.push({h: tr("Test robot recruteur : à corriger", "Recruiter robot test: to fix")}, ...ats.map(a => ({t: `- ${a.label}${tr(" : ", ": ")}${a.help}`})));
+  const added = Object.values(fixes).filter(f => f.state === "accepted").map(f => ({t: "- " + fillTpl(f.fix, f.vals)}));
+  if (added.length) out.push({h: tr("Ajouté au CV avec l'app", "Added to the CV with the app")}, ...added);
+  const rv = cvCheck($("#cvraw").value);
+  if (rv.length) out.push({h: tr("Relecture du CV", "CV proofreading")}, ...rv.map(r => ({t: "- " + r.msg})));
+  out.push({t: tr("Fait avec Ça colle ? (ca-colle.pissits.com) : l'analyse se fait sur l'appareil, rien n'est envoyé.", "Made with Ça colle? (ca-colle.pissits.com): the analysis runs on the device, nothing is sent.")});
+  return out;
+}
+const summaryText = () => summaryParts().map(x => x.title ? x.title.toUpperCase() : x.h ? "\n" + x.h.toUpperCase() : x.t).join("\n");
+async function exportSummary(how){
+  const parts = summaryParts(), name = tr("Bilan_", "Summary_") + fileBase(titleOf($("#offer").value).split(/\s+[–-]\s+/)[0]);
+  if (how === "docx") { Export.download(Export.docx(parts.map(x => x.title ? {text: x.title, style: "title"} : x.h ? {text: x.h, style: "head"} : {text: x.t, bold: x.b})), name + ".docx"); return toast(tr("Fichier Word téléchargé", "Word file downloaded")); }
+  if (how === "pdf") { toast(tr("Choisis « Enregistrer en PDF »", "Choose \"Save as PDF\"")); return setTimeout(() => Export.printHTML(`<div class="p-cv">${parts.map(x => x.title ? `<div class="name">${esc(x.title)}</div>` : x.h ? `<div class="sec">${esc(x.h)}</div>` : `<p>${x.b ? `<b>${esc(x.t)}</b>` : esc(x.t)}</p>`).join("")}</div>`), 300); }
+  if (how === "mail") { location.href = "mailto:?subject=" + encodeURIComponent(tr("Mon bilan de candidature", "My application summary")) + "&body=" + encodeURIComponent(summaryText().slice(0, 1800)); return; }
+  toast(await Export.copy(summaryText()) ? tr("Bilan copié : colle-le dans un mail", "Summary copied: paste it into an email") : tr("Copie impossible", "Copy failed"));
+}
+
 /* ---------- Étape 2 : lecture du CV ---------- */
 let cvTimer;
 function setCV(text, typed){
@@ -349,7 +402,7 @@ function saveNow(){
   clearTimeout(saveTimer);
   if (!keep()) return;
   if (cur) { cur.text = $("#offer").value; cur.title = titleOf(cur.text); }
-  const data = {v: 1, cv: {text: $("#cvraw").value, ...cvFile}, me, cur: cur?.id, offers: offers.filter(o => o.text.trim()).map(o => ({id: o.id, text: o.text, title: o.title, score: o.score, fixes: o.fixes, over: o.over, letter: o.letter}))};
+  const data = {v: 1, cv: {text: $("#cvraw").value, ...cvFile}, me, cur: cur?.id, offers: offers.filter(o => o.text.trim() || o.app).map(o => ({id: o.id, text: o.text, title: o.title, score: o.score, fixes: o.fixes, over: o.over, letter: o.letter, app: o.app, prep: o.prep}))};
   try { localStorage.setItem(STORE, JSON.stringify(data)); } catch {}
 }
 function save(){ clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, 400); }
@@ -395,6 +448,12 @@ document.addEventListener("click", e => {
     offers = offers.filter(o => o.id !== t.dataset.deloffer);
     if (cur && cur.id === t.dataset.deloffer) { cur = null; $("#offer").value = ""; newOffer(); gates(); }
     renderOffers(); return save();
+  }
+  if (t.dataset.share) return exportSummary(t.dataset.share);
+  if (t.dataset.typo) {
+    const re = new RegExp(`(^|[^\\p{L}])${t.dataset.typo}(?=[^\\p{L}]|$)`, "gu");
+    setCV($("#cvraw").value.replace(re, `$1${t.dataset.to}`)); refresh();
+    return toast(tr(`Corrigé : « ${t.dataset.to} »`, `Fixed: "${t.dataset.to}"`));
   }
   if (t.dataset.dl) {
     const [kind, how] = t.dataset.dl.split("-"), k = kind === "l" ? "letter" : "cv";

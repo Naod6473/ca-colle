@@ -568,3 +568,70 @@ function cleanOffer(text){
   });
   return {text: kept.join("\n").replace(/\n{3,}/g, "\n\n").trim(), removed};
 }
+
+/* ---------- L'annonce en bref : salaire, contrat, lieu… et signaux douteux ---------- */
+const AD_FACTS = [
+  ["salary", tr("Salaire", "Salary"), /(\d[\d\s.,]*\s?(k ?€|€|euros?|k£|£|\$)\s?(brut|net|gross)?\s?(\/|par|per|a)?\s?(mois|an|annuel|heure|h|jour|semaine|month|year|annum|hour|day|week)?|(£|\$|€)\s?\d[\d,.]*k?(\s?(-|–|à|to)\s?(£|\$|€)?\s?\d[\d,.]*k?)?(\s?(per|a|\/)\s?(hour|year|annum|month|an|mois))?|\bsmic\b|selon (profil|experience|convention)|a negocier|salaire attractif|competitive salary)/],
+  ["contract", tr("Contrat", "Contract"), /\b(cdi|cdd( de \d+ mois)?|interim(aire)?|alternance|apprentissage|contrat pro\w*|stage|freelance|saisonnier|vacation|permanent( role| contract| position)?|fixed[- ]term|temporary|internship|apprenticeship|zero[- ]hours?)\b/],
+  ["hours", tr("Temps de travail", "Hours"), /(\d{2}(,\d)? ?h(eures)?( hebdo\w*| ?(\/|par) ?semaine)?\b|temps (plein|partiel)|full[- ]time|part[- ]time|\d{2} hours? (a|per) week)/],
+  ["remote", tr("Télétravail", "Remote work"), /(teletravail|full remote|remote|hybride|hybrid|work from home)/],
+  ["start", tr("Début", "Start"), /(des que possible|des maintenant|poste a pourvoir (immediatement|des que possible|le [^\n,.]{3,20})|prise de poste (le |en )?[^\n,.]{3,20}|asap|immediate start|start date:? [^\n,.]{3,20})/]
+];
+const AD_FLAGS = [
+  ["pay", "red", tr("On te demande de payer", "You are asked to pay"), tr("Une vraie entreprise ne fait jamais payer pour postuler, pour une formation obligatoire ou pour un « kit ».", "A real employer never charges you to apply, for compulsory training or for a \"kit\"."),
+    /((frais|droits?) (d'inscription|de dossier|de formation)|payer (une|des|vos|votre|la|le) (formation|frais|inscription|kit|caution|materiel)|paiement (prealable|d'avance)|kit de demarrage|achat (d'un |du )?kit|caution de|mandat cash|western union|carte (prepayee|pcs)|neosurf|transcash|registration fee|pay (a|an|the|for) (fee|training|kit)|upfront (fee|payment)|starter kit)/],
+  ["data", "red", tr("On te demande des données sensibles", "You are asked for sensitive data"), tr("Ne donne pas ton RIB, ta carte Vitale ou une copie de pièce d'identité avant d'avoir signé un contrat.", "Do not give your bank details, social security number or ID copy before signing a contract."),
+    /((coordonnees|informations) bancaires|\brib\b|\biban\b|numero de securite sociale|carte vitale|copie (de votre |de la |d'une )?(piece d'identite|carte d'identite|passeport)|bank (details|account number)|social security number|national insurance number|passport copy|copy of your (id|passport))/],
+  ["chat", "amber", tr("Contact par messagerie seulement", "Contact through a messaging app only"), tr("Les arnaques passent souvent par WhatsApp ou Telegram. Cherche le site et l'adresse de l'entreprise.", "Scams often go through WhatsApp or Telegram. Look up the company's website and address."),
+    /\b(whatsapp|telegram|snapchat|messenger)\b/],
+  ["tooGood", "red", tr("Trop beau pour être vrai", "Too good to be true"), tr("Des gains élevés et rapides sans expérience, c'est le signe classique d'une arnaque.", "High, quick earnings with no experience are a classic sign of a scam."),
+    /((gagne[rz]?|gains?|revenus?) (jusqu'a |de |plus de )?\d[\d\s]*\s?(€|euros?) (par|\/) ?(jour|semaine)|argent facile|revenus? (illimites|garantis)|earn (up to )?(£|\$|€)?\d[\d,]* (a|per) (day|week)|easy money|guaranteed income)/],
+  ["mlm", "amber", tr("Vente à domicile ou parrainage", "Home selling or recruiting others"), tr("Vérifie que tu seras salarié(e) avec un vrai contrat, et pas payé(e) seulement à la commission.", "Check you will be an employee with a real contract, not paid only on commission."),
+    /(devenez (votre propre patron|independant|ambassadeur)|marketing de reseau|vente directe|parrain(age|er)|be your own boss|network marketing|commission only)/],
+  ["mail", "amber", tr("Adresse email personnelle", "Personal email address"), tr("Une adresse Gmail, Hotmail ou Yahoo pour une entreprise : vérifie qu'elle existe vraiment (site, SIRET, avis).", "A Gmail, Hotmail or Yahoo address for a company: check it really exists (website, company number, reviews)."),
+    /[\w.+-]+@(gmail|hotmail|yahoo|outlook|live|aol|laposte|orange|free|sfr|wanadoo)\.[a-z.]+/]
+];
+function adCheck(text){
+  const t = String(text || ""), F = fold(t), facts = [], missing = [], flags = [];
+  AD_FACTS.forEach(([id, label, re]) => {
+    const m = F.match(re);
+    if (m) facts.push({id, label, v: t.substr(m.index, m[0].length).trim().replace(/\s+/g, " ").replace(/[,.;:]$/, "")});
+    else if (id !== "remote" && id !== "start") missing.push({id, label});
+  });
+  // Lieu : « Lieu : Caen », « Location: Leeds », ou le dernier morceau du titre (« Vendeur – CDI – Caen »)
+  const ml = t.match(/(?:^|\n)\s*(?:lieu(?: de travail)?|localisation|location|ville|based in|bas[ée] [àa])\s*:?\s*([^\n,;]{2,40})/i);
+  let place = ml ? ml[1].trim() : "";
+  if (!place) {
+    const parts = (t.split("\n").find(l => l.trim()) || "").split(/\s+[–—-]\s+|\s+\|\s+/).slice(1).map(x => x.replace(/\s*\([^)]*\)/g, "").trim());
+    place = parts.reverse().find(x => /^[A-ZÉÈÀÂ][\p{L}' -]{1,30}$/u.test(x) && !/^(cdi|cdd|stage|alternance|interim|freelance)$/i.test(fold(x)) && !/exemple|sample/i.test(x)) || "";
+  }
+  if (place) facts.splice(2, 0, {id: "place", label: tr("Lieu", "Location"), v: place}); else missing.push({id: "place", label: tr("Lieu", "Location")});
+  AD_FLAGS.forEach(([id, level, label, why, re]) => { const m = F.match(re); if (m) flags.push({id, level, label, why, v: t.substr(m.index, m[0].length)}); });
+  return {facts, missing, flags};
+}
+
+/* ---------- Relecture du CV : fautes fréquentes, verbes faibles, phrases longues, chiffres ---------- */
+const TYPOS_FR = {acceuil: "accueil", acceuillir: "accueillir", acceuilli: "accueilli", dévelopement: "développement", dévellopement: "développement", developement: "développement", parmis: "parmi", malgrés: "malgré", courrament: "couramment", professionel: "professionnel", professionelle: "professionnelle", professionels: "professionnels", professionelles: "professionnelles", personel: "personnel", addresse: "adresse", experiance: "expérience", expèrience: "expérience", éxpérience: "expérience", compétance: "compétence", competance: "compétence", compétances: "compétences", responsabilitée: "responsabilité", disponibilitée: "disponibilité", rigeur: "rigueur", comercial: "commercial", comerciale: "commerciale", dévelopeur: "développeur", developpeur: "développeur", reconaissance: "reconnaissance", envirronement: "environnement", environement: "environnement", maintenace: "maintenance", maîtrisse: "maîtrise", maitrisse: "maîtrise", informatiqe: "informatique", coordonées: "coordonnées", quotidient: "quotidien", bureautiqe: "bureautique", éffectué: "effectué", éfficace: "efficace", gestionaire: "gestionnaire", polyvalance: "polyvalence", autonomme: "autonome", dynamiqe: "dynamique", entousiaste: "enthousiaste", vendeure: "vendeuse", magazin: "magasin", ordinnateur: "ordinateur", connaisance: "connaissance", connaisances: "connaissances"};
+const TYPOS_EN = {recieve: "receive", recieved: "received", managment: "management", experiance: "experience", responsable: "responsible", acheive: "achieve", acheived: "achieved", seperate: "separate", enviroment: "environment", sucessful: "successful", succesful: "successful", comunication: "communication", communcation: "communication", maintainance: "maintenance", mantain: "maintain", profesional: "professional", proffesional: "professional", knowlege: "knowledge", adress: "address", oportunity: "opportunity", independant: "independent", definately: "definitely", custumer: "customer", costumer: "customer", untill: "until", begining: "beginning", calender: "calendar", occured: "occurred", relevent: "relevant"};
+const WEAK_FR = /\b(participer a|participation a|aider a|aide a la|s'occuper de|occupe(e)? de|etre en charge de|en charge de|charge(e)? de|diverses taches|taches diverses|differentes taches|etc\.?)(?=\W|$)/;
+const WEAK_EN = /\b(responsible for|helped (to|with)|involved in|worked on|duties included|various tasks|assisted with|etc\.?)(?=\W|$)/;
+function cvCheck(text){
+  const t = String(text || ""), out = [];
+  const words = fold(t).split(/[^a-z']+/), en = words.filter(w => /^(the|and|with|for|of|to|in)$/.test(w)).length > words.filter(w => /^(le|la|les|et|des|du|de|pour)$/.test(w)).length;
+  const typos = en ? TYPOS_EN : TYPOS_FR;
+  Object.entries(typos).forEach(([bad, good]) => {
+    const re = new RegExp(`(^|[^\\p{L}])(${bad})(?=[^\\p{L}]|$)`, "iu"), m = t.match(re);
+    if (m) { const w = m[2], to = w[0] === w[0].toUpperCase() ? good.charAt(0).toUpperCase() + good.slice(1) : good; out.push({id: "typo:" + bad, type: "typo", word: w, to, msg: tr(`« ${w} » s'écrit « ${to} »`, `"${w}" is spelt "${to}"`)}); }
+  });
+  const cv = parseCV(t), weakRe = en ? WEAK_EN : WEAK_FR;
+  let weak = 0, nonum = 0, long = 0;
+  cv.filter(l => l.t && !l.name).forEach(l => {
+    const F = fold(l.t), mw = F.match(weakRe);
+    if (mw && weak < 3) { weak++; out.push({id: "weak:" + l.id, type: "weak", line: l.t, word: l.t.substr(mw.index, mw[0].length), msg: tr(`« ${l.t.substr(mw.index, mw[0].length)} » ne dit pas ce que tu as fait toi-même. Préfère un verbe d'action : « organisé », « géré », « préparé », « vendu »…`, `"${l.t.substr(mw.index, mw[0].length)}" does not say what you did yourself. Use an action verb: "organised", "managed", "prepared", "sold"…`)}); }
+    l.t.split(/(?<=[.;!?])\s+/).forEach(sn => { const n = sn.split(/\s+/).length; if (n > 32 && long < 2) { long++; out.push({id: "long:" + l.id + ":" + long, type: "long", line: sn, msg: tr(`Phrase de ${n} mots : coupe-la en deux, un recruteur lit vite.`, `A ${n}-word sentence: split it in two, recruiters read fast.`)}); } });
+    if (l.exp && l.t.split(/\s+/).length >= 8 && !/\d/.test(l.t.replace(/\b(19|20)\d\d\b/g, "")) && nonum < 3) { nonum++; out.push({id: "num:" + l.id, type: "nonum", line: l.t, msg: tr("Aucun chiffre ici : ajoute combien (clients, commandes, personnes, euros) ou pendant combien de temps.", "No number here: add how many (customers, orders, people, money) or for how long.")}); }
+  });
+  const je = (fold(t).match(en ? /\bi\b/g : /\b(je|j')\b/g) || []).length;
+  if (!en && !EN && je >= 3) out.push({id: "je", type: "style", msg: tr(`« Je » revient ${je} fois. Dans un CV, commence plutôt par le verbe : « Préparé 120 commandes par jour ».`, "")});
+  return out;
+}

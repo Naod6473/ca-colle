@@ -13,6 +13,19 @@ function runCases(cases){
       c.clean.removed.forEach(l => { if (out.includes(l)) fails.push(`nettoyage : « ${l} » aurait dû partir`); });
       c.clean.kept.forEach(l => { if (!out.some(x => x.includes(l))) fails.push(`nettoyage : « ${l} » a disparu`); });
     }
+    if (c.ad) {
+      const a = adCheck(c.offer), ids = l => l.map(x => x.id);
+      Object.entries(c.ad.facts || {}).forEach(([id, v]) => { const f = a.facts.find(x => x.id === id); if (!f || !fold(f.v).includes(fold(v))) fails.push(`annonce : ${id} = « ${f ? f.v : "rien"} » au lieu de « ${v} »`); });
+      (c.ad.missing || []).forEach(id => { if (!ids(a.missing).includes(id)) fails.push(`annonce : ${id} devrait manquer`); });
+      (c.ad.flags || []).forEach(id => { if (!ids(a.flags).includes(id)) fails.push(`annonce : signal ${id} pas repéré`); });
+      if (c.ad.noFlags && a.flags.length) fails.push(`annonce : signaux en trop (${ids(a.flags).join(", ")})`);
+    }
+    if (c.review) {
+      const rv = cvCheck(c.cv);
+      (c.review.typos || []).forEach(([w, to]) => { if (!rv.some(x => x.type === "typo" && x.word === w && x.to === to)) fails.push(`relecture : « ${w} » → « ${to} » pas proposé`); });
+      (c.review.types || []).forEach(t => { if (!rv.some(x => x.type === t)) fails.push(`relecture : aucune remarque ${t}`); });
+      (c.review.notTypes || []).forEach(t => { if (rv.some(x => x.type === t)) fails.push(`relecture : remarque ${t} en trop (${rv.filter(x => x.type === t).map(x => x.word || x.msg).join(", ")})`); });
+    }
     return {name: c.name, points: rs.length, score: scoreOf(rs), fails, rs};
   });
 }
