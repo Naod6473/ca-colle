@@ -306,9 +306,13 @@
         <div class="filters" role="group" aria-label="Affichage">
           <button class="chip" type="button" data-view="cards" aria-pressed="true">Par offre</button>
           <button class="chip" type="button" data-view="table" aria-pressed="false">Tableau</button>
+          <button class="chip" type="button" data-view="compare" aria-pressed="false">Comparer</button>
         </div>
         <button class="btn small" id="addapp" type="button">+ Ajouter une candidature</button>
         <button class="btn light small" id="csv" type="button">Exporter pour un tableur</button>
+        <button class="btn light small" id="backup" type="button">Sauvegarder dans un fichier</button>
+        <button class="btn light small" id="restore" type="button">Ouvrir une sauvegarde</button>
+        <input type="file" id="restorefile" accept=".json,application/json" hidden>
       </div>
       <p class="notice" id="tracknokeep" hidden>Ton suivi n'est pas encore gardé sur cet appareil : il disparaîtra en fermant la page. <button class="btn small" id="keepon" type="button">Le garder sur cet appareil</button></p>
     </div>
@@ -337,6 +341,7 @@
       <p>Ton CV et l'offre restent dans ton navigateur. Aucun compte, rien sur un serveur. Seules les visites sont comptées, de façon anonyme et sans cookie (Umami).</p>
       <p class="hint-foot" id="ioshint" hidden>Sur iPhone : bouton Partager puis « Sur l'écran d'accueil » pour avoir l'app, même sans réseau.</p>
       <label class="keep"><input type="checkbox" id="keep"> Garder ma session sur cet appareil pour revenir plus tard</label>
+      <p><a href="salaire.html">Calculer un salaire brut → net</a></p>
       <p><button type="button" class="linkbtn" id="wipe">Effacer mes données de cet appareil</button> · <small>Une app de <a href="https://portfolio.pissits.com/">Simon Victor</a>.</small></p>
     </div>
   </div>
@@ -348,6 +353,7 @@
 <script src="js/export.js"></script>
 <script src="js/app.js"></script>
 <script src="js/suivi.js"></script>
+<script src="js/outils.js"></script>
 <script src="js/confort.js"></script>
 <script src="js/demo.js"></script><!-- mode démo temporaire -->
 </body>

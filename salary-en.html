@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fdf3e3">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="alternate" hreflang="fr" href="https://ca-colle.pissits.com/salaire.html">
+<link rel="alternate" hreflang="en" href="https://ca-colle.pissits.com/salary-en.html">
+<link rel="preload" href="fonts/archivo-latin-900-italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="css/app.css">
+<script src="js/lang.js"></script>
+<script defer src="https://stats.pissits.com/script.js" data-website-id="79e7d60a-075b-4867-9973-a2659b51101c"></script>
+<title>Gross to net salary · Ça colle?</title>
+<meta name="description" content="Work out your UK take-home pay from your gross salary (hourly, weekly, monthly, yearly): income tax, National Insurance and pension. Free, in your browser.">
+</head>
+<body>
+<a class="skip-link" href="#contenu">Skip to content</a>
+<header class="top">
+  <a class="logo" href="index-en.html"><span>Ça colle?</span></a>
+  <div class="top-actions">
+    <a class="pill pill-track" href="index-en.html">← Back to the app</a>
+    <details class="comfort" id="comfortmenu">
+      <summary class="pill pill-comfort" title="Comfort mode">Aa <span class="sr-only">Comfort mode</span></summary>
+      <div class="comfort-menu" role="group" aria-label="Comfort mode">
+        <button type="button" data-comfort="big" aria-pressed="false">Bigger text</button>
+        <button type="button" data-comfort="contrast" aria-pressed="false">High contrast</button>
+        <button type="button" data-comfort="calm" aria-pressed="false">Less motion</button>
+        <small>Setting kept on this device.</small>
+      </div>
+    </details>
+    <a class="pill pill-lang" href="salaire.html" hreflang="fr" lang="fr" title="Version française">FR</a>
+    <span class="pill pill-safe">Free · local · no AI</span>
+  </div>
+</header>
+<span id="contenu" tabindex="-1"></span>
+<main class="salary">
+<section class="panel" style="--c: var(--orange); --shadow: var(--yellow)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <span class="label">Tool · salary</span>
+      <h1 class="big">Gross → net</h1>
+      <p class="lede" id="sum"></p>
+      <p class="notice" id="from" hidden>Salary read in the ad: <b id="fromv"></b></p>
+      <div class="sal-grid">
+        <fieldset class="sal-col"><legend>Your gross pay</legend>
+          <label class="afield"><span>Per hour</span><input class="money" id="ha" inputmode="decimal" autocomplete="off" placeholder="0"></label><label class="afield"><span>Per week</span><input class="money" id="wa" inputmode="decimal" autocomplete="off" placeholder="0"></label><label class="afield"><span>Per month</span><input class="money" id="ma" inputmode="decimal" autocomplete="off" placeholder="0"></label><label class="afield"><span>Per year</span><input class="money" id="ya" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+        </fieldset>
+        <fieldset class="sal-col"><legend>What comes off (per year)</legend>
+          <p class="sal-line"><span>Income tax</span><b id="tax">£0</b></p>
+          <p class="sal-line"><span>National Insurance</span><b id="ni">£0</b></p>
+          <p class="sal-line"><span>Pension</span><b id="pen">£0</b></p>
+        </fieldset>
+      </div>
+    </div>
+    <aside class="box">
+      <div class="box-head">Your take-home pay</div>
+      <div class="box-body sal-res">
+        <div><small>Per month</small><b id="pmn">£0</b><span>net</span></div>
+        <div><small>Per year</small><b id="pan">£0</b><span>net</span></div>
+      </div>
+    </aside>
+  </div>
+</section>
+<div class="below" style="--c: var(--orange)">
+  <section class="group"><h2 class="section-title" style="--k: var(--yellow)">Hours per week: <span id="hoursv"></span></h2>
+    <label class="sr-only" for="hours">Hours per week</label><input type="range" id="hours" min="5" max="48" step="0.5" value="37.5">
+    <p class="hint">Used to turn an hourly rate into a yearly salary.</p>
+  </section>
+  <section class="group"><h2 class="section-title" style="--k: var(--yellow)">Pension contribution: <span id="penv"></span></h2>
+    <label class="sr-only" for="pension">Pension contribution</label><input type="range" id="pension" min="0" max="15" step="1" value="5">
+    <p class="hint">Most workplace pensions take 5 % of your pay. Set 0 if you have none.</p>
+  </section>
+  <p class="promise"><b>This is an estimate</b> using 2025/26 rates for England, Wales and Northern Ireland, with the standard tax code (1257L). Scotland has different income tax bands, and student loans are not included. <button type="button" class="linkbtn" id="clear">Clear the boxes</button></p>
+</div>
+</main>
+<footer class="foot">
+  <div class="foot-inner">
+    <h2>Your CV stays with you.</h2>
+    <div class="foot-text">
+      <p>The calculation runs in your browser. Only visits are counted, anonymously and without cookies (Umami).</p>
+      <p><a href="index-en.html">Compare my CV with a job ad</a> · <small>An app by <a href="https://portfolio.pissits.com/">Simon Victor</a>.</small></p>
+    </div>
+  </div>
+</footer>
+<script src="js/salaire.js"></script>
+<script src="js/confort.js"></script>
+</body>
+</html>

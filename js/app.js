@@ -188,7 +188,7 @@ function adHTML(ad){
     ${ad.flags.length ? `<div class="alert ${red.length ? "red" : "amber"}" role="note"><b>${red.length ? tr("Attention, cette annonce ressemble à une arnaque.", "Careful, this ad looks like a scam.") : tr("Quelques points à vérifier avant de postuler.", "A few things to check before applying.")}</b>
       <ul>${ad.flags.map(f => `<li class="${f.level}"><b>${esc(f.label)}</b> <q>${esc(f.v)}</q><span>${esc(f.why)}</span></li>`).join("")}</ul>
       ${red.length ? `<p>${tr("Ne paie jamais pour postuler et ne donne pas tes papiers avant un contrat signé. En cas de doute, signale l'annonce au site qui la publie.", "Never pay to apply and do not hand over your papers before a signed contract. If in doubt, report the ad to the site that posted it.")}</p>` : ""}</div>` : ""}
-    <ul class="facts">${ad.facts.map(f => `<li><small>${esc(f.label)}</small><b>${esc(f.v)}</b></li>`).join("")}${ad.missing.map(f => `<li class="miss"><small>${esc(f.label)}</small><b>${tr("pas indiqué", "not given")}</b></li>`).join("")}</ul>
+    <ul class="facts">${ad.facts.map(f => `<li><small>${esc(f.label)}</small><b>${esc(f.v)}</b>${f.id === "salary" && /\d/.test(f.v) ? `<a class="linkbtn" href="${tr("salaire.html", "salary-en.html")}?s=${encodeURIComponent(f.v)}">${tr("Brut → net", "Take-home pay")}</a>` : ""}</li>`).join("")}${ad.missing.map(f => `<li class="miss"><small>${esc(f.label)}</small><b>${tr("pas indiqué", "not given")}</b></li>`).join("")}</ul>
     ${ad.missing.length ? `<p class="hint">${tr("Ce qui n'est pas écrit, demande-le avant ou pendant l'entretien : c'est normal de poser la question.", "Whatever is not written, ask about it before or during the interview: it is normal to ask.")}</p>` : ""}</section>`;
 }
 
@@ -404,9 +404,11 @@ let saveTimer;
 function saveNow(){
   clearTimeout(saveTimer);
   if (!keep()) return;
+  try { localStorage.setItem(STORE, JSON.stringify(snapshot())); } catch {}
+}
+function snapshot(){
   if (cur) { cur.text = $("#offer").value; cur.title = titleOf(cur.text); }
-  const data = {v: 1, cv: {text: $("#cvraw").value, ...cvFile}, me, cur: cur?.id, offers: offers.filter(o => o.text.trim() || o.app).map(o => ({id: o.id, text: o.text, title: o.title, score: o.score, fixes: o.fixes, over: o.over, letter: o.letter, app: o.app, prep: o.prep}))};
-  try { localStorage.setItem(STORE, JSON.stringify(data)); } catch {}
+  return {v: 1, cv: {text: $("#cvraw").value, ...cvFile}, me, cur: cur?.id, offers: offers.filter(o => o.text.trim() || o.app).map(o => ({id: o.id, text: o.text, title: o.title, score: o.score, fixes: o.fixes, over: o.over, letter: o.letter, app: o.app, prep: o.prep}))};
 }
 function save(){ clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, 400); }
 addEventListener("pagehide", saveNow);

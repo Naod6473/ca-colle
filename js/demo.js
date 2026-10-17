@@ -41,6 +41,8 @@ Your tasks:
 - Deploy containers with Docker and Kubernetes
 - Manage infrastructure as code with Terraform and Ansible
 - Monitor production with Prometheus and Grafana
+- Write technical documentation
+- Experience with Azure is a plus
 Your profile:
 - 3+ years of experience as a DevOps or systems engineer
 - Linux, scripting (Python or Bash)
@@ -54,6 +56,7 @@ Your tasks:
 - Run steering committees
 - Write specifications with business teams
 - Train users
+- Write technical documentation
 Your profile: 5 years of IT project management, Agile methods, rigorous and organised.`,
       app: {company: "Example Logistics", status: "call", offer: -10, applied: -7, next: 1, contact: "Paul Martin · 0117 000 0000", notes: "Phone call booked for tomorrow 10 am.", hist: [["sent", -7], ["call", -1]]}},
     {text: `Home IT assistant – work from home – earn up to £400 a day
@@ -115,6 +118,8 @@ Vos missions :
 - Déployer les conteneurs avec Docker et Kubernetes
 - Gérer l'infrastructure as code avec Terraform et Ansible
 - Superviser la production avec Prometheus et Grafana
+- Rédiger la documentation technique
+- Une expérience sur Azure est appréciée
 Votre profil :
 - 3 ans d'expérience comme DevOps ou ingénieur systèmes
 - Linux, scripts (Python ou Bash)
@@ -128,6 +133,7 @@ Vos missions :
 - Animer les comités de pilotage
 - Rédiger les cahiers des charges avec les métiers
 - Former les utilisateurs
+- Rédiger la documentation technique
 Votre profil : 5 ans en gestion de projet informatique, méthodes agiles, rigueur et organisation.`,
       app: {company: "Exemple Logistique", status: "call", offer: -10, applied: -7, next: 1, contact: "Paul Martin · 02 35 00 00 00", notes: "Appel prévu demain à 10 h.", hist: [["sent", -7], ["call", -1]]}},
     {text: `Assistant informatique à domicile – Gagnez 400 € par jour

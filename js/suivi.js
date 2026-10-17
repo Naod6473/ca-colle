@@ -63,7 +63,7 @@ function showTrack(focusId){
   $$("[data-p]").forEach(p => p.hidden = true); $$("[data-for]").forEach(p => p.hidden = true);
   $$(".tab").forEach(t => t.setAttribute("aria-selected", "false"));
   $("#track").hidden = false; $("#trackbelow").hidden = false; $("#trackbtn").setAttribute("aria-pressed", "true");
-  prepFor = null;
+  prepFor = null; mailFor = null;
   if (focusId) { openApp = focusId; trackView = "cards"; trackFilter = "all"; }
   renderTrack();
   if (focusId) setTimeout(() => document.getElementById("app-" + focusId)?.scrollIntoView({block: "start", behavior: "smooth"}), 60);
@@ -86,10 +86,12 @@ function renderTrack(){
     ? `<ul class="todo">${todos.slice(0, 6).map(t => `<li class="${t.urgent ? "urgent" : ""}"><span><button type="button" class="linkbtn" data-openapp="${t.o.id}">${esc(appTitle(t.o))}</button>${t.o.app.company ? ` · ${esc(t.o.app.company)}` : ""}</span><small>${esc(t.t)}</small></li>`).join("")}</ul>`
     : `<p>${all.length ? tr("Rien d'urgent. Pense à noter chaque réponse.", "Nothing urgent. Remember to note every reply.") : tr("Aucune candidature pour l'instant. Ajoute-en une, ou clique sur « Suivre cette candidature » après une analyse.", "No applications yet. Add one, or click \"Track this application\" after an analysis.")}</p>`;
   const list = all.filter(o => trackFilter === "all" || grp(o) === trackFilter);
-  $("#trackfilters").hidden = !!prepFor || !all.length;
+  $("#trackfilters").hidden = !!prepFor || !!mailFor || !all.length;
   if (prepFor) return renderPrep(offers.find(o => o.id === prepFor));
+  if (mailFor) return renderMail(offers.find(o => o.id === mailFor));
+  if (trackView === "compare") { $("#trackout").innerHTML = compareHTML(list); return; }
   if (!list.length) { $("#trackout").innerHTML = all.length ? `<p class="notice">${tr("Aucune candidature dans ce filtre.", "No application in this filter.")}</p>` : ""; return; }
-  $("#trackout").innerHTML = trackView === "table" ? tableHTML(list) : `<div class="apps">${list.sort((a, b) => (b.app.appliedDate || b.app.history[0].d).localeCompare(a.app.appliedDate || a.app.history[0].d)).map(cardHTML).join("")}</div>`;
+  $("#trackout").innerHTML = gapsHTML() + (trackView === "table" ? tableHTML(list) : `<div class="apps">${list.sort((a, b) => (b.app.appliedDate || b.app.history[0].d).localeCompare(a.app.appliedDate || a.app.history[0].d)).map(cardHTML).join("")}</div>`);
 }
 const statusSelect = o => `<select class="stsel" data-app="${o.id}" data-fld="status" aria-label="${tr("État", "Status")}" style="--k: ${ST[o.app.status].c}">${STATUSES.map(s => `<option value="${s.id}" ${s.id === o.app.status ? "selected" : ""}>${s[LANG]}</option>`).join("")}</select>`;
 const field = (o, k, label, type = "text", ph = "") => `<label class="afield"><span>${label}</span>${type === "area"
@@ -122,6 +124,8 @@ function cardHTML(o){
     <div class="app-actions">
       ${o.text.trim() ? `<button type="button" class="btn light small" data-openoffer="${o.id}">${tr("Voir l'analyse", "See the analysis")}</button>` : ""}
       <button type="button" class="btn small" data-prep="${o.id}">${tr("Préparer l'entretien", "Prepare the interview")}</button>
+      <button type="button" class="btn light small" data-mail="${o.id}">${tr("Écrire un mail", "Write an email")}</button>
+      ${a.next ? `<button type="button" class="btn light small" data-ics="${o.id}">${tr("Ajouter à l'agenda", "Add to calendar")}</button>` : ""}
       ${a.link && /^https?:\/\//i.test(a.link) ? `<a class="btn light small" href="${esc(a.link)}" target="_blank" rel="noopener noreferrer">${tr("Ouvrir l'annonce", "Open the ad")}</a>` : ""}
       <button type="button" class="btn ghost small" data-delapp="${o.id}">${tr("Supprimer", "Delete")}</button>
     </div>
@@ -195,13 +199,15 @@ function renderPrep(o){
     ${!o.text.trim() || !cvReady ? `<p class="notice">${tr("Pour avoir des questions sur cette offre, ajoute le texte de l'annonce et ton CV. En attendant, voici les questions classiques.", "To get questions about this offer, add the ad's text and your CV. Meanwhile, here are the classic questions.")}</p>` : ""}
     <ol class="qs">${qs.map(q => `<li class="q"><h3>${esc(q.q)}${q.must ? ` <i class="tag must">${tr("Indispensable", "Essential")}</i>` : ""}</h3>${q.tip ? `<p class="hint">${esc(q.tip)}</p>` : ""}
       ${q.one ? box(q, "t", tr("Ma réponse", "My answer"), "") : box(q, "s", tr("Situation", "Situation"), tr("ex : au Drive Super U, un samedi de rush", "e.g. at FreshMart, on a busy Saturday")) + box(q, "a", tr("Ce que j'ai fait", "What I did"), "") + box(q, "r", tr("Résultat", "Result"), tr("ex : 120 commandes prêtes à l'heure", "e.g. 120 orders ready on time"))}</li>`).join("")}</ol>
+    ${askHTML(o)}
     <div class="export"><button class="btn small" type="button" data-prepdl="docx" data-prepo="${o.id}">${tr("Télécharger en Word", "Download as Word")}</button><button class="btn light small" type="button" data-prepdl="pdf" data-prepo="${o.id}">${tr("En PDF", "As PDF")}</button><button class="btn light small" type="button" data-prepdl="copy" data-prepo="${o.id}">${tr("Copier", "Copy")}</button></div>
   </div>`;
 }
 function prepText(o){
   const qs = interviewQs(o), P = o.prep || {};
   return [tr("Préparation d'entretien", "Interview preparation") + " : " + appTitle(o) + (o.app.company ? " · " + o.app.company : ""), "",
-    ...qs.flatMap(q => { const a = P[q.id] || {}; return [q.q, ...(q.one ? [a.t || "…"] : [tr("Situation : ", "Situation: ") + (a.s || "…"), tr("Ce que j'ai fait : ", "What I did: ") + (a.a || "…"), tr("Résultat : ", "Result: ") + (a.r || "…")]), ""]; })].join("\n");
+    ...qs.flatMap(q => { const a = P[q.id] || {}; return [q.q, ...(q.one ? [a.t || "…"] : [tr("Situation : ", "Situation: ") + (a.s || "…"), tr("Ce que j'ai fait : ", "What I did: ") + (a.a || "…"), tr("Résultat : ", "Result: ") + (a.r || "…")]), ""]; }),
+    tr("Questions à poser au recruteur", "Questions to ask the recruiter"), ...askQs(o).map(q => "- " + q)].join("\n");
 }
 
 /* ---------- Événements ---------- */
@@ -218,7 +224,7 @@ document.addEventListener("click", e => {
   if (t.dataset.sort) { trackSort = {k: t.dataset.sort, dir: trackSort.k === t.dataset.sort ? -trackSort.dir : 1}; return renderTrack(); }
   if (t.dataset.openapp) { openApp = t.dataset.openapp; trackView = "cards"; trackFilter = "all"; renderTrack(); return document.getElementById("app-" + openApp)?.scrollIntoView({block: "start", behavior: "smooth"}); }
   if (t.dataset.openoffer) return loadOffer(t.dataset.openoffer);
-  if (t.dataset.prep) { stat("entretien-prep"); prepFor = t.dataset.prep; renderTrack(); return $("#trackbelow").scrollIntoView({behavior: "smooth"}); }
+  if (t.dataset.prep) { stat("entretien-prep"); prepFor = t.dataset.prep; mailFor = null; renderTrack(); return $("#trackbelow").scrollIntoView({behavior: "smooth"}); }
   if (t.id === "prepback") { prepFor = null; return renderTrack(); }
   if (t.dataset.prepdl) {
     const o = offers.find(x => x.id === t.dataset.prepo), txt = prepText(o), how = t.dataset.prepdl;

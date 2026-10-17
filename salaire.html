@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fdf3e3">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="alternate" hreflang="fr" href="https://ca-colle.pissits.com/salaire.html">
+<link rel="alternate" hreflang="en" href="https://ca-colle.pissits.com/salary-en.html">
+<link rel="preload" href="fonts/archivo-latin-900-italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="css/app.css">
+<script src="js/lang.js"></script>
+<script defer src="https://stats.pissits.com/script.js" data-website-id="79e7d60a-075b-4867-9973-a2659b51101c"></script>
+<title>Salaire brut en net · Ça colle ?</title>
+<meta name="description" content="Calcule ton salaire net à partir du brut (horaire, mensuel, annuel), selon ton statut, ton temps de travail et le prélèvement à la source. Gratuit, dans ton navigateur.">
+</head>
+<body>
+<a class="skip-link" href="#contenu">Aller au contenu</a>
+<header class="top">
+  <a class="logo" href="./"><span>Ça colle ?</span></a>
+  <div class="top-actions">
+    <a class="pill pill-track" href="./">← Retour à l'app</a>
+    <details class="comfort" id="comfortmenu">
+      <summary class="pill pill-comfort" title="Mode confort">Aa <span class="sr-only">Mode confort</span></summary>
+      <div class="comfort-menu" role="group" aria-label="Mode confort">
+        <button type="button" data-comfort="big" aria-pressed="false">Texte plus gros</button>
+        <button type="button" data-comfort="contrast" aria-pressed="false">Contraste fort</button>
+        <button type="button" data-comfort="calm" aria-pressed="false">Moins d'animations</button>
+        <small>Réglage gardé sur cet appareil.</small>
+      </div>
+    </details>
+    <a class="pill pill-lang" href="salary-en.html" hreflang="en" lang="en" title="English version">EN</a>
+    <span class="pill pill-safe">Gratuit · local · sans IA</span>
+  </div>
+</header>
+<span id="contenu" tabindex="-1"></span>
+<main class="salary">
+<section class="panel" style="--c: var(--orange); --shadow: var(--yellow)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <span class="label">Outil · salaire</span>
+      <h1 class="big">Brut → net</h1>
+      <p class="lede" id="sum"></p>
+      <p class="notice" id="from" hidden>Salaire lu dans l'annonce : <b id="fromv"></b></p>
+      <div class="sal-grid">
+        <fieldset class="sal-col"><legend>Ton salaire brut</legend>
+          <label class="afield"><span>Horaire brut</span><input class="money" id="hb" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label class="afield"><span>Mensuel brut <i class="tag" id="rate"></i></span><input class="money" id="mb" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label class="afield"><span>Annuel brut</span><input class="money" id="ab" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+        </fieldset>
+        <fieldset class="sal-col"><legend>Ton salaire net</legend>
+          <label class="afield"><span>Horaire net</span><input class="money" id="hn" inputmode="decimal" autocomplete="off" placeholder="0"></label><label class="afield"><span>Mensuel net</span><input class="money" id="mn" inputmode="decimal" autocomplete="off" placeholder="0"></label><label class="afield"><span>Annuel net</span><input class="money" id="an" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+        </fieldset>
+      </div>
+    </div>
+    <aside class="box">
+      <div class="box-head">Après le prélèvement à la source</div>
+      <div class="box-body sal-res">
+        <div><small>Par mois</small><b id="pmn">0</b><span>€ net</span></div>
+        <div><small>Par an</small><b id="pan">0</b><span>€ net</span></div>
+        <label class="afield"><span>Taux de prélèvement à la source : <b id="pasv"></b></span><input type="range" id="pas" min="0" max="43" step="0.1" value="0"></label>
+        <p class="hint">Ton taux est sur ta fiche de paie ou sur impots.gouv.fr.</p>
+      </div>
+    </aside>
+  </div>
+</section>
+<div class="below" style="--c: var(--orange)">
+  <section class="group"><h2 class="section-title" style="--k: var(--yellow)">Ton statut</h2>
+    <div class="filters" role="group" aria-label="Statut">
+      <button class="chip" type="button" data-st="nc" aria-pressed="true">Salarié non-cadre · −22 %</button>
+      <button class="chip" type="button" data-st="c" aria-pressed="false">Salarié cadre · −25 %</button>
+      <button class="chip" type="button" data-st="fp" aria-pressed="false">Fonction publique · −15 %</button>
+      <button class="chip" type="button" data-st="pl" aria-pressed="false">Profession libérale · −45 %</button>
+      <button class="chip" type="button" data-st="ps" aria-pressed="false">Portage salarial · −51 %</button>
+    </div>
+  </section>
+  <section class="group"><h2 class="section-title" style="--k: var(--yellow)">Temps de travail : <span id="timev"></span></h2>
+    <label class="sr-only" for="time">Temps de travail</label><input type="range" id="time" min="10" max="100" step="5" value="100">
+    <p class="hint">100 % = 35 heures par semaine (151,67 heures par mois). Ça change le salaire horaire.</p>
+  </section>
+  <section class="group"><h2 class="section-title" style="--k: var(--yellow)">Mois de salaire par an</h2>
+    <div class="filters" role="group" aria-label="Nombre de mois">
+      <button class="chip" type="button" data-mo="12" aria-pressed="true">12 mois</button><button class="chip" type="button" data-mo="13" aria-pressed="false">13 mois</button><button class="chip" type="button" data-mo="14" aria-pressed="false">14 mois</button><button class="chip" type="button" data-mo="15" aria-pressed="false">15 mois</button><button class="chip" type="button" data-mo="16" aria-pressed="false">16 mois</button>
+    </div>
+    <p class="hint">Un 13e mois (ou plus) prévu par ton contrat ou ta convention collective augmente le salaire annuel.</p>
+  </section>
+  <p class="promise"><b>C'est une estimation.</b> Les cotisations exactes dépendent de ton entreprise et de ta convention collective : ta fiche de paie fait foi. <button type="button" class="linkbtn" id="clear">Effacer les cases</button></p>
+</div>
+</main>
+<footer class="foot">
+  <div class="foot-inner">
+    <h2>Ton CV reste chez toi.</h2>
+    <div class="foot-text">
+      <p>Le calcul se fait dans ton navigateur. Seules les visites sont comptées, de façon anonyme et sans cookie (Umami).</p>
+      <p><a href="./">Comparer mon CV à une offre</a> · <small>Une app de <a href="https://portfolio.pissits.com/">Simon Victor</a>.</small></p>
+    </div>
+  </div>
+</footer>
+<script src="js/salaire.js"></script>
+<script src="js/confort.js"></script>
+</body>
+</html>
