@@ -4,7 +4,7 @@
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const fold = s => String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 const nf = new Intl.NumberFormat(tr("fr-FR", "en-GB"), {maximumFractionDigits: 2, minimumFractionDigits: 0});
-const num = v => { const n = parseFloat(String(v).replace(/[\s  ]/g, "").replace(/[£€$]/g, "").replace(/,(?=\d{3}\b)/g, EN ? "" : ",").replace(",", ".")); return isFinite(n) ? n : 0; };
+const num = v => { const n = parseFloat(String(v).replace(/[\s  ]/g, "").replace(/[£€$]/g, "").replace(/,(?=\d{3}\b)/g, EN ? "" : ",").replace(LANG === "fr" || EN ? /$^/ : /\.(?=\d{3}\b)/g, "").replace(",", ".")); return isFinite(n) ? n : 0; };
 const show = n => { if (!n) return ""; const r = Math.round(n * 100) / 100; return new Intl.NumberFormat(tr("fr-FR", "en-GB"), {minimumFractionDigits: r % 1 ? 2 : 0, maximumFractionDigits: 2}).format(r); };
 
 // Lit un salaire tel qu'il est écrit dans une annonce : « 45 000 € brut par an », « 48 k€ », « £11.50 per hour »
@@ -17,24 +17,15 @@ function parseSalary(t){
 }
 
 let edit = "a";
-// Onglets des étapes : même état que dans l'app (hachurés tant que l'offre et le CV ne sont pas remplis), lu dans la session gardée
-(() => {
-  let d = null; try { d = JSON.parse(localStorage.getItem(EN ? "cacolle-en-v1" : "cacolle-v1")); } catch {}
-  const o = d && (d.offers || []).find(x => x.id === d.cur) || d?.offers?.at(-1), txt = o?.text || "";
-  const ok1 = txt.trim().split(/\s+/).filter(Boolean).length >= 25 && !/^\s*https?:\/\/\S+\s*$/.test(txt), ok2 = !!d?.cv?.text?.trim();
-  $$('a.tab[href*="#etape-"]').forEach(a => {
-    const n = +a.href.slice(-1), can = n === 1 || (n === 2 && ok1) || (n >= 3 && ok1 && ok2);
-    a.classList.toggle("done", (n === 1 && ok1) || (n === 2 && ok2));
-    if (can) return;
-    a.setAttribute("aria-disabled", "true"); a.removeAttribute("href");
-    a.title = n === 2 ? tr("Colle d'abord l'offre", "Paste the offer first") : tr("Ajoute d'abord l'offre et ton CV", "Add the offer and your CV first");
-  });
-})();
+
 // Position du curseur pour la partie remplie de la barre (0 = tout à gauche, max = tout à droite)
 const fill = () => $$('input[type="range"]').forEach(r => r.style.setProperty("--r", (r.value - r.min) / (r.max - r.min)));
 document.addEventListener("input", e => { if (e.target.type === "range") fill(); });
 addEventListener("DOMContentLoaded", fill); fill();
-if (!EN) {
+if (LANG !== "fr" && LANG !== "en" && L10N?.salary) {
+  // Autre pays : le calcul est dans js/i18n/<langue>.js (mêmes outils : $, $$, num, show, fill, parseSalary)
+  L10N.salary({$, $$, num, show, nf, fill, parseSalary, fold});
+} else if (!EN) {
   /* ---------- France ---------- */
   const RATE = {nc: .22, c: .25, fp: .15, pl: .45, ps: .51}, HOURS = 151.67;
   let st = "nc", time = 100, months = 12, pas = 0, pasAuto = true, base = {k: "ma", v: 0};

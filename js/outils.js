@@ -22,7 +22,8 @@ function mailText(o, kind){
   const hello = name ? tr(`Bonjour ${name},`, `Dear ${name},`) : tr("Bonjour,", "Dear Hiring Manager,");
   const sign = [tr("Bien cordialement,", "Kind regards,"), who, me.contact || ""].filter(Boolean).join("\n");
   const at = co ? tr(` chez ${co}`, ` at ${co}`) : "", sentOn = a.appliedDate ? tr(` envoyée le ${fmtDate(a.appliedDate)}`, ` sent on ${fmtDate(a.appliedDate)}`) : "";
-  const M = EN ? {
+  // Autre langue : L10N.mails({job, at, sentOn}) rend le même objet que la version anglaise
+  const M = L10N?.mails ? L10N.mails({job, at, sentOn}) : EN ? {
     followup: [`Following up on my application: ${job}`, `I am writing to follow up on my application for the ${job} position${at}${sentOn}. I am still very interested in the role and would be happy to talk whenever suits you.`],
     thanks: [`Thank you for the interview: ${job}`, `Thank you for taking the time to meet me. Our conversation confirmed my interest in the ${job} position${at}. [What you liked during the interview]\n\nPlease let me know if you need any further information.`],
     accept: [`Accepting your offer: ${job}`, `Thank you for your offer for the ${job} position${at}. I am delighted to accept it. Could you let me know the next steps (contract, start date, documents to provide)?`],
@@ -44,7 +45,7 @@ function renderMail(o){
   $("#trackout").innerHTML = `<div class="prep mail">
     <div class="prep-h"><button type="button" class="btn ghost small" data-mailback>${tr("← Retour au suivi", "← Back to my applications")}</button>
       <h2 class="section-title" style="--k: var(--blue)">${tr("Écrire un mail", "Write an email")} · ${esc(appTitle(o))}${o.app.company ? " · " + esc(o.app.company) : ""}</h2></div>
-    <div class="filters" role="group" aria-label="${tr("Type de mail", "Kind of email")}">${MAILS.map(k => `<button type="button" class="chip" data-mailkind="${k.id}" aria-pressed="${k.id === kind}">${k[LANG]}</button>`).join("")}</div>
+    <div class="filters" role="group" aria-label="${tr("Type de mail", "Kind of email")}">${MAILS.map(k => `<button type="button" class="chip" data-mailkind="${k.id}" aria-pressed="${k.id === kind}">${LL(k)}</button>`).join("")}</div>
     <label class="afield"><span>${tr("Objet", "Subject")}</span><input id="mailsubj" value="${esc(m.subject)}"></label>
     <label class="afield"><span>${tr("Message", "Message")}</span><textarea id="mailbody" rows="12">${esc(m.body)}</textarea></label>
     <p class="hint">${tr("Relis et complète ce qui est entre crochets avant d'envoyer. Le mail part de ta propre messagerie.", "Read it and fill in what is in brackets before sending. The email goes from your own mailbox.")}${email ? "" : tr(" Ajoute l'email du contact dans la fiche pour qu'il soit rempli tout seul.", " Add the contact's email to the card to fill it in automatically.")}</p>
@@ -148,7 +149,7 @@ function exportBackup(){
 async function importBackup(file){
   let d;
   try { d = JSON.parse(await file.text()); } catch {}
-  if (!d || d.v !== 1 || !Array.isArray(d.offers)) return toast(tr("Ce fichier n'est pas une sauvegarde de Ça colle ?", "This file is not a Ça colle? backup"));
+  if (!d || d.v !== 1 || !Array.isArray(d.offers)) return toast(tr("Ce fichier n'est pas une sauvegarde de Ça colle ?", "This file is not a Good fit? backup"));
   if ((offers.some(o => o.text.trim() || o.app) || cvReady) && !confirm(tr("Remplacer ce qui est dans l'app par le contenu de ce fichier ?", "Replace what is in the app with the content of this file?"))) return;
   // la case décochée empêche la sauvegarde automatique à la fermeture d'écraser le fichier ouvert ; restore() la recoche
   $("#keep").checked = false; clearTimeout(saveTimer);
@@ -194,7 +195,7 @@ function proofDoc(period){
     <p>${tr("Période : ", "Period: ")}${esc(when)} · ${plural(list.length, tr("candidature", "application"))}</p>
     <table><thead><tr><th>${tr("Date", "Date")}</th><th>${tr("Entreprise", "Company")}</th><th>${tr("Poste", "Job")}</th><th>${tr("État", "Status")}</th><th>${tr("Contact ou lien", "Contact or link")}</th></tr></thead>
     <tbody>${list.map(o => `<tr><td>${fmtDate(sentDate(o))}</td><td>${esc(o.app.company || "–")}</td><td>${esc(appTitle(o))}</td><td>${esc(stLabel(o.app.status))}</td><td>${esc(o.app.contact || o.app.link || "–")}</td></tr>`).join("")}</tbody></table>
-    <p class="p-foot">${tr(`Liste établie le ${fmtDate(today())} à partir du suivi tenu par la personne avec Ça colle ? (ca-colle.pissits.com).`, `List made on ${fmtDate(today())} from the person's own tracker in Ça colle? (ca-colle.pissits.com).`)}</p></div>`;
+    <p class="p-foot">${tr(`Liste établie le ${fmtDate(today())} à partir du suivi tenu par la personne avec Ça colle ? (ca-colle.pissits.com).`, `List made on ${fmtDate(today())} from the person's own tracker in Good fit? (ca-colle.pissits.com).`)}</p></div>`;
   stat("justificatif", {period});
   toast(tr("Choisis « Enregistrer en PDF »", "Choose \"Save as PDF\""));
   setTimeout(() => Export.printHTML(html), 300);
@@ -229,7 +230,7 @@ function statsHTML(){
       <div class="weeks">${weeks.map((w, i) => `<div class="wk"><i style="height: ${Math.round(per[i] / max * 100)}%" title="${per[i]}"></i><b>${per[i]}</b><small>${new Date(w + "T12:00:00").toLocaleDateString(tr("fr-FR", "en-GB"), {day: "numeric", month: "short"})}</small></div>`).join("")}</div>
     </section>
     <section class="group"><h2 class="section-title" style="--k: var(--violet)">${tr("Où en sont tes candidatures", "Where your applications stand")}</h2>
-      <ul class="stbars">${byStatus.map(x => `<li><span>${esc(x.s[LANG])}</span><i style="--w: ${Math.round(x.n / all.length * 100)}%; --k: ${x.s.c}"></i><b>${x.n}</b></li>`).join("")}</ul>
+      <ul class="stbars">${byStatus.map(x => `<li><span>${esc(LL(x.s))}</span><i style="--w: ${Math.round(x.n / all.length * 100)}%; --k: ${x.s.c}"></i><b>${x.n}</b></li>`).join("")}</ul>
     </section>
   </div>`;
 }
@@ -243,11 +244,12 @@ document.addEventListener("input", e => { if (e.target.id === "goal") { me.goal 
 function pitchText(o){
   const exp = CV.find(l => l.exp), title = exp ? exp.t.split(/\s*[,(:]\s*|\s+[–-]\s+/)[0].trim() : "", yrs = cvYears($("#cvraw").value);
   const rs = resultsFor(o).filter(r => r.st === "ok" && !["y", "h", "l", "d", "x"].includes(r.type)).sort((a, b) => (a.prio === "must" ? 0 : 1) - (b.prio === "must" ? 0 : 1));
-  const low = k => EN ? k : k.charAt(0).toLowerCase() + k.slice(1), top = rs.slice(0, 2).map(r => r.k), P = rs.find(r => r.proof && r.proof.exp)?.proof;
+  const low = k => KEEPCASE ? k : k.charAt(0).toLowerCase() + k.slice(1), top = rs.slice(0, 2).map(r => r.k), P = rs.find(r => r.proof && r.proof.exp)?.proof;
   // l'exemple : la description du poste qui prouve le premier point fort, coupée proprement
   let proof = P ? (P.t.includes(":") ? P.t.slice(P.t.indexOf(":") + 1) : P.t).trim().replace(/[.;]+$/, "") : "";
   if (proof.length > 140) proof = proof.slice(0, 140).replace(/[,;\s]+\S*$/, "");
   const name = me.name || personName() || tr("[ton prénom]", "[your name]"), job = appTitle(o), co = o.app.company;
+  if (L10N?.pitch) return L10N.pitch({name, title, yrs: yrs ? Y(yrs) : "", top, proof, co, job});
   return EN ? [
     `My name is ${name}.`,
     title ? `My current role: ${title}${yrs ? `, with about ${Y(yrs)} of experience` : ""}.` : "[What you do today, in one sentence.]",

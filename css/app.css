@@ -461,7 +461,12 @@ mark.miss { background: var(--yellow); padding: 0 3px; border: 1px dashed var(--
 .share-body .hint { margin: 0; padding: 12px 18px 0; }
 
 /* Mode confort */
-.comfort { position: relative; }
+.comfort, .langs { position: relative; }
+.langs summary { list-style: none; cursor: pointer; } .langs summary::-webkit-details-marker { display: none; }
+.lang-menu { position: absolute; right: 0; top: calc(100% + 8px); z-index: 30; display: grid; gap: 6px; width: 190px; padding: 10px; border: var(--line); background: var(--card); box-shadow: 4px 4px 0 var(--ink); }
+.lang-menu a { display: flex; gap: 10px; align-items: center; padding: 9px 12px; border: 2px solid var(--ink); background: var(--paper); font: 700 15px/1.2 var(--body); text-decoration: none; }
+.lang-menu a b { min-width: 24px; font: italic 900 12px/1 var(--display); }
+.lang-menu a[aria-current] { background: var(--green); }
 .comfort > summary { list-style: none; cursor: pointer; }
 .comfort > summary::-webkit-details-marker { display: none; }
 .comfort-menu { position: absolute; right: 0; top: calc(100% + 8px); z-index: 30; display: grid; gap: 6px; width: 230px; padding: 12px; border: var(--line); background: var(--card); box-shadow: 4px 4px 0 var(--ink); }
@@ -476,7 +481,7 @@ html.c-contrast body::before, html.c-contrast .panel::before { display: none; }
 html.c-contrast .hint, html.c-contrast small { color: #000; opacity: 1; }
 html.c-calm *, html.c-calm *::before { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
 .pill-comfort { text-transform: none; }
-@media (max-width: 560px) { .top-actions { flex-wrap: wrap; gap: 8px; min-width: 0; } .top-actions .pill { padding: 8px 12px; } .comfort-menu { position: fixed; top: auto; left: 16px; right: 16px; width: auto; } }
+@media (max-width: 560px) { .top-actions { flex-wrap: wrap; gap: 8px; min-width: 0; } .top-actions .pill { padding: 8px 12px; } .comfort-menu, .lang-menu { position: fixed; top: auto; left: 16px; right: 16px; width: auto; } }
 #track .big { font-size: clamp(30px, 6.2vw, 84px); }
 
 /* Ce qui manque le plus, comparaison, mails, questions au recruteur */
@@ -592,3 +597,14 @@ html[data-skin="fiche"] .checklist input { accent-color: var(--accent); }
   .tab-sep { margin: 8px 1px 12px; }
   .toast { bottom: calc(92px + env(safe-area-inset-bottom, 0px)); }
 }
+
+/* Page Infos : mentions, confidentialité, plan du site */
+.infos-body .group p { max-width: 72ch; margin: 0 0 12px; }
+.infos-body .group { scroll-margin-top: 20px; }
+.facts-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 10px; margin: 0 0 14px; max-width: 900px; min-width: 0; }
+.facts-list div { padding: 10px 14px; border: 2px solid var(--ink); border-radius: 8px; background: var(--card); }
+.facts-list dt { font: 700 12px/1.2 var(--body); text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); }
+.facts-list dd { margin: 4px 0 0; font-weight: 700; overflow-wrap: anywhere; }
+.sitemap { margin: 0; padding-left: 20px; display: grid; gap: 8px; } .sitemap ul { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 6px; }
+.foot-legal { font-size: 14px; }
+html[data-skin="fiche"] .facts-list div { border: 0; border-radius: 14px; box-shadow: var(--soft) !important; }

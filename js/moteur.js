@@ -60,10 +60,12 @@ Skills
 Spreadsheets, stock management, attention to detail, punctuality
 Other
 Driving licence, own car`;
-const OFFER = EN ? OFFER_EN : OFFER_FR, SAMPLE_CV = EN ? SAMPLE_CV_EN : SAMPLE_CV_FR;
+const OFFER = L10N?.offer || (LANG === "fr" ? OFFER_FR : OFFER_EN), SAMPLE_CV = L10N?.cv || (LANG === "fr" ? SAMPLE_CV_FR : SAMPLE_CV_EN);
+// Motifs propres à une autre langue (js/i18n) : ajoutés aux motifs français et anglais
+const LX = (k, base) => L10N?.re?.[k] ? new RegExp(`(?:${base.source})|(?:${L10N.re[k]})`, base.flags) : base;
 
 const esc = t => String(t).replace(/[&<>"]/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
-const LABEL = EN ? {ok:"It fits", mid:"Needs proof", no:"Not in your CV"} : {ok:"Ça colle", mid:"À préciser", no:"Pas dans ton CV"};
+const LABEL = {ok: tr("Ça colle", "It fits"), mid: tr("À préciser", "Needs proof"), no: tr("Pas dans ton CV", "Not in your CV")};
 // Texte sans accents ni majuscules, de même longueur que l'original (les positions restent valables)
 const fold = s => [...String(s)].map(ch => { const d = ch.normalize("NFD"); return d.length > 1 && /^[̀-ͯ]+$/.test(d.slice(1)) ? d[0] : ch; }).join("").toLowerCase();
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
@@ -82,14 +84,14 @@ function parseCV(text){
     const prev = out[out.length - 1];
     if (/^[a-zà-ÿ(]/.test(l) && prev && prev.t && !prev.name) { prev.t += " " + l; return; }
     const bare = l.replace(/[\s:]+$/, "");
-    const h = bare.split(/\s+/).length <= 4 && SECS.find(([, re]) => re.test(fold(bare)));
+    const h = bare.split(/\s+/).length <= 4 && SECS.find(([k, re]) => re.test(fold(bare)) || (L10N?.secs?.[k] && new RegExp(`^(${L10N.secs[k]})$`).test(fold(bare))));
     if (h) { kind = h[0]; out.push({id:"s" + n++, sec:bare, kind}); return; }
     if (!named && !kind) { named = true; out.push({id:"nom", t:l, name:true}); return; }
     out.push({id:"l" + n++, t:l, exp: kind === "exp", kind: kind || "misc"});
   });
   // Pas de rubrique Expériences repérée : une ligne avec une année compte comme expérience
   if (!out.some(l => l.exp)) out.forEach(l => { if (l.t && !l.name && l.kind !== "edu" && /\b(19|20)\d\d\b/.test(l.t)) l.exp = true; });
-  if (!out.some(l => l.kind === "skills" && l.t)) out.push({id:"sAuto", sec:"Compétences", kind:"skills", auto:true}, {id:"kAuto", t:"", kind:"skills", auto:true});
+  if (!out.some(l => l.kind === "skills" && l.t)) out.push({id:"sAuto", sec:tr("Compétences", "Skills"), kind:"skills", auto:true}, {id:"kAuto", t:"", kind:"skills", auto:true});
   return out;
 }
 let CV = parseCV(SAMPLE_CV);
@@ -322,14 +324,17 @@ const LEX = [
   ["BAFA", "\\bbafa\\b|\\bbafd\\b", "l", "obtenu en 2022"]
 ].map(([k, o, type, ex, c]) => {
   const [ek, eo, eex, ec] = LEX_EN[k] || [k, "", ex];
-  const O2 = eo ? o + "|" + eo : o, C2 = (c || o) + (ec || eo ? "|" + (ec || eo) : "");
-  return {k: EN ? ek : k, o: new RegExp(O2), c: new RegExp(C2), type, ex: EN ? eex : ex, broad: !!(c || ec)};
+  // Autre langue : [nom, motif, exemple, motif côté CV] dans L10N.lex, ajoutés aux motifs français et anglais
+  const [xk, xo, xex, xc] = L10N?.lex?.[k] || [];
+  let O2 = eo ? o + "|" + eo : o, C2 = (c || o) + (ec || eo ? "|" + (ec || eo) : "");
+  if (xo) { O2 += "|" + xo; C2 += "|" + (xc || xo); }
+  return {k: LANG === "fr" ? k : xk || ek, o: new RegExp(O2), c: new RegExp(C2), type, ex: LANG === "fr" ? ex : xk ? xex : eex, broad: !!(c || ec || xc)};
 });
 
 /* ---------- Réécritures à trous, selon le type de point ---------- */
-const ART = EN ? {s: "this quality"} : {s: "cette qualité"};
+const ART = {s: tr("cette qualité", "this quality")};
 function makeFix(r){
-  const ex = r.ex ? tr(`ex : ${r.ex}`, `e.g. ${r.ex}`) : tr("ex : …", "e.g. …"), K = r.k, k = EN ? r.k : r.k.toLowerCase();
+  const ex = r.ex ? tr(`ex : ${r.ex}`, `e.g. ${r.ex}`) : tr("ex : …", "e.g. …"), K = r.k, k = KEEPCASE ? r.k : r.k.toLowerCase();
   const learn = tr("Pas grave. Si tu es prêt(e) à apprendre, dis-le dans ta lettre de motivation.", "No problem. If you are ready to learn, say so in your cover letter.");
   switch (r.type) {
     case "t": return r.st === "mid"
@@ -392,7 +397,7 @@ function cvLines(withIns){
 /* ---------- Années d'expérience écrites dans le CV ---------- */
 function cvYears(text){
   const now = new Date().getFullYear(), iv = [];
-  for (const m of fold(text).matchAll(/\b((?:19|20)\d\d)\s*(?:-|–|—|à|a|au|to|\/)\s*((?:19|20)\d\d|aujourd'hui|auj\.?|present|actuel\w*|maintenant|en cours|ce jour|current\w*|now|today|ongoing|date)/g)) {
+  for (const m of fold(text).matchAll(new RegExp(String.raw`\b((?:19|20)\d\d)\s*(?:-|–|—|à|a|au|to|\/${L10N?.re?.to ? "|" + L10N.re.to : ""})\s*((?:19|20)\d\d|aujourd'hui|auj\.?|present|actuel\w*|maintenant|en cours|ce jour|current\w*|now|today|ongoing|date${L10N?.re?.now ? "|" + L10N.re.now : ""})`, "g"))) {
     const a = +m[1], b = /^\d/.test(m[2]) ? +m[2] : now;
     if (b >= a && b - a < 45) iv.push([a, Math.max(b, a + .5)]);
   }
@@ -404,7 +409,7 @@ function cvYears(text){
 }
 
 /* ---------- Mots importants d'une ligne de l'offre qui n'est pas dans le lexique ---------- */
-const STOP = new Set(("le la les un une des du de d l au aux et ou en a dans sur pour par avec sans sous chez vers entre ce cet cette ces son sa ses leur leurs votre vos notre nos vous nous il elle ils elles on qui que quoi dont est sont etre avoir sera serez etes avez ont fait faire tout tous toute toutes tres plus moins bien bon bonne bonnes bons poste postes missions mission profil recherche recherchons recherche h f h/f cdi cdd temps plein partiel salaire experience experiences ans annee annees minimum maximum souhaite souhaitee apprecie appreciee requis requise exige exigee indispensable obligatoire capacite capacites savoir connaissance connaissances maitrise maitriser assurer assurez participer participez realiser realisez effectuer effectuez gerer gerez etc ainsi selon afin lors type idealement equivalent similaire premiere premier divers diverses ensemble differentes differents garantir mettre oeuvre intervenir contribuer veiller cadre the and with for from your you our will that this have has are can able ability must should strong excellent good great knowledge including such other within across into well role job position responsibilities requirements required preferred desired years year experience working work ensure using use help").split(" "));
+const STOP = new Set(("le la les un une des du de d l au aux et ou en a dans sur pour par avec sans sous chez vers entre ce cet cette ces son sa ses leur leurs votre vos notre nos vous nous il elle ils elles on qui que quoi dont est sont etre avoir sera serez etes avez ont fait faire tout tous toute toutes tres plus moins bien bon bonne bonnes bons poste postes missions mission profil recherche recherchons recherche h f h/f cdi cdd temps plein partiel salaire experience experiences ans annee annees minimum maximum souhaite souhaitee apprecie appreciee requis requise exige exigee indispensable obligatoire capacite capacites savoir connaissance connaissances maitrise maitriser assurer assurez participer participez realiser realisez effectuer effectuez gerer gerez etc ainsi selon afin lors type idealement equivalent similaire premiere premier divers diverses ensemble differentes differents garantir mettre oeuvre intervenir contribuer veiller cadre the and with for from your you our will that this have has are can able ability must should strong excellent good great knowledge including such other within across into well role job position responsibilities requirements required preferred desired years year experience working work ensure using use help").split(" ").concat(L10N?.stop ? L10N.stop.split(" ") : []));
 const tokens = s => [...new Set(fold(s).split(/[^a-z0-9+#]+/).filter(w => w.length >= 4 && !STOP.has(w)).map(w => w.slice(0, 6)))];
 /* Familles de mots proches : un mot de l'offre est retrouvé dans le CV par un mot de la même famille.
    Racines de 6 lettres au plus, sans accents (comme les mots importants ci-dessus). */
@@ -416,11 +421,11 @@ const SYN = [
   "config parame", "reseau networ", "serveu server", "securi cyber", "incide panne depann ticket", "utilis usager user",
   "projet project", "manage encadr", "budget financ couts", "crise crisis", "chanti travau batime", "ponctu assidu",
   "commun relati", "accomp suivi", "repara depann", "prepar confec", "rangem range ordonn", "plann agenda calend", "wareho entrep logist", "custom client", "deliv livrai", "cleani nettoy entret", "repair repara", "kitche cuisin cook", "childr enfant", "colleag equipe team staff", "sales vente selling retail", "shop magasi store", "patien resident", "elderl agees senior"
-].map(g => g.split(" "));
+].concat(L10N?.syn || []).map(g => g.split(" "));
 const synOf = w => [w, ...SYN.filter(g => g.some(x => w.startsWith(x) || x.startsWith(w))).flat()];
-const NOT_SKILL = /salaire|remuneration|€|euros?|\bcdi\b|\bcdd\b|contrat|temps (plein|partiel)|avantages|mutuelle|tickets? resto|primes?|postuler|candidature|envoy|\bcv\b|lieu de travail|poste base|prise de poste|date de debut|horaires? :|rejoignez|nous sommes|notre (entreprise|societe|groupe)|entreprise de|leader|\bdes que possible\b|vous aurez|principales missions|en lien direct|salary|£|\$|per (hour|annum|year)|benefits|pension|holidays?|apply now|how to apply|application process|full[- ]time|part[- ]time|permanent (contract|role|position)|about us|we are|our (company|team is)|equal opportunit|start date|location/;
+const NOT_SKILL = LX("notSkill", /salaire|remuneration|€|euros?|\bcdi\b|\bcdd\b|contrat|temps (plein|partiel)|avantages|mutuelle|tickets? resto|primes?|postuler|candidature|envoy|\bcv\b|lieu de travail|poste base|prise de poste|date de debut|horaires? :|rejoignez|nous sommes|notre (entreprise|societe|groupe)|entreprise de|leader|\bdes que possible\b|vous aurez|principales missions|en lien direct|salary|£|\$|per (hour|annum|year)|benefits|pension|holidays?|apply now|how to apply|application process|full[- ]time|part[- ]time|permanent (contract|role|position)|about us|we are|our (company|team is)|equal opportunit|start date|location/);
 
-const DIPLOMA = EN ? /\b(bachelor'?s degree|master'?s degree|degree|phd|high school diploma|gcses?|a[- ]levels?|nvq level \d|hnd|hnc|bac ?\+ ?\d|bts)\b/ : /\b(cap|bep|bac ?\+ ?\d|bac pro|bac|bts|dut|but|licence|master|titre professionnel|diplome d'etat)\b/;
+const DIPLOMA = L10N?.re?.diploma ? new RegExp(L10N.re.diploma) : EN ? /\b(bachelor'?s degree|master'?s degree|degree|phd|high school diploma|gcses?|a[- ]levels?|nvq level \d|hnd|hnc|bac ?\+ ?\d|bts)\b/ : /\b(cap|bep|bac ?\+ ?\d|bac pro|bac|bts|dut|but|licence|master|titre professionnel|diplome d'etat)\b/;
 
 /* ---------- Analyse : chaque point de l'offre reçoit ok (prouvé par une expérience), mid (cité sans preuve) ou no (absent) ---------- */
 function analyse(offer){
@@ -441,7 +446,8 @@ function analyse(offer){
   const ctxAt = i => { const a = Math.max(O.lastIndexOf("\n", i) + 1, i - 70), b0 = O.indexOf("\n", i), b = Math.min(b0 < 0 ? O.length : b0, i + 90); return (a > O.lastIndexOf("\n", i) + 1 ? "…" : "") + offer.slice(a, b).trim().replace(/^[-•●▪◦*–·✓✔>]+\s*/, "") + (b < (b0 < 0 ? O.length : b0) ? "…" : ""); };
   const lineAt = i => { const a = O.lastIndexOf("\n", i) + 1, b = O.indexOf("\n", i); return O.slice(a, b < 0 ? O.length : b); };
   const clauseAt = i => { const l = O.slice(0, i).search(/[^,;.\n:]*$/), m = O.slice(i).search(/[,;.\n]/); return O.slice(l, m < 0 ? O.length : i + m); };
-  const weight = i => { const l = clauseAt(i); return /indispensable|exige|obligatoire|imperati|requis|\brequired\b|essential|mandatory|must have/.test(l) ? "must" : /apprecie|un plus|souhait|serait un|idealement|atout|desirable|preferred|nice to have|a plus\b|bonus|ideally|advantage/.test(l) ? "nice" : ""; };
+  const MUST = LX("must", /indispensable|exige|obligatoire|imperati|requis|\brequired\b|essential|mandatory|must have/), NICE = LX("nice", /apprecie|un plus|souhait|serait un|idealement|atout|desirable|preferred|nice to have|a plus\b|bonus|ideally|advantage/);
+  const weight = i => { const l = clauseAt(i); return MUST.test(l) ? "must" : NICE.test(l) ? "nice" : ""; };
   const out = [];
 
   // Points du lexique
@@ -456,10 +462,10 @@ function analyse(offer){
   });
 
   // Années d'expérience demandées
-  const my = O.match(/(\d{1,2})\s*(?:a|à)?\s*\d{0,2}\s*ans? (?:minimum )?(?:d'|d’|de )?experience|experience (?:de |d'au moins |minimum (?:de )?)?(\d{1,2}) ans?|(\d{1,2})\+?\s*(?:years?|yrs?)(?:'|’)?\s*(?:of\s+)?(?:[a-z-]+\s+){0,3}?experience|at least (\d{1,2}) years?|experience of (\d{1,2})\+? years?/);
+  const my = O.match(L10N?.re?.years ? new RegExp(L10N.re.years) : /(\d{1,2})\s*(?:a|à)?\s*\d{0,2}\s*ans? (?:minimum )?(?:d'|d’|de )?experience|experience (?:de |d'au moins |minimum (?:de )?)?(\d{1,2}) ans?|(\d{1,2})\+?\s*(?:years?|yrs?)(?:'|’)?\s*(?:of\s+)?(?:[a-z-]+\s+){0,3}?experience|at least (\d{1,2}) years?|experience of (\d{1,2})\+? years?/);
   if (my) {
     const need = +(my[1] || my[2] || my[3] || my[4] || my[5]), have = cvYears(allTxt);
-    out.push({k: EN ? `${need} year${need > 1 ? "s" : ""} of experience` : `${need} an${need > 1 ? "s" : ""} d'expérience`, type:"y", st: have === null ? "mid" : have >= need ? "ok" : "no", pos:my.index, prio:weight(my.index), need, have, offerCtx:ctxAt(my.index)});
+    out.push({k: need > 1 ? tr(`${need} ans d'expérience`, `${need} years of experience`) : tr("1 an d'expérience", "1 year of experience"), type:"y", st: have === null ? "mid" : have >= need ? "ok" : "no", pos:my.index, prio:weight(my.index), need, have, offerCtx:ctxAt(my.index)});
   }
 
   // Diplôme demandé
@@ -469,7 +475,7 @@ function analyse(offer){
     const pat = fold(w).replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s*");
     const inCv = new RegExp("\\b" + pat + "\\b").test(A) || (base.startsWith("bac") && /\b(bac|bts|dut|but|licence|master)\b/.test(A));
     const dre = new RegExp("\\b(" + base.slice(0, 3) + "\\w*)"), dl = inCv && bestLine(body.filter(l => l.kind === "edu").concat(body), {o:dre, c:dre});
-    out.push({k: /^dipl/i.test(fold(w)) ? cap(w) : EN ? `Qualification: ${w.length > 4 ? cap(w) : w.toUpperCase()}` : `Diplôme : ${w.toUpperCase()}`, type:"d", word:w, st: inCv ? "ok" : "no", pos:md.index, prio:weight(md.index), offerWord:w, offerCtx:ctxAt(md.index), proof:dl || null, re:dre});
+    out.push({k: /^dipl/i.test(fold(w)) ? cap(w) : LANG === "fr" ? `Diplôme : ${w.toUpperCase()}` : tr(`Diplôme : ${w.length > 4 ? cap(w) : w.toUpperCase()}`, `Qualification: ${w.length > 4 ? cap(w) : w.toUpperCase()}`), type:"d", word:w, st: inCv ? "ok" : "no", pos:md.index, prio:weight(md.index), offerWord:w, offerCtx:ctxAt(md.index), proof:dl || null, re:dre});
   }
 
   // Lignes à puces de l'offre que le lexique ne connaît pas : on compare leurs mots importants
@@ -481,7 +487,7 @@ function analyse(offer){
   rows.forEach((raw, idx) => {
     if (generic >= 15 || !(useBullets ? BUL.test(raw) : listy(idx))) return;
     const line = raw.replace(/^\s*[-•●▪◦*–·✓✔>]+\s*/, "").replace(/[.;]+$/, "").trim(), F = fold(line);
-    if (line.length < 6 || line.length > 120 || NOT_SKILL.test(F) || LEX.some(d => d.o.test(F)) || /\d+\+?\s*(ans?|years?)\b/.test(F) || DIPLOMA.test(F)) return;
+    if (line.length < 6 || line.length > 120 || NOT_SKILL.test(F) || LEX.some(d => d.o.test(F)) || (L10N?.re?.yearsWord ? new RegExp(String.raw`\d+\+?\s*(ans?|years?|${L10N.re.yearsWord})\b`) : /\d+\+?\s*(ans?|years?)\b/).test(F) || DIPLOMA.test(F)) return;
     const tk = tokens(line); if (tk.length < 1) return;
     const hits = T => { const ws = T.split(/[^a-z0-9+#]+/); return tk.filter(w => synOf(w).some(v => ws.some(x => x.startsWith(v)))); };
     const se = hits(E).length / tk.length, sa = hits(A).length / tk.length;
@@ -526,7 +532,7 @@ function atsCheck(text, info){
   const has = k => cv.some(l => l.sec && !l.auto && l.kind === k);
   const expDated = cv.filter(l => l.exp).some(l => /\b(19|20)\d\d\b/.test(l.t));
   const img = /scann|photo/i.test(info || "");
-  const phone = /(\+33|0)\s*[1-9](?:[\s.-]*\d{2}){4}/.test(t) || (EN && /(\+\d{1,3}[\s.-]?)?\(?\d{2,5}\)?[\s.-]?\d{3,4}[\s.-]?\d{3,4}/.test(t));
+  const phone = /(\+33|0)\s*[1-9](?:[\s.-]*\d{2}){4}/.test(t) || (LANG !== "fr" && /(\+\d{1,3}[\s.-]?)?\(?\d{2,5}\)?[\s.-]?\d{3,4}[\s.-]?\d{3,4}/.test(t));
   return [
     {ok: !img, label: img ? tr("Ton CV est une image", "Your CV is an image") : tr("Ton CV contient du vrai texte", "Your CV contains real text"), help: img ? tr("Beaucoup de logiciels de tri ne lisent pas les images. Envoie plutôt un PDF enregistré depuis Word ou Google Docs.", "Many screening tools cannot read images. Send a PDF saved from Word or Google Docs instead.") : tr("Les logiciels de tri peuvent le lire.", "Screening tools can read it.")},
     {ok: /[\w.+-]+@[\w-]+\.[a-z.]{2,}/i.test(t), label: tr("Adresse email", "Email address"), help: tr("Mets ton email en haut du CV, en texte (pas dans une image).", "Put your email at the top of your CV, as text (not in an image).")},
@@ -559,7 +565,7 @@ const JUNK = new RegExp("^(" + [
   // English job sites
   "apply( now)?", "easy apply", "save( job)?", "share", "report( job)?", "sign in", "log in", "show (more|less)", "see more", "similar jobs",
   "posted \\d+ \\w+ ago", "\\d+ applicants?", "accept( all)?( cookies)?", "reject all", "privacy policy", "terms.*"
-].join("|") + ")[ .!:…]*$");
+].concat(L10N?.junk || []).join("|") + ")[ .!:…]*$");
 function cleanOffer(text){
   const kept = [], removed = [];
   String(text).replace(/\r/g, "").split("\n").forEach(l => {
@@ -594,19 +600,19 @@ const AD_FLAGS = [
 function adCheck(text){
   const t = String(text || ""), F = fold(t), facts = [], missing = [], flags = [];
   AD_FACTS.forEach(([id, label, re]) => {
-    const m = F.match(re);
+    const m = F.match(LX("ad_" + id, re));
     if (m) facts.push({id, label, v: t.substr(m.index, m[0].length).trim().replace(/\s+/g, " ").replace(/[,.;:]$/, "")});
     else if (id !== "remote" && id !== "start") missing.push({id, label});
   });
   // Lieu : « Lieu : Caen », « Location: Leeds », ou le dernier morceau du titre (« Vendeur – CDI – Caen »)
-  const ml = t.match(/(?:^|\n)\s*(?:lieu(?: de travail)?|localisation|location|ville|based in|bas[ée] [àa])\s*:?\s*([^\n,;]{2,40})/i);
+  const ml = t.match(new RegExp(String.raw`(?:^|\n)\s*(?:lieu(?: de travail)?|localisation|location|ville|based in|bas[ée] [àa]${L10N?.re?.place ? "|" + L10N.re.place : ""})\s*:?\s*([^\n,;]{2,40})`, "i"));
   let place = ml ? ml[1].trim() : "";
   if (!place) {
     const parts = (t.split("\n").find(l => l.trim()) || "").split(/\s+[–—-]\s+|\s+\|\s+/).slice(1).map(x => x.replace(/\s*\([^)]*\)/g, "").trim());
     place = parts.reverse().find(x => /^[A-ZÉÈÀÂ][\p{L}' -]{1,30}$/u.test(x) && !/^(cdi|cdd|stage|alternance|interim|freelance)$/i.test(fold(x)) && !/exemple|sample/i.test(x)) || "";
   }
   if (place) facts.splice(2, 0, {id: "place", label: tr("Lieu", "Location"), v: place}); else missing.push({id: "place", label: tr("Lieu", "Location")});
-  AD_FLAGS.forEach(([id, level, label, why, re]) => { const m = F.match(re); if (m) flags.push({id, level, label, why, v: t.substr(m.index, m[0].length)}); });
+  AD_FLAGS.forEach(([id, level, label, why, re]) => { const m = F.match(LX("flag_" + id, re)); if (m) flags.push({id, level, label, why, v: t.substr(m.index, m[0].length)}); });
   return {facts, missing, flags};
 }
 
@@ -618,12 +624,12 @@ const WEAK_EN = /\b(responsible for|helped (to|with)|involved in|worked on|dutie
 function cvCheck(text){
   const t = String(text || ""), out = [];
   const words = fold(t).split(/[^a-z']+/), en = words.filter(w => /^(the|and|with|for|of|to|in)$/.test(w)).length > words.filter(w => /^(le|la|les|et|des|du|de|pour)$/.test(w)).length;
-  const typos = en ? TYPOS_EN : TYPOS_FR;
+  const own = !!L10N && !en, typos = own ? L10N.typos || {} : en ? TYPOS_EN : TYPOS_FR;
   Object.entries(typos).forEach(([bad, good]) => {
     const re = new RegExp(`(^|[^\\p{L}])(${bad})(?=[^\\p{L}]|$)`, "iu"), m = t.match(re);
     if (m) { const w = m[2], to = w[0] === w[0].toUpperCase() ? good.charAt(0).toUpperCase() + good.slice(1) : good; out.push({id: "typo:" + bad, type: "typo", word: w, to, msg: tr(`« ${w} » s'écrit « ${to} »`, `"${w}" is spelt "${to}"`)}); }
   });
-  const cv = parseCV(t), weakRe = en ? WEAK_EN : WEAK_FR;
+  const cv = parseCV(t), weakRe = own ? (L10N.re?.weak ? new RegExp(L10N.re.weak) : /$^/) : en ? WEAK_EN : WEAK_FR;
   let weak = 0, nonum = 0, long = 0;
   cv.filter(l => l.t && !l.name).forEach(l => {
     const F = fold(l.t), mw = F.match(weakRe);
@@ -632,6 +638,6 @@ function cvCheck(text){
     if (l.exp && l.t.split(/\s+/).length >= 8 && !/\d/.test(l.t.replace(/\b(19|20)\d\d\b/g, "")) && nonum < 3) { nonum++; out.push({id: "num:" + l.id, type: "nonum", line: l.t, msg: tr("Aucun chiffre ici : ajoute combien (clients, commandes, personnes, euros) ou pendant combien de temps.", "No number here: add how many (customers, orders, people, money) or for how long.")}); }
   });
   const je = (fold(t).match(en ? /\bi\b/g : /\b(je|j')\b/g) || []).length;
-  if (!en && !EN && je >= 3) out.push({id: "je", type: "style", msg: tr(`« Je » revient ${je} fois. Dans un CV, commence plutôt par le verbe : « Préparé 120 commandes par jour ».`, "")});
+  if (!en && !own && LANG === "fr" && je >= 3) out.push({id: "je", type: "style", msg: tr(`« Je » revient ${je} fois. Dans un CV, commence plutôt par le verbe : « Préparé 120 commandes par jour ».`, "")});
   return out;
 }

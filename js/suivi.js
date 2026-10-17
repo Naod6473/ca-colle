@@ -18,7 +18,7 @@ const STATUSES = [
   {id: "dropped",   fr: "Abandonnée",                en: "Dropped",                g: "done",   c: "var(--grey)"}
 ];
 const ST = Object.fromEntries(STATUSES.map(s => [s.id, s]));
-const stLabel = id => (ST[id] || ST.todo)[LANG];
+const stLabel = id => (LL(ST[id] || ST.todo));
 const today = () => new Date().toISOString().slice(0, 10);
 const addDays = (d, n) => { const x = new Date(d + "T12:00:00"); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
 const daysFrom = d => Math.round((new Date(today() + "T12:00:00") - new Date(d + "T12:00:00")) / 864e5);
@@ -103,7 +103,7 @@ function renderTrack(){
   if (!list.length) { $("#trackout").innerHTML = all.length ? `<p class="notice">${tr("Aucune candidature dans ce filtre.", "No application in this filter.")}</p>` : ""; return; }
   $("#trackout").innerHTML = gapsHTML() + (trackView === "table" ? tableHTML(list) : `<div class="apps">${list.sort((a, b) => (b.app.appliedDate || b.app.history[0].d).localeCompare(a.app.appliedDate || a.app.history[0].d)).map(cardHTML).join("")}</div>`);
 }
-const statusSelect = o => `<select class="stsel" data-app="${o.id}" data-fld="status" aria-label="${tr("État", "Status")}" style="--k: ${ST[o.app.status].c}">${STATUSES.map(s => `<option value="${s.id}" ${s.id === o.app.status ? "selected" : ""}>${s[LANG]}</option>`).join("")}</select>`;
+const statusSelect = o => `<select class="stsel" data-app="${o.id}" data-fld="status" aria-label="${tr("État", "Status")}" style="--k: ${ST[o.app.status].c}">${STATUSES.map(s => `<option value="${s.id}" ${s.id === o.app.status ? "selected" : ""}>${LL(s)}</option>`).join("")}</select>`;
 const field = (o, k, label, type = "text", ph = "") => `<label class="afield"><span>${label}</span>${type === "area"
   ? `<textarea data-app="${o.id}" data-fld="${k}" rows="3" placeholder="${esc(ph)}">${esc(o.app[k] || "")}</textarea>`
   : `<input type="${type}" data-app="${o.id}" data-fld="${k}" value="${esc(o.app[k] || "")}" placeholder="${esc(ph)}">`}</label>`;
@@ -157,7 +157,7 @@ function tableHTML(list){
 }
 function csvExport(){
   const head = [tr("Poste", "Job"), tr("Entreprise", "Company"), tr("Date de l'offre", "Offer date"), tr("Date de candidature", "Application date"), tr("État", "Status"), tr("Prochaine étape", "Next step"), tr("Contact", "Contact"), tr("Lien", "Link"), tr("Score", "Score"), tr("Notes", "Notes")];
-  const q = v => `"${String(v ?? "").replace(/"/g, '""').replace(/\r?\n/g, " ")}"`, sep = EN ? "," : ";";
+  const q = v => `"${String(v ?? "").replace(/"/g, '""').replace(/\r?\n/g, " ")}"`, sep = EN ? "," : ";"; // Excel en anglais attend des virgules, ailleurs des points-virgules
   const rows = apps().map(o => { const a = o.app; return [appTitle(o), a.company, a.offerDate, a.appliedDate, stLabel(a.status), a.next, a.contact, a.link, o.text.trim() && o.score != null ? o.score : "", a.notes]; });
   Export.download(new Blob(["﻿" + [head, ...rows].map(r => r.map(q).join(sep)).join("\r\n")], {type: "text/csv;charset=utf-8"}), tr("mes_candidatures.csv", "my_applications.csv"));
   toast(tr("Fichier téléchargé : il s'ouvre dans Excel ou LibreOffice", "File downloaded: it opens in Excel or LibreOffice"));

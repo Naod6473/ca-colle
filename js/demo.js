@@ -2,7 +2,7 @@
 // l'écrire seul dans la case de l'offre, ou ouvrir la page avec ?demo, remplit toute l'app avec un profil fictif : Maurice MARCEL, 32 ans,
 // ingénieur en informatique. Pour le retirer : supprimer ce fichier, sa ligne <script> et son entrée dans sw.js.
 (() => {
-const D = EN ? {
+const D = LANG !== "fr" ? {
   file: "CV_Maurice_MARCEL.pdf (demo)", info: "Made-up profile for testing",
   cv: `MAURICE MARCEL · Software and IT engineer · 32 years old
 Caen, France · maurice.marcel@example.com · 07700 900123

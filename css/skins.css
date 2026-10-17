@@ -154,6 +154,9 @@ html[data-skin="fiche"] .salary input[type="range"]::-moz-range-thumb { border: 
 html[data-skin="fiche"] ins { background: var(--lime); border-radius: 4px; }
 html[data-skin="fiche"] mark.miss { background: var(--yellow); border: 0; border-radius: 4px; }
 html[data-skin="fiche"] .blank { border-bottom: 2.5px solid var(--accent); border-radius: 6px 6px 0 0; }
+html[data-skin="fiche"] .lang-menu { border: 0; border-radius: 18px; box-shadow: var(--soft) !important; }
+html[data-skin="fiche"] .lang-menu a { border: 1.5px solid var(--hair); border-radius: 12px; background: var(--card); }
+html[data-skin="fiche"] .lang-menu a[aria-current] { background: var(--lime); border-color: var(--lime); color: #15142B; }
 html[data-skin="fiche"] .comfort-menu { border: 0; border-radius: 18px; box-shadow: var(--soft) !important; }
 html[data-skin="fiche"] .comfort-menu button { border: 1.5px solid var(--hair); border-radius: 12px; background: var(--card); }
 html[data-skin="fiche"] .comfort-menu button[aria-pressed="true"] { background: var(--lime); border-color: var(--lime); }

@@ -2,7 +2,7 @@
 // sur l'appareil si on le choisit. Le calcul est dans js/moteur.js, la lecture des fichiers dans js/lecteur.js,
 // les exports Word / PDF dans js/export.js.
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
-const MIN_WORDS = 25, STORE = typeof EN !== "undefined" && EN ? "cacolle-en-v1" : "cacolle-v1";
+const MIN_WORDS = 25, STORE = LANG === "fr" ? "cacolle-v1" : `cacolle-${LANG}-v1`;
 let step = 1, filter = "all", results = [], cvReady = false;
 let cvFile = {name: "", info: "", conf: 0};
 let me = {name: "", contact: ""};          // pour la lettre, commun à toutes les offres
@@ -12,8 +12,10 @@ const words = t => t.trim() ? t.trim().split(/\s+/).length : 0;
 const isLink = t => /^\s*(https?:\/\/|www\.)\S+\s*$/i.test(t);
 const offerOk = () => words($("#offer").value) >= MIN_WORDS && !isLink($("#offer").value);
 const canReach = n => n === 1 || (n === 2 && offerOk()) || (n >= 3 && offerOk() && cvReady);
-const plural = (n, w) => `${n} ${w}${n > 1 ? "s" : ""}`;
-const LANG = tr("fr", "en");
+// Autre langue : le mot français est traduit (L10N.w) puis mis au pluriel (L10N.pl), avant de passer dans tr()
+// Objet {fr, en} : texte dans la langue de la page (autres langues : traduit par tr depuis le français)
+const LL = o => o[LANG] ?? tr(o.fr, o.en);
+const plural = (n, w) => { if (L10N && !EN) { const b = L10N.w?.[w] ?? w; return `${n} ${n > 1 ? L10N.pl?.[b] ?? b : b}`; } return `${n} ${w}${n > 1 ? "s" : ""}`; };
 
 function toast(t){ const el = $("#toast"); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 2200); }
 
@@ -73,7 +75,7 @@ function go(n){
 }
 
 /* ---------- Étape 3 : le résultat ---------- */
-const HELP = EN ? {
+const HELP = L10N?.help || (EN ? {
   mid: "It is in your CV, but with no example. Add a real fact: a number, a place, a length of time.",
   no: "The offer asks for it. If you have done it, even in a summer job, internship or volunteering, add it.",
   s: "The offer asks for it. Show it with a fact in one of your jobs, not just a word."
@@ -81,7 +83,7 @@ const HELP = EN ? {
   mid: "C'est dans ton CV, mais sans exemple. Ajoute un fait concret : un chiffre, un lieu, une durée.",
   no: "L'offre le demande. Si tu l'as déjà fait, même en job d'été, en stage ou en bénévolat, ajoute-le.",
   s: "L'offre le demande. Montre-le par un fait dans une expérience, pas seulement par un mot."
-};
+});
 const Y = n => tr(plural(n, "an"), plural(n, "year"));
 // Extrait du CV où le point est trouvé (dans les expériences seulement si onlyExp)
 function excerpt(r, onlyExp){
@@ -139,9 +141,9 @@ function renderResult(){
   $("#pct").textContent = p;
   $("#verdict").textContent = !t ? tr("à vérifier", "to check") : p >= 80 ? tr("ça colle !", "it fits!") : p >= 50 ? tr("ça colle presque", "almost there") : tr("à retravailler", "needs work");
   const must = results.filter(r => r.prio === "must" && r.st === "no").length;
-  $("#sum").textContent = !t ? tr("Je n'ai reconnu aucun point dans cette offre.", "I did not recognise any point in this offer.") : EN
-    ? `The offer asks for ${plural(t, "thing")}. Your CV proves ${c.ok}, mentions ${c.mid} without an example and says nothing about ${c.no}.` + (must ? ` Careful: ${must > 1 ? `${must} essential points are missing` : "one essential point is missing"}.` : "")
-    : `L'offre demande ${plural(t, "chose")}. Ton CV en prouve ${c.ok}, en cite ${c.mid} sans exemple et n'en parle pas pour ${c.no}.` + (must ? ` Attention : ${must > 1 ? `${must} points indispensables manquent` : "un point indispensable manque"}.` : "");
+  $("#sum").textContent = !t ? tr("Je n'ai reconnu aucun point dans cette offre.", "I did not recognise any point in this offer.")
+    : tr(`L'offre demande ${plural(t, "chose")}. Ton CV en prouve ${c.ok}, en cite ${c.mid} sans exemple et n'en parle pas pour ${c.no}.`, `The offer asks for ${plural(t, "thing")}. Your CV proves ${c.ok}, mentions ${c.mid} without an example and says nothing about ${c.no}.`)
+      + (!must ? "" : must > 1 ? tr(` Attention : ${must} points indispensables manquent.`, ` Careful: ${must} essential points are missing.`) : tr(" Attention : un point indispensable manque.", " Careful: one essential point is missing."));
   $("#n-all").textContent = t; ["ok", "mid", "no"].forEach(s => $("#n-" + s).textContent = c[s]);
 
   const todo = results.filter(r => r.st !== "ok").sort((a, b) => urgency(a) - urgency(b)).slice(0, 3);
@@ -278,8 +280,9 @@ function letterText(){
   const tone = L.tone || "classic", at = L.company ? tr(" chez " + L.company, " at " + L.company) : "";
   const why = L.why ? " " + sentence(L.why) : tr(" [pourquoi ce poste ou cette entreprise]", " [why this job or company]");
   // Ce que l'offre demande et que le CV ne montre pas encore : seulement cité, jamais inventé
-  const gaps = results.filter(r => r.st === "no" && !["y", "h", "x"].includes(r.type)).sort((a, b) => (a.prio === "must" ? 0 : 1) - (b.prio === "must" ? 0 : 1)).slice(0, 2).map(r => EN ? r.k : r.k.charAt(0).toLowerCase() + r.k.slice(1));
-  const T = EN ? {
+  const gaps = results.filter(r => r.st === "no" && !["y", "h", "x"].includes(r.type)).sort((a, b) => (a.prio === "must" ? 0 : 1) - (b.prio === "must" ? 0 : 1)).slice(0, 2).map(r => KEEPCASE ? r.k : r.k.charAt(0).toLowerCase() + r.k.slice(1));
+  // Autre langue : L10N.letter({job, at, why, L, gaps}) rend le même objet que la version anglaise
+  const T = L10N?.letter ? L10N.letter({job, at, why, L, gaps}) : EN ? {
     classic: {subj: `Application for the position of ${job}`, open: `I was very interested to see your offer for the position of ${job}${at}.${why}`, intro: "Here is what I can bring:", extra: "", close: `I am available ${L.when ? L.when.trim() : "soon"} and would be glad to meet you to talk about it.`, bye: "Yours sincerely,"},
     dynamic: {subj: `Application: ${job}`, open: `Your ${job} offer${at} made me want to write to you straight away.${why}`, intro: "What I bring, in practice:", extra: "", close: `I am available ${L.when ? L.when.trim() : "now"} and would love to tell you more in person.`, bye: "Best regards,"},
     change: {subj: `Application for the position of ${job} (career change)`, open: `I am moving into a new line of work, and your offer for the position of ${job}${at} matches that plan exactly.${why}`, intro: "What my background has taught me and I can bring to this role:", extra: gaps.length ? `I am ready to train in what I do not know yet, such as ${gaps.join(" and ")}.` : "I am ready to train in whatever I do not know yet.", close: `I am available ${L.when ? L.when.trim() : "soon"} and would be glad to meet you to talk about it.`, bye: "Yours sincerely,"},
@@ -362,7 +365,7 @@ async function exportCopy(kind){
 function summaryParts(){
   const c = countOf(results), p = scoreOf(results), ad = adCheck($("#offer").value), out = [];
   const list = s => results.filter(r => r.st === s).sort((a, b) => urgency(a) - urgency(b)).map(r => ({t: "- " + r.k + (r.prio === "must" ? tr(" (indispensable)", " (essential)") : "") + (s === "ok" && r.type !== "y" && excerpt(r, false) ? tr(" : ", ": ") + clip(excerpt(r, false)) : "")}));
-  out.push({title: tr("Bilan Ça colle ?", "Ça colle? summary")});
+  out.push({title: tr("Bilan Ça colle ?", "Good fit? summary")});
   out.push({t: (personName() ? personName() + " · " : "") + titleOf($("#offer").value) + " · " + new Date().toLocaleDateString(tr("fr-FR", "en-GB"))});
   out.push({t: tr(`Score : ${p} % (${$("#verdict").textContent}). ${c.ok} point${c.ok > 1 ? "s" : ""} prouvé${c.ok > 1 ? "s" : ""}, ${c.mid} à préciser, ${c.no} absent${c.no > 1 ? "s" : ""} du CV, sur ${results.length}.`, `Score: ${p}% (${$("#verdict").textContent}). ${c.ok} proven, ${c.mid} to clarify, ${c.no} missing from the CV, out of ${results.length}.`), b: true});
   if (cur && cur.app) out.push({t: tr("Suivi : ", "Tracking: ") + stLabel(cur.app.status) + (cur.app.appliedDate ? tr(" · envoyée le ", " · sent on ") + fmtDate(cur.app.appliedDate) : "")});
@@ -374,7 +377,7 @@ function summaryParts(){
   if (added.length) out.push({h: tr("Ajouté au CV avec l'app", "Added to the CV with the app")}, ...added);
   const rv = cvCheck($("#cvraw").value);
   if (rv.length) out.push({h: tr("Relecture du CV", "CV proofreading")}, ...rv.map(r => ({t: "- " + r.msg})));
-  out.push({t: tr("Fait avec Ça colle ? (ca-colle.pissits.com) : l'analyse se fait sur l'appareil, rien n'est envoyé.", "Made with Ça colle? (ca-colle.pissits.com): the analysis runs on the device, nothing is sent.")});
+  out.push({t: tr("Fait avec Ça colle ? (ca-colle.pissits.com) : l'analyse se fait sur l'appareil, rien n'est envoyé.", "Made with Good fit? (ca-colle.pissits.com): the analysis runs on the device, nothing is sent.")});
   return out;
 }
 const summaryText = () => summaryParts().map(x => x.title ? x.title.toUpperCase() : x.h ? "\n" + x.h.toUpperCase() : x.t).join("\n");
