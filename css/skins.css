@@ -76,12 +76,13 @@ html[data-skin="fiche"] .logo span { padding: 0; border: 0; font-weight: 800; fo
 html[data-skin="fiche"] .pill { border: 0; background: var(--card); font-weight: 700; font-size: 13px; box-shadow: var(--soft) !important; }
 html[data-skin="fiche"] .pill-safe { background: var(--lime); }
 html[data-skin="fiche"] .pill-track { background: var(--accent); color: #fff; }
+html[data-skin="fiche"] .top::after { content: ""; order: 2; flex-basis: 100%; height: 0; margin-top: -18px; }
 html[data-skin="fiche"] .tabs { gap: 4px; padding: 5px; margin: 6px 16px 0 0; background: var(--card); border-radius: 16px; align-items: stretch; flex-basis: auto; width: fit-content; max-width: 100%; box-shadow: var(--soft) !important; }
 html[data-skin="fiche"] .tab { border: 0; border-radius: 11px; background: transparent; transform: none; padding: 9px 14px; margin: 0; }
 html[data-skin="fiche"] .tab small { color: var(--ink-soft); font-weight: 600; }
 html[data-skin="fiche"] .tab b { font-weight: 700; font-size: 15px; }
-html[data-skin="fiche"] .tab[aria-selected="true"] { background: var(--accent); color: #fff; padding: 9px 14px; }
-html[data-skin="fiche"] .tab[aria-selected="true"] small { color: rgba(255, 255, 255, .8); }
+html[data-skin="fiche"] .tab[aria-selected="true"], html[data-skin="fiche"] .tab[aria-current="page"] { background: var(--accent); color: #fff; padding: 9px 14px; }
+html[data-skin="fiche"] .tab[aria-selected="true"] small, html[data-skin="fiche"] .tab[aria-current="page"] small { color: rgba(255, 255, 255, .8); }
 html[data-skin="fiche"] .tab:disabled { background: transparent; opacity: .45; }
 html[data-skin="fiche"] .tab:hover:not(:disabled):not([aria-selected="true"]) { background: var(--paper); }
 
@@ -143,7 +144,11 @@ html[data-skin="fiche"] .apps-table.compare .best { border: 0; border-radius: 99
 html[data-skin="fiche"] .sal-col legend { border: 0; border-radius: 999px; background: var(--lime); }
 html[data-skin="fiche"] .sal-line { border-bottom: 1.5px solid var(--hair); }
 html[data-skin="fiche"] .sal-res > div b { color: var(--accent); font-weight: 800; }
-html[data-skin="fiche"] input[type="range"] { accent-color: var(--accent); }
+html[data-skin="fiche"] input[type="range"] { accent-color: var(--accent); --fill: var(--accent); --track: var(--paper); }
+html[data-skin="fiche"] .salary input[type="range"]::-webkit-slider-runnable-track { border: 0; }
+html[data-skin="fiche"] .salary input[type="range"]::-webkit-slider-thumb { margin-top: -5px; border: 0; background: var(--accent); outline: 3px solid var(--card); }
+html[data-skin="fiche"] .salary input[type="range"]::-moz-range-track { border: 0; }
+html[data-skin="fiche"] .salary input[type="range"]::-moz-range-thumb { border: 0; background: var(--accent); }
 html[data-skin="fiche"] ins { background: var(--lime); border-radius: 4px; }
 html[data-skin="fiche"] mark.miss { background: var(--yellow); border: 0; border-radius: 4px; }
 html[data-skin="fiche"] .blank { border-bottom: 2.5px solid var(--accent); border-radius: 6px 6px 0 0; }

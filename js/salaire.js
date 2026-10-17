@@ -17,12 +17,16 @@ function parseSalary(t){
 }
 
 let edit = "a";
+// Position du curseur pour la partie remplie de la barre (0 = tout à gauche, max = tout à droite)
+const fill = () => $$('input[type="range"]').forEach(r => r.style.setProperty("--r", (r.value - r.min) / (r.max - r.min)));
+document.addEventListener("input", e => { if (e.target.type === "range") fill(); });
+addEventListener("DOMContentLoaded", fill); fill();
 if (!EN) {
   /* ---------- France ---------- */
   const RATE = {nc: .22, c: .25, fp: .15, pl: .45, ps: .51}, HOURS = 151.67;
   let st = "nc", time = 100, months = 12, pas = 0, base = {k: "ma", v: 0};
   function calc(){
-    const r = RATE[st], t = time / 100, h = HOURS * t;
+    const r = RATE[st], t = time / 100, h = HOURS * t, q = 1 - pas / 100;
     let mb;
     switch (base.k) {
       case "hb": mb = base.v * h; break;
@@ -31,13 +35,16 @@ if (!EN) {
       case "hn": mb = base.v * h / (1 - r); break;
       case "mn": mb = base.v / (1 - r); break;
       case "an": mb = base.v / months / (1 - r); break;
+      case "hp": mb = base.v * h / q / (1 - r); break;
+      case "mp": mb = base.v / q / (1 - r); break;
+      case "ap": mb = base.v / months / q / (1 - r); break;
       default: mb = 0;
     }
-    const mn = mb * (1 - r), out = {hb: h ? mb / h : 0, mb, ab: mb * months, hn: h ? mn / h : 0, mn, an: mn * months};
+    const mn = mb * (1 - r), mp = mn * q, out = {hb: h ? mb / h : 0, mb, ab: mb * months, hn: h ? mn / h : 0, mn, an: mn * months, hp: h ? mp / h : 0, mp, ap: mp * months};
     Object.entries(out).forEach(([k, v]) => { if (k !== base.k || document.activeElement !== $("#" + k)) $("#" + k).value = show(v); });
-    $("#pmn").textContent = show(mn * (1 - pas / 100)) || "0"; $("#pan").textContent = show(mn * months * (1 - pas / 100)) || "0";
+    $("#pmn").textContent = show(mp) || "0"; $("#pan").textContent = show(mp * months) || "0";
     $("#rate").textContent = `−${Math.round(r * 100)} %`; $("#timev").textContent = time + " %"; $("#pasv").textContent = nf.format(pas) + " %";
-    $("#sum").textContent = mb ? `${show(mb)} € brut par mois, c'est environ ${show(mn)} € net avant impôt, et ${show(mn * (1 - pas / 100))} € après le prélèvement à la source.` : "Remplis une case : les autres se calculent toutes seules.";
+    $("#sum").textContent = mb ? `${show(mb)} € brut par mois, c'est environ ${show(mn)} € net avant impôt, et ${show(mp)} € après le prélèvement à la source.` : "Remplis une case : les autres se calculent toutes seules.";
   }
   document.addEventListener("input", e => {
     const t = e.target;

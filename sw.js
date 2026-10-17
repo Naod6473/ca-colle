@@ -1,7 +1,7 @@
 // Ça colle ? hors connexion : l'app est gardée sur l'appareil après la première visite.
 // Pages, styles et scripts : réseau d'abord (pour avoir la dernière version), cache si pas de réseau.
 // Bibliothèques de lecture (vendor/) : cache d'abord, elles ne changent pas.
-const VERSION = "cacolle-2026-10-17i";
+const VERSION = "cacolle-2026-10-17j";
 const SHELL = [
   "./", "index.html", "index-en.html", "salaire.html", "salary-en.html", "js/salaire.js", "css/app.css", "css/skins.css", "fonts/fonts.css",
   "fonts/archivo-latin-700-normal.woff2", "fonts/archivo-latin-800-italic.woff2", "fonts/archivo-latin-900-italic.woff2", "fonts/archivo-latin-900-normal.woff2",

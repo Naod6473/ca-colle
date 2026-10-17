@@ -37,6 +37,10 @@
     <a class="pill pill-lang" href="salary-en.html" hreflang="en" lang="en" title="English version">EN</a>
     <span class="pill pill-safe">Gratuit · local · sans IA</span>
   </div>
+  <nav class="tabs" aria-label="Pages">
+    <a class="tab" href="./" style="--c: var(--blue)"><small>L'app</small><b>Comparer CV et offre</b></a>
+    <a class="tab" href="salaire.html" aria-current="page" style="--c: var(--orange)"><small>Outil</small><b>Brut → net</b></a>
+  </nav>
 </header>
 <span id="contenu" tabindex="-1"></span>
 <main class="salary">
@@ -55,6 +59,11 @@
         </fieldset>
         <fieldset class="sal-col"><legend>Ton salaire net</legend>
           <label class="afield"><span>Horaire net</span><input class="money" id="hn" inputmode="decimal" autocomplete="off" placeholder="0"></label><label class="afield"><span>Mensuel net</span><input class="money" id="mn" inputmode="decimal" autocomplete="off" placeholder="0"></label><label class="afield"><span>Annuel net</span><input class="money" id="an" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+        </fieldset>
+        <fieldset class="sal-col"><legend>Net après impôt</legend>
+          <label class="afield"><span>Horaire après impôt</span><input class="money" id="hp" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label class="afield"><span>Mensuel après impôt</span><input class="money" id="mp" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label class="afield"><span>Annuel après impôt</span><input class="money" id="ap" inputmode="decimal" autocomplete="off" placeholder="0"></label>
         </fieldset>
       </div>
     </div>
