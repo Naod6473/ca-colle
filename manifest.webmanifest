@@ -1,7 +1,7 @@
 {
   "name": "Ça colle ? · ton CV face à une offre",
   "short_name": "Ça colle ?",
-  "description": "Compare ton CV à une offre d'emploi, améliore-le et prépare ta lettre. Gratuit, local, sans IA.",
+  "description": "Compare ton CV à une offre d'emploi, améliore-le et prépare ta lettre. Gratuit, sans compte, sans IA.",
   "lang": "fr",
   "start_url": "./",
   "scope": "./",

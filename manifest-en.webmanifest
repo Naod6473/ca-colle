@@ -1,7 +1,7 @@
 {
   "name": "Ça colle ? · your CV vs a job offer",
   "short_name": "Ça colle ?",
-  "description": "Compare your CV with a job ad, improve it and write your letter. Free, local, no AI.",
+  "description": "Compare your CV with a job ad, improve it and write your letter. Free, no account, no AI.",
   "lang": "en",
   "start_url": "index-en.html",
   "scope": "./",
