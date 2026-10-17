@@ -577,3 +577,18 @@ html[data-skin="fiche"] .stbars i { background: linear-gradient(90deg, var(--acc
 html[data-skin="fiche"] .checklist li { border: 0; border-radius: 14px; box-shadow: var(--soft) !important; }
 html[data-skin="fiche"] .checklist input { accent-color: var(--accent); }
 .pitchbtn { justify-self: start; }
+
+/* Téléphone : les onglets deviennent une barre fixe en bas, onglets retournés (le texte reste à l'endroit) */
+@media (max-width: 560px) {
+  body { padding-bottom: calc(78px + env(safe-area-inset-bottom, 0px)); }
+  .tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; flex-basis: auto; align-items: flex-start; gap: 3px; overflow: visible; padding: 0 4px calc(8px + env(safe-area-inset-bottom, 0px)); background: var(--paper); border-top: var(--line); }
+  .tab { position: relative; flex: 1 1 0; min-width: 0; margin: -2.5px 0 0; padding: 6px 1px 7px; border-top: 0; border-radius: 0 0 8px 8px; text-align: center; transform: none; }
+  .tab small, .tab b { font-size: 0; line-height: 0; letter-spacing: 0; }
+  .tab::before { content: attr(data-n); display: block; font: italic 900 17px/1.1 var(--display); }
+  .tab::after { content: attr(data-s); display: block; margin-top: 2px; font: 700 9.5px/1.1 var(--body); letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tab.done::before { content: attr(data-n) "✓"; }
+  .tab[aria-selected="true"], .tab[aria-current="page"] { margin-bottom: 0; padding: 6px 1px 13px; }
+  .tab #trackn { position: absolute; top: 4px; right: 3px; margin: 0; font-size: 9.5px; line-height: 16px; }
+  .tab-sep { margin: 8px 1px 12px; }
+  .toast { bottom: calc(92px + env(safe-area-inset-bottom, 0px)); }
+}

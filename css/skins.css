@@ -208,3 +208,11 @@ html[data-skin="fiche"] [data-p="3"] .big { color: var(--accent); }
 }
 @media screen { html.c-dark[data-skin="fiche"] .todo li { border-color: var(--hair); } }
 @media screen { html.c-dark .btn:disabled { background: #343B58; color: #8E93AD; } }
+
+@media (max-width: 560px) {
+  html[data-skin="fiche"] .tabs { width: auto; max-width: none; margin: 0; padding: 0 4px calc(8px + env(safe-area-inset-bottom, 0px)); border-radius: 0; border-top: 1.5px solid var(--hair); background: var(--card); box-shadow: 0 -6px 20px rgba(21, 20, 43, .08) !important; }
+  html[data-skin="fiche"] .tab, html[data-skin="fiche"] .tab[aria-selected="true"], html[data-skin="fiche"] .tab[aria-current="page"] { margin: 0; padding: 7px 1px 9px; border-radius: 0 0 12px 12px; }
+  html[data-skin="fiche"] .tab small, html[data-skin="fiche"] .tab b, html[data-skin="fiche"] .tab[aria-selected="true"] small { font-size: 0; line-height: 0; }
+  html[data-skin="fiche"] .tab::before { font: 800 16px/1.1 var(--body); }
+  html[data-skin="fiche"] .tab-sep { margin: 10px 1px 14px; }
+}
