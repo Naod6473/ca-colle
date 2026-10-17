@@ -55,11 +55,11 @@
       <div class="sal-grid">
         <fieldset class="sal-col"><legend>Ton salaire brut</legend>
           <label class="afield"><span>Horaire brut</span><input class="money" id="hb" inputmode="decimal" autocomplete="off" placeholder="0"></label>
-          <label class="afield"><span>Mensuel brut <i class="tag" id="rate"></i></span><input class="money" id="mb" inputmode="decimal" autocomplete="off" placeholder="0"></label>
-          <label class="afield"><span>Annuel brut</span><input class="money" id="ab" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label class="afield main"><span>Mensuel brut <i class="tag" id="rate"></i></span><input class="money" id="mb" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label class="afield main"><span>Annuel brut</span><input class="money" id="ab" inputmode="decimal" autocomplete="off" placeholder="0"></label>
         </fieldset>
         <fieldset class="sal-col"><legend>Ton salaire net</legend>
-          <label class="afield"><span>Horaire net</span><input class="money" id="hn" inputmode="decimal" autocomplete="off" placeholder="0"></label><label class="afield"><span>Mensuel net</span><input class="money" id="mn" inputmode="decimal" autocomplete="off" placeholder="0"></label><label class="afield"><span>Annuel net</span><input class="money" id="an" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label class="afield"><span>Horaire net</span><input class="money" id="hn" inputmode="decimal" autocomplete="off" placeholder="0"></label><label class="afield main"><span>Mensuel net</span><input class="money" id="mn" inputmode="decimal" autocomplete="off" placeholder="0"></label><label class="afield"><span>Annuel net</span><input class="money" id="an" inputmode="decimal" autocomplete="off" placeholder="0"></label>
         </fieldset>
         <fieldset class="sal-col"><legend>Net après impôt</legend>
           <label class="afield"><span>Horaire après impôt</span><input class="money" id="hp" inputmode="decimal" autocomplete="off" placeholder="0"></label>
@@ -74,7 +74,7 @@
         <div><small>Par mois</small><b id="pmn">0</b><span>€ net</span></div>
         <div><small>Par an</small><b id="pan">0</b><span>€ net</span></div>
         <label class="afield"><span>Taux de prélèvement à la source : <b id="pasv"></b></span><input type="range" id="pas" min="0" max="43" step="0.1" value="0"></label>
-        <p class="hint">Ton taux est sur ta fiche de paie ou sur impots.gouv.fr.</p>
+        <p class="hint"><span id="pasauto">Taux estimé avec la grille du taux neutre (sans tenir compte de ta famille ni de tes autres revenus). </span>Ton vrai taux est sur ta fiche de paie ou sur impots.gouv.fr : règle le curseur dessus.</p>
       </div>
     </aside>
   </div>

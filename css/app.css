@@ -524,6 +524,9 @@ a.tab { text-decoration: none; color: inherit; }
 .salary input[type="range"]::-moz-range-thumb { width: 17px; height: 17px; border: 2.5px solid var(--ink); border-radius: 50%; background: var(--yellow); }
 .salary .below { display: grid; gap: 24px; }
 .salary .afield span .tag { margin-left: 6px; }
+/* Les cases les plus utilisées, légèrement surlignées */
+.salary .afield.main input { background: color-mix(in srgb, var(--yellow) 28%, var(--card)); }
+html[data-skin="fiche"] .salary .afield.main input { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border-color: color-mix(in srgb, var(--accent) 35%, var(--hair)); }
 @media (max-width: 560px) { .sal-grid { grid-template-columns: minmax(0, 1fr); } }
 
 /* Justificatif de démarches */

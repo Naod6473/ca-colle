@@ -24,9 +24,12 @@ addEventListener("DOMContentLoaded", fill); fill();
 if (!EN) {
   /* ---------- France ---------- */
   const RATE = {nc: .22, c: .25, fp: .15, pl: .45, ps: .51}, HOURS = 151.67;
-  let st = "nc", time = 100, months = 12, pas = 0, base = {k: "ma", v: 0};
+  let st = "nc", time = 100, months = 12, pas = 0, pasAuto = true, base = {k: "ma", v: 0};
+  // Taux neutre du prélèvement à la source (grille 2025, métropole) : estimation tant qu'on n'a pas bougé le curseur
+  const NEUTRE = [[1620, 0], [1683, .5], [1791, 1.3], [1911, 2.1], [2042, 2.9], [2151, 3.5], [2294, 4.1], [2714, 5.3], [3107, 7.5], [3539, 9.9], [3983, 11.9], [4648, 13.8], [5574, 15.8], [6974, 17.9], [8711, 20], [12091, 24], [16376, 28], [25706, 33], [55062, 38], [Infinity, 43]];
+  const neutre = m => NEUTRE.find(([max]) => m < max)[1];
   function calc(){
-    const r = RATE[st], t = time / 100, h = HOURS * t, q = 1 - pas / 100;
+    const r = RATE[st], t = time / 100, h = HOURS * t; let q = 1 - pas / 100;
     let mb;
     switch (base.k) {
       case "hb": mb = base.v * h; break;
@@ -40,7 +43,9 @@ if (!EN) {
       case "ap": mb = base.v / months / q / (1 - r); break;
       default: mb = 0;
     }
-    const mn = mb * (1 - r), mp = mn * q, out = {hb: h ? mb / h : 0, mb, ab: mb * months, hn: h ? mn / h : 0, mn, an: mn * months, hp: h ? mp / h : 0, mp, ap: mp * months};
+    let mn = mb * (1 - r);
+    if (pasAuto && base.k[1] !== "p") { pas = neutre(mn); q = 1 - pas / 100; $("#pas").value = pas; fill(); }
+    const mp = mn * q, out = {hb: h ? mb / h : 0, mb, ab: mb * months, hn: h ? mn / h : 0, mn, an: mn * months, hp: h ? mp / h : 0, mp, ap: mp * months};
     Object.entries(out).forEach(([k, v]) => { if (k !== base.k || document.activeElement !== $("#" + k)) $("#" + k).value = show(v); });
     $("#pmn").textContent = show(mp) || "0"; $("#pan").textContent = show(mp * months) || "0";
     $("#rate").textContent = `−${Math.round(r * 100)} %`; $("#timev").textContent = time + " %"; $("#pasv").textContent = nf.format(pas) + " %";
@@ -50,7 +55,7 @@ if (!EN) {
     const t = e.target;
     if (t.matches(".money")) { base = {k: t.id, v: num(t.value)}; return calc(); }
     if (t.id === "time") { time = +t.value; return calc(); }
-    if (t.id === "pas") { pas = +t.value; return calc(); }
+    if (t.id === "pas") { pas = +t.value; pasAuto = false; $("#pasauto").hidden = true; return calc(); }
   });
   document.addEventListener("click", e => {
     const b = e.target.closest("[data-st], [data-mo]"); if (!b) return;
@@ -58,7 +63,7 @@ if (!EN) {
     if (b.dataset.mo) { months = +b.dataset.mo; $$("[data-mo]").forEach(x => x.setAttribute("aria-pressed", x === b)); }
     calc();
   });
-  $("#clear").addEventListener("click", () => { base = {k: "mb", v: 0}; $$(".money").forEach(i => i.value = ""); calc(); });
+  $("#clear").addEventListener("click", () => { base = {k: "mb", v: 0}; pasAuto = true; $("#pasauto").hidden = false; $$(".money").forEach(i => i.value = ""); calc(); });
   const q = new URLSearchParams(location.search).get("s"), p = q && parseSalary(q);
   if (p) base = {k: p.u === "h" ? "hb" : p.u === "a" ? "ab" : "mb", v: /net/.test(fold(q)) ? 0 : p.v};
   if (p && /net/.test(fold(q))) base = {k: p.u === "h" ? "hn" : p.u === "a" ? "an" : "mn", v: p.v};
