@@ -6,6 +6,7 @@ if (typeof document !== "undefined") try {
   const c = JSON.parse(localStorage.getItem("cacolle-confort")) || {}, h = document.documentElement;
   if (c.skin === "fiche") h.dataset.skin = "fiche";
   ["big", "contrast", "calm"].forEach(k => c[k] && h.classList.add("c-" + k));
+  if (c.dark ?? matchMedia("(prefers-color-scheme: dark)").matches) h.classList.add("c-dark");
 } catch {}
 // Statistiques anonymes (Umami, sans cookie) : seulement des noms d'actions, jamais le contenu du CV ou de l'offre
 const stat = (name, data) => { try { if (typeof window !== "undefined" && window.umami) window.umami.track(name, Object.assign({lang: EN ? "en" : "fr"}, data)); } catch {} };

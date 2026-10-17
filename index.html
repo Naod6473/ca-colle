@@ -32,6 +32,7 @@
         <div class="skins" role="group" aria-label="Apparence"><b>Apparence</b><button type="button" data-skin="tampon" aria-pressed="true">Tampon</button><button type="button" data-skin="fiche" aria-pressed="false">Fiche</button></div>
         <button type="button" data-comfort="big" aria-pressed="false">Texte plus gros</button>
         <button type="button" data-comfort="contrast" aria-pressed="false">Contraste fort</button>
+        <button type="button" data-comfort="dark" aria-pressed="false">Mode sombre</button>
         <button type="button" data-comfort="calm" aria-pressed="false">Moins d'animations</button>
         <small>Réglage gardé sur cet appareil.</small>
       </div>
@@ -187,7 +188,7 @@
         <button class="chip" data-f="all" aria-pressed="true">Tout <span id="n-all"></span></button>
         <button class="chip" data-f="no" aria-pressed="false" style="--k: var(--pink)">✕ Pas dans ton CV <span id="n-no"></span></button>
         <button class="chip" data-f="mid" aria-pressed="false" style="--k: var(--yellow)">? À préciser <span id="n-mid"></span></button>
-        <button class="chip" data-f="ok" aria-pressed="false" style="--k: #fff">✓ Ça colle <span id="n-ok"></span></button>
+        <button class="chip" data-f="ok" aria-pressed="false" style="--k: var(--card)">✓ Ça colle <span id="n-ok"></span></button>
       </div>
       <div class="next-row tight">
         <button class="btn light small" id="compare" type="button">Comparer avec une autre offre</button>
@@ -276,6 +277,7 @@
 <div class="below" data-for="5" hidden style="--c: var(--violet)">
   <div class="rewrite">
     <form class="letter-form" id="lform" autocomplete="on">
+      <fieldset class="field"><legend>Ton de la lettre</legend><div class="filters" role="group" aria-label="Ton de la lettre"><button class="chip" type="button" data-tone="classic" aria-pressed="true">Classique</button><button class="chip" type="button" data-tone="dynamic" aria-pressed="false">Dynamique</button><button class="chip" type="button" data-tone="change" aria-pressed="false">Reconversion</button><button class="chip" type="button" data-tone="study" aria-pressed="false">Alternance ou stage</button></div></fieldset>
       <div class="field"><label for="l-name">Ton nom</label><input id="l-name" autocomplete="name"></div>
       <div class="field"><label for="l-contact">Ton email et ton téléphone</label><input id="l-contact"></div>
       <div class="field"><label for="l-company">Nom de l'entreprise</label><input id="l-company" placeholder="ex : Normandie Distribution"></div>
@@ -296,6 +298,7 @@
       <p class="preview-foot">Lettre envoyée ? <button class="linkbtn" type="button" data-trackthis="sent">Note-le dans ton suivi</button></p>
     </aside>
   </div>
+  <section class="group" id="checklist"></section>
 </div>
 <!-- ============ SUIVI DES CANDIDATURES ============ -->
 <section class="panel" id="track" hidden style="--c: var(--orange); --shadow: var(--yellow)">
@@ -309,9 +312,11 @@
           <button class="chip" type="button" data-view="cards" aria-pressed="true">Par offre</button>
           <button class="chip" type="button" data-view="table" aria-pressed="false">Tableau</button>
           <button class="chip" type="button" data-view="compare" aria-pressed="false">Comparer</button>
+          <button class="chip" type="button" data-view="stats" aria-pressed="false">Tableau de bord</button>
         </div>
         <button class="btn small" id="addapp" type="button">+ Ajouter une candidature</button>
         <button class="btn light small" id="csv" type="button">Exporter pour un tableur</button>
+        <details class="share proofmenu"><summary class="btn light small">Justificatif de démarches</summary><div class="share-body"><div class="export"><button class="btn small" type="button" data-proof="month">Ce mois-ci</button><button class="btn light small" type="button" data-proof="last">Le mois dernier</button><button class="btn light small" type="button" data-proof="all">Tout</button></div></div></details>
         <button class="btn light small" id="backup" type="button">Sauvegarder dans un fichier</button>
         <button class="btn light small" id="restore" type="button">Ouvrir une sauvegarde</button>
         <input type="file" id="restorefile" accept=".json,application/json" hidden>
@@ -329,7 +334,7 @@
     <button class="chip" type="button" data-tf="all" aria-pressed="true">Toutes <span id="tf-all"></span></button>
     <button class="chip" type="button" data-tf="active" aria-pressed="false" style="--k: var(--yellow)">En cours <span id="tf-active"></span></button>
     <button class="chip" type="button" data-tf="talk" aria-pressed="false" style="--k: var(--violet)">Entretiens <span id="tf-talk"></span></button>
-    <button class="chip" type="button" data-tf="done" aria-pressed="false" style="--k: #fff">Terminées <span id="tf-done"></span></button>
+    <button class="chip" type="button" data-tf="done" aria-pressed="false" style="--k: var(--card)">Terminées <span id="tf-done"></span></button>
   </div>
   <div id="trackout"></div>
 </div>

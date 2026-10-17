@@ -4,7 +4,7 @@
 // Rien ne part sur un serveur : c'est gardé sur l'appareil seulement si la case « Garder ma session » est cochée.
 
 const STATUSES = [
-  {id: "todo",      fr: "À postuler",                en: "To apply",               g: "active", c: "#fff"},
+  {id: "todo",      fr: "À postuler",                en: "To apply",               g: "active", c: "var(--card)"},
   {id: "sent",      fr: "Candidature envoyée",       en: "Application sent",       g: "active", c: "var(--blue)"},
   {id: "followup",  fr: "Relancée",                  en: "Followed up",            g: "active", c: "var(--blue)"},
   {id: "call",      fr: "Appel de prise de contact", en: "First call",             g: "talk",   c: "var(--violet)"},
@@ -14,8 +14,8 @@ const STATUSES = [
   {id: "offer",     fr: "Proposition reçue",         en: "Offer received",         g: "talk",   c: "var(--green)"},
   {id: "accepted",  fr: "Acceptée",                  en: "Accepted",               g: "done",   c: "var(--green)"},
   {id: "refused",   fr: "Refusée",                   en: "Rejected",               g: "done",   c: "var(--pink)"},
-  {id: "silent",    fr: "Sans réponse",              en: "No reply",               g: "done",   c: "#e6e1d6"},
-  {id: "dropped",   fr: "Abandonnée",                en: "Dropped",                g: "done",   c: "#e6e1d6"}
+  {id: "silent",    fr: "Sans réponse",              en: "No reply",               g: "done",   c: "var(--grey)"},
+  {id: "dropped",   fr: "Abandonnée",                en: "Dropped",                g: "done",   c: "var(--grey)"}
 ];
 const ST = Object.fromEntries(STATUSES.map(s => [s.id, s]));
 const stLabel = id => (ST[id] || ST.todo)[LANG];
@@ -90,6 +90,7 @@ function renderTrack(){
   if (prepFor) return renderPrep(offers.find(o => o.id === prepFor));
   if (mailFor) return renderMail(offers.find(o => o.id === mailFor));
   if (trackView === "compare") { $("#trackout").innerHTML = compareHTML(list); return; }
+  if (trackView === "stats") { $("#trackout").innerHTML = statsHTML(); return; }
   if (!list.length) { $("#trackout").innerHTML = all.length ? `<p class="notice">${tr("Aucune candidature dans ce filtre.", "No application in this filter.")}</p>` : ""; return; }
   $("#trackout").innerHTML = gapsHTML() + (trackView === "table" ? tableHTML(list) : `<div class="apps">${list.sort((a, b) => (b.app.appliedDate || b.app.history[0].d).localeCompare(a.app.appliedDate || a.app.history[0].d)).map(cardHTML).join("")}</div>`);
 }
@@ -191,13 +192,14 @@ function renderPrep(o){
   if (!o) { prepFor = null; return renderTrack(); }
   o.prep = o.prep || {};
   const qs = interviewQs(o), P = o.prep;
-  const box = (q, f, label, ph) => `<label class="afield"><span>${label}</span><textarea rows="2" data-prepq="${esc(q.id)}" data-pf="${f}" data-prepo="${o.id}" placeholder="${esc(ph)}">${esc((P[q.id] || {})[f] || "")}</textarea></label>`;
+  const box = (q, f, label, ph) => `<label class="afield"><span>${label}</span><textarea rows="${q.id === "g1" ? 5 : 2}" data-prepq="${esc(q.id)}" data-pf="${f}" data-prepo="${o.id}" placeholder="${esc(ph)}">${esc((P[q.id] || {})[f] || "")}</textarea></label>`;
   $("#trackout").innerHTML = `<div class="prep">
     <div class="prep-h"><button type="button" class="btn ghost small" id="prepback">${tr("← Retour au suivi", "← Back to my applications")}</button>
       <h2 class="section-title" style="--k: var(--violet)">${tr("Préparer l'entretien", "Prepare the interview")} · ${esc(appTitle(o))}${o.app.company ? " · " + esc(o.app.company) : ""}</h2></div>
     <p class="promise"><b>${tr("Méthode simple :", "Simple method:")}</b> ${tr("la situation (où, quand), ce que tu as fait toi, et le résultat (avec un chiffre si possible). Écris seulement des choses vraies : c'est toi qui réponds le jour J.", "the situation (where, when), what you did yourself, and the result (with a number if you can). Only write true things: you are the one answering on the day.")}</p>
     ${!o.text.trim() || !cvReady ? `<p class="notice">${tr("Pour avoir des questions sur cette offre, ajoute le texte de l'annonce et ton CV. En attendant, voici les questions classiques.", "To get questions about this offer, add the ad's text and your CV. Meanwhile, here are the classic questions.")}</p>` : ""}
     <ol class="qs">${qs.map(q => `<li class="q"><h3>${esc(q.q)}${q.must ? ` <i class="tag must">${tr("Indispensable", "Essential")}</i>` : ""}</h3>${q.tip ? `<p class="hint">${esc(q.tip)}</p>` : ""}
+      ${q.id === "g1" ? `<button type="button" class="btn light small pitchbtn" data-pitch="${o.id}">${tr("Préparer mon pitch d'une minute", "Build my one-minute pitch")}</button>` : ""}
       ${q.one ? box(q, "t", tr("Ma réponse", "My answer"), "") : box(q, "s", tr("Situation", "Situation"), tr("ex : au Drive Super U, un samedi de rush", "e.g. at FreshMart, on a busy Saturday")) + box(q, "a", tr("Ce que j'ai fait", "What I did"), "") + box(q, "r", tr("Résultat", "Result"), tr("ex : 120 commandes prêtes à l'heure", "e.g. 120 orders ready on time"))}</li>`).join("")}</ol>
     ${askHTML(o)}
     <div class="export"><button class="btn small" type="button" data-prepdl="docx" data-prepo="${o.id}">${tr("Télécharger en Word", "Download as Word")}</button><button class="btn light small" type="button" data-prepdl="pdf" data-prepo="${o.id}">${tr("En PDF", "As PDF")}</button><button class="btn light small" type="button" data-prepdl="copy" data-prepo="${o.id}">${tr("Copier", "Copy")}</button></div>

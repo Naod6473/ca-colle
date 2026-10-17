@@ -171,7 +171,7 @@ function renderResult(){
         </details>
       </article>`).join("")}</div></section>`;
   }).join("")
-  + (skipped.length ? `<section class="group"><h2 class="section-title" style="--k: #fff">${tr("Points retirés", "Removed points")} (${skipped.length})</h2>
+  + (skipped.length ? `<section class="group"><h2 class="section-title" style="--k: var(--card)">${tr("Points retirés", "Removed points")} (${skipped.length})</h2>
       <ul class="skipped">${skipped.map(r => `<li><span>${esc(r.k)}</span><button type="button" class="btn light small" data-over="${esc(r.k)}" data-v="">${tr("Remettre", "Put back")}</button></li>`).join("")}</ul></section>` : "")
   + (vocab.length ? `<section class="group"><h2 class="section-title" style="--k: var(--blue)">${tr("Les mots de l'annonce", "The ad's own words")}</h2>
       <p class="hint">${tr("Les recruteurs et leurs logiciels cherchent les mots exacts de l'offre. Reprends-les dans ton CV quand c'est vrai.", "Recruiters and their software look for the exact words of the offer. Use them in your CV when they are true.")}</p>
@@ -257,6 +257,7 @@ function renderLetterForm(){
   prefillLetter();
   const L = cur.letter;
   $("#l-name").value = me.name; $("#l-contact").value = me.contact;
+  $$("[data-tone]").forEach(b => b.setAttribute("aria-pressed", b.dataset.tone === (L.tone || "classic")));
   $("#l-company").value = L.company || ""; $("#l-job").value = L.job || ""; $("#l-why").value = L.why || ""; $("#l-when").value = L.when || "";
   const oks = results.filter(r => r.st === "ok" && r.type !== "y");
   $("#l-strengths").innerHTML = oks.length ? oks.map(r => `<label class="str"><input type="checkbox" data-str="${esc(r.k)}" ${L.strengths.includes(r.k) ? "checked" : ""}> <span><b>${esc(r.k)}</b><small>${esc(clip(excerpt(r, false)))}</small></span></label>`).join("")
@@ -274,31 +275,62 @@ function letterText(){
     if (g) g.k.push(/^.[a-zà-ÿ]/.test(r.k) ? r.k.charAt(0).toLowerCase() + r.k.slice(1) : r.k); else groups.push({k: [r.k], x});
   });
   const strong = groups.map(g => `- ${g.k.join(", ")}${g.x ? tr(" : ", ": ") + g.x : ""}`);
-  if (EN) return [
-    me.name || "[your name]", me.contact || "[your email and phone]", "",
-    co, "Recruitment team", "",
-    `Application for the position of ${job}`, "",
-    "Dear Hiring Manager,", "",
-    `I was very interested to see your offer for the position of ${job}${L.company ? " at " + L.company : ""}.${L.why ? " " + sentence(L.why) : " [why this job or company]"}`, "",
-    ...(strong.length ? ["Here is what I can bring:", ...strong, ""] : []),
-    `I am available ${L.when ? L.when.trim() : "soon"} and would be glad to meet you to talk about it.`, "",
-    "Yours sincerely,", "",
-    me.name || "[your name]"
-  ].join("\n");
+  const tone = L.tone || "classic", at = L.company ? tr(" chez " + L.company, " at " + L.company) : "";
+  const why = L.why ? " " + sentence(L.why) : tr(" [pourquoi ce poste ou cette entreprise]", " [why this job or company]");
+  // Ce que l'offre demande et que le CV ne montre pas encore : seulement cité, jamais inventé
+  const gaps = results.filter(r => r.st === "no" && !["y", "h", "x"].includes(r.type)).sort((a, b) => (a.prio === "must" ? 0 : 1) - (b.prio === "must" ? 0 : 1)).slice(0, 2).map(r => EN ? r.k : r.k.charAt(0).toLowerCase() + r.k.slice(1));
+  const T = EN ? {
+    classic: {subj: `Application for the position of ${job}`, open: `I was very interested to see your offer for the position of ${job}${at}.${why}`, intro: "Here is what I can bring:", extra: "", close: `I am available ${L.when ? L.when.trim() : "soon"} and would be glad to meet you to talk about it.`, bye: "Yours sincerely,"},
+    dynamic: {subj: `Application: ${job}`, open: `Your ${job} offer${at} made me want to write to you straight away.${why}`, intro: "What I bring, in practice:", extra: "", close: `I am available ${L.when ? L.when.trim() : "now"} and would love to tell you more in person.`, bye: "Best regards,"},
+    change: {subj: `Application for the position of ${job} (career change)`, open: `I am moving into a new line of work, and your offer for the position of ${job}${at} matches that plan exactly.${why}`, intro: "What my background has taught me and I can bring to this role:", extra: gaps.length ? `I am ready to train in what I do not know yet, such as ${gaps.join(" and ")}.` : "I am ready to train in whatever I do not know yet.", close: `I am available ${L.when ? L.when.trim() : "soon"} and would be glad to meet you to talk about it.`, bye: "Yours sincerely,"},
+    study: {subj: `Application for an apprenticeship or internship: ${job}`, open: `I am looking for an apprenticeship or internship [say which, with the dates or the schedule and your school] as ${job}${at}.${why}`, intro: "What I can already bring:", extra: "I am keen to learn on the job and to grow with your team.", close: `I am available ${L.when ? L.when.trim() : "soon"} and would be glad to meet you to talk about it.`, bye: "Yours sincerely,"}
+  } : {
+    classic: {subj: `Objet : candidature au poste « ${job} »`, open: `Votre offre pour le poste « ${job} »${at} a retenu toute mon attention.${why}`, intro: "Voici ce que je peux vous apporter :", extra: "", close: `Je suis disponible ${L.when ? L.when.trim() : "rapidement"} et je serais heureux·se de vous rencontrer pour en parler.`, bye: "Je vous prie d'agréer, Madame, Monsieur, mes salutations distinguées."},
+    dynamic: {subj: `Objet : candidature « ${job} »`, open: `Votre offre pour le poste « ${job} »${at} m'a donné envie de vous écrire tout de suite.${why}`, intro: "Ce que j'apporte, concrètement :", extra: "", close: `Je suis disponible ${L.when ? L.when.trim() : "dès maintenant"} et j'aimerais beaucoup vous en dire plus de vive voix.`, bye: "Bien cordialement,"},
+    change: {subj: `Objet : candidature au poste « ${job} » (reconversion)`, open: `Je souhaite mettre mon expérience au service d'un nouveau métier, et votre offre pour le poste « ${job} »${at} correspond exactement à ce projet.${why}`, intro: "Ce que mon parcours m'a appris et que je peux mettre à profit :", extra: gaps.length ? `Je suis prêt·e à me former sur ce que je ne connais pas encore, comme ${gaps.join(" et ")}.` : "Je suis prêt·e à me former sur ce que je ne connais pas encore.", close: `Je suis disponible ${L.when ? L.when.trim() : "rapidement"} et je serais heureux·se de vous rencontrer pour en parler.`, bye: "Je vous prie d'agréer, Madame, Monsieur, mes salutations distinguées."},
+    study: {subj: `Objet : candidature en alternance ou en stage « ${job} »`, open: `Je recherche une alternance ou un stage [précise lequel, avec les dates ou le rythme et ton école] au poste « ${job} »${at}.${why}`, intro: "Ce que je peux déjà vous apporter :", extra: "J'ai envie d'apprendre sur le terrain et de progresser avec votre équipe.", close: `Je suis disponible ${L.when ? L.when.trim() : "rapidement"} et je serais heureux·se de vous rencontrer pour en parler.`, bye: "Je vous prie d'agréer, Madame, Monsieur, mes salutations distinguées."}
+  };
+  const t = T[tone] || T.classic;
   return [
-    me.name || "[ton nom]", me.contact || "[ton email et ton téléphone]", "",
-    co, "À l'attention du service recrutement", "",
-    `Objet : candidature au poste « ${job} »`, "",
-    "Madame, Monsieur,", "",
-    `Votre offre pour le poste « ${job} »${L.company ? " chez " + L.company : ""} a retenu toute mon attention.${L.why ? " " + sentence(L.why) : " [pourquoi ce poste ou cette entreprise]"}`, "",
-    ...(strong.length ? ["Voici ce que je peux vous apporter :", ...strong, ""] : []),
-    `Je suis disponible ${L.when ? L.when.trim() : "rapidement"} et je serais heureux·se de vous rencontrer pour en parler.`, "",
-    "Je vous prie d'agréer, Madame, Monsieur, mes salutations distinguées.", "",
-    me.name || "[ton nom]"
+    me.name || tr("[ton nom]", "[your name]"), me.contact || tr("[ton email et ton téléphone]", "[your email and phone]"), "",
+    co, tr("À l'attention du service recrutement", "Recruitment team"), "",
+    t.subj, "",
+    tr("Madame, Monsieur,", "Dear Hiring Manager,"), "",
+    t.open, "",
+    ...(strong.length ? [t.intro, ...strong, ""] : []),
+    ...(t.extra ? [t.extra, ""] : []),
+    t.close, "",
+    t.bye, "",
+    me.name || tr("[ton nom]", "[your name]")
   ].join("\n");
 }
 const currentLetter = () => cur.letter.frozen ? cur.letter.text : letterText();
+// Check-list avant d'envoyer : certains points se vérifient tout seuls, les autres se cochent
+function renderChecklist(){
+  const box = $("#checklist"); if (!box || !cur) return;
+  const L = cur.letter, C = cur.check = cur.check || {}, name = personName() || tr("Prénom Nom", "First Last"), job = L.job || tr("poste", "job");
+  const typos = cvCheck($("#cvraw").value).filter(c => c.type === "typo").length, mustNo = results.filter(r => r.prio === "must" && r.st === "no").length;
+  const auto = [
+    [!!(L.company && L.job), tr("Le nom de l'entreprise et le poste sont écrits dans ta lettre", "The company name and the job title are in your letter")],
+    [/@/.test(me.contact || "") && /\d{6}/.test((me.contact || "").replace(/\D/g, "")), tr("Ton email et ton téléphone sont dans la lettre", "Your email and phone are in the letter")],
+    [!typos, typos ? tr(`Ton CV a encore ${plural(typos, "faute courante")} (étape 4)`, `Your CV still has ${plural(typos, "common typo")} (step 4)`) : tr("Pas de faute courante dans ton CV", "No common typo in your CV")],
+    [!mustNo, mustNo ? tr(`${mustNo > 1 ? mustNo + " points indispensables manquent" : "Un point indispensable manque"} dans ton CV (étape 4)`, `${plural(mustNo, "essential point")} still missing from your CV (step 4)`) : tr("Les points indispensables de l'offre sont dans ton CV", "The offer's essential points are in your CV")]
+  ];
+  const manual = [
+    ["pdf", tr(`CV enregistré en PDF, avec un nom clair : ${fileBase(name)}_CV.pdf`, `CV saved as a PDF with a clear name: ${fileBase(name)}_CV.pdf`)],
+    ["subject", tr(`Objet du mail clair : « Candidature ${job} · ${name} »`, `Clear email subject: "Application ${job} · ${name}"`)],
+    ["attach", tr("CV et lettre joints au mail (ou collés dans le formulaire du site)", "CV and letter attached to the email (or pasted in the site's form)")],
+    ["read", tr("Lettre relue une dernière fois, à voix haute", "Letter read one last time, out loud")],
+    ["keep", tr("Annonce gardée : copie du texte ou lien noté dans ton suivi", "Ad kept: copy of the text or link saved in your tracker")]
+  ];
+  const done = auto.filter(a => a[0]).length + manual.filter(m => C[m[0]]).length, all = auto.length + manual.length;
+  box.innerHTML = `<h2 class="section-title" style="--k: var(--green)">${tr("Avant d'envoyer", "Before you send")} · ${done} / ${all}</h2>
+    <ul class="checklist">${auto.map(([ok, t]) => `<li class="${ok ? "ok" : "ko"}"><span aria-hidden="true">${ok ? "✓" : "!"}</span>${esc(t)}<span class="sr-only">${ok ? tr(" : fait", ": done") : tr(" : à faire", ": to do")}</span></li>`).join("")}
+    ${manual.map(([id, t]) => `<li><label><input type="checkbox" data-check="${id}" ${C[id] ? "checked" : ""}> ${esc(t)}</label></li>`).join("")}</ul>
+    <div class="next-row"><button class="btn" type="button" data-trackthis="sent">${tr("C'est envoyé : noter dans mon suivi", "Sent: note it in my tracker")}</button></div>`;
+}
 function renderLetter(){
+  renderChecklist();
   const L = cur.letter;
   $("#letter").hidden = !!L.frozen; $("#letteredit").hidden = !L.frozen;
   $("#l-edit").textContent = L.frozen ? tr("Revenir au modèle", "Back to the template") : tr("Modifier le texte", "Edit the text");
@@ -408,7 +440,7 @@ function saveNow(){
 }
 function snapshot(){
   if (cur) { cur.text = $("#offer").value; cur.title = titleOf(cur.text); }
-  return {v: 1, cv: {text: $("#cvraw").value, ...cvFile}, me, cur: cur?.id, offers: offers.filter(o => o.text.trim() || o.app).map(o => ({id: o.id, text: o.text, title: o.title, score: o.score, fixes: o.fixes, over: o.over, letter: o.letter, app: o.app, prep: o.prep}))};
+  return {v: 1, cv: {text: $("#cvraw").value, ...cvFile}, me, cur: cur?.id, offers: offers.filter(o => o.text.trim() || o.app).map(o => ({id: o.id, text: o.text, title: o.title, score: o.score, fixes: o.fixes, over: o.over, letter: o.letter, app: o.app, prep: o.prep, check: o.check}))};
 }
 function save(){ clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, 400); }
 addEventListener("pagehide", saveNow);
@@ -455,6 +487,7 @@ document.addEventListener("click", e => {
     if (cur && cur.id === t.dataset.deloffer) { cur = null; $("#offer").value = ""; newOffer(); gates(); }
     renderOffers(); return save();
   }
+  if (t.dataset.tone) { cur.letter.tone = t.dataset.tone; $$("[data-tone]").forEach(b => b.setAttribute("aria-pressed", b === t)); stat("lettre-ton", {t: t.dataset.tone}); renderLetter(); return save(); }
   if (t.dataset.share) { stat("bilan", {how: t.dataset.share}); return exportSummary(t.dataset.share); }
   if (t.dataset.typo) {
     const re = new RegExp(`(^|[^\\p{L}])${t.dataset.typo}(?=[^\\p{L}]|$)`, "gu");
@@ -502,6 +535,7 @@ document.addEventListener("input", e => {
     renderLetter(); return save();
   }
   if (t.id === "letteredit") { cur.letter.text = t.value; return save(); }
+  if (t.dataset.check) { (cur.check = cur.check || {})[t.dataset.check] = t.checked; renderChecklist(); return save(); }
 });
 document.addEventListener("change", e => {
   if (e.target.id === "keep") { if (keep()) { save(); toast(tr("Ta session restera sur cet appareil", "Your session will stay on this device")); } else { try { localStorage.removeItem(STORE); } catch {} toast(tr("Plus rien n'est gardé sur cet appareil", "Nothing is kept on this device any more")); } }
@@ -545,3 +579,15 @@ $("#ioshint").hidden = !(/iphone|ipad/i.test(navigator.userAgent) && !navigator.
 if (!restore()) newOffer();
 gates();
 go(1);
+// « Partager vers Ça colle » depuis un site d'emploi (app installée sur téléphone) : ?title=…&text=…&url=…
+(() => {
+  const q = new URLSearchParams(location.search), title = q.get("title") || "", text = q.get("text") || "", url = q.get("url") || (text.match(/https?:\/\/\S+/) || [""])[0];
+  if (!title && !text && !url) return;
+  history.replaceState(null, "", location.pathname);
+  const body = [title, text.replace(url, "").trim()].filter(Boolean).join("\n\n").trim();
+  syncOffer(); if (cur.text.trim()) newOffer();
+  $("#offer").value = words(body) >= MIN_WORDS ? body : url || body;
+  if (words(body) >= MIN_WORDS) tidyOffer();
+  gates(); go(1); save(); stat("partage-recu", {full: words(body) >= MIN_WORDS});
+  toast(words(body) >= MIN_WORDS ? tr("Annonce reçue", "Ad received") : tr("Le site n'a envoyé que le lien : copie le texte de l'annonce", "The site only sent the link: copy the ad's text"));
+})();

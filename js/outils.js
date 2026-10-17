@@ -177,3 +177,96 @@ document.addEventListener("click", e => {
   if (t.id === "restore") return $("#restorefile").click();
 });
 document.addEventListener("change", e => { if (e.target.id === "restorefile" && e.target.files[0]) { importBackup(e.target.files[0]); e.target.value = ""; } });
+
+/* ---------- Justificatif de recherche d'emploi (PDF à imprimer) ---------- */
+const sentDate = o => o.app.appliedDate || (o.app.history.find(h => h.s !== "todo") || {}).d || "";
+function proofDoc(period){
+  const now = new Date(today() + "T12:00:00"), ym = d => d.slice(0, 7);
+  const last = new Date(now.getFullYear(), now.getMonth() - 1, 15).toISOString().slice(0, 7);
+  const keepIt = d => d && (period === "all" || (period === "month" ? ym(d) === today().slice(0, 7) : ym(d) === last));
+  const list = apps().filter(o => o.app.status !== "todo" && keepIt(sentDate(o))).sort((a, b) => sentDate(a).localeCompare(sentDate(b)));
+  if (!list.length) return toast(tr("Aucune candidature envoyée sur cette période", "No application sent in this period"));
+  const ds = list.map(sentDate), when = period === "all" ? tr(`du ${fmtDate(ds[0])} au ${fmtDate(ds[ds.length - 1])}`, `from ${fmtDate(ds[0])} to ${fmtDate(ds[ds.length - 1])}`)
+    : new Date((period === "month" ? today().slice(0, 7) : last) + "-15T12:00:00").toLocaleDateString(tr("fr-FR", "en-GB"), {month: "long", year: "numeric"});
+  const html = `<div class="p-proof">
+    <h1>${tr("Mes démarches de recherche d'emploi", "My job search activity")}</h1>
+    <p><b>${esc(me.name || personName() || tr("[ton nom]", "[your name]"))}</b>${me.contact ? " · " + esc(me.contact) : ""}</p>
+    <p>${tr("Période : ", "Period: ")}${esc(when)} · ${plural(list.length, tr("candidature", "application"))}</p>
+    <table><thead><tr><th>${tr("Date", "Date")}</th><th>${tr("Entreprise", "Company")}</th><th>${tr("Poste", "Job")}</th><th>${tr("État", "Status")}</th><th>${tr("Contact ou lien", "Contact or link")}</th></tr></thead>
+    <tbody>${list.map(o => `<tr><td>${fmtDate(sentDate(o))}</td><td>${esc(o.app.company || "–")}</td><td>${esc(appTitle(o))}</td><td>${esc(stLabel(o.app.status))}</td><td>${esc(o.app.contact || o.app.link || "–")}</td></tr>`).join("")}</tbody></table>
+    <p class="p-foot">${tr(`Liste établie le ${fmtDate(today())} à partir du suivi tenu par la personne avec Ça colle ? (ca-colle.pissits.com).`, `List made on ${fmtDate(today())} from the person's own tracker in Ça colle? (ca-colle.pissits.com).`)}</p></div>`;
+  stat("justificatif", {period});
+  toast(tr("Choisis « Enregistrer en PDF »", "Choose \"Save as PDF\""));
+  setTimeout(() => Export.printHTML(html), 300);
+}
+
+/* ---------- Mon tableau de bord : rythme, réponses, objectif de la semaine ---------- */
+const REPLY = ["call", "interview", "met", "test", "offer", "accepted", "refused"];
+const monday = d => { const x = new Date(d + "T12:00:00"), k = (x.getDay() + 6) % 7; x.setDate(x.getDate() - k); return x.toISOString().slice(0, 10); };
+function statsHTML(){
+  const all = apps(), sent = all.filter(o => o.app.status !== "todo" && sentDate(o));
+  if (!sent.length) return `<p class="notice">${tr("Ton tableau de bord se remplira quand tu auras noté des candidatures envoyées.", "Your dashboard fills up once you have noted applications as sent.")}</p>`;
+  const replied = sent.filter(o => o.app.history.some(h => REPLY.includes(h.s))), talks = sent.filter(o => o.app.history.some(h => h.s === "interview" || h.s === "met"));
+  const delays = replied.map(o => daysFrom(sentDate(o)) - daysFrom(o.app.history.find(h => REPLY.includes(h.s)).d)).filter(n => n >= 0);
+  const avg = delays.length ? Math.round(delays.reduce((a, b) => a + b, 0) / delays.length) : null;
+  const goal = +me.goal || 5, wk = monday(today()), weeks = [...Array(8)].map((_, i) => addDays(wk, -7 * (7 - i)));
+  const per = weeks.map(w => sent.filter(o => monday(sentDate(o)) === w).length), max = Math.max(goal, ...per), now = per[per.length - 1];
+  const rate = Math.round(replied.length / sent.length * 100);
+  const byStatus = STATUSES.map(s => ({s, n: all.filter(o => o.app.status === s.id).length})).filter(x => x.n);
+  return `<div class="stats">
+    <div class="kpis">
+      <div><b>${sent.length}</b><span>${tr("candidatures envoyées", "applications sent")}</span></div>
+      <div><b>${rate}${tr(" %", "%")}</b><span>${tr(`de réponses (${replied.length})`, `got a reply (${replied.length})`)}</span></div>
+      <div><b>${talks.length}</b><span>${tr("entretiens obtenus", "interviews")}</span></div>
+      <div><b>${avg == null ? "–" : plural(avg, tr("jour", "day"))}</b><span>${tr("avant une réponse, en moyenne", "on average before a reply")}</span></div>
+    </div>
+    <section class="group"><h2 class="section-title" style="--k: var(--yellow)">${tr("Cette semaine : ", "This week: ")}${now} / ${goal}</h2>
+      <div class="goalbar" role="img" aria-label="${tr(`${now} candidatures sur un objectif de ${goal}`, `${now} applications out of a goal of ${goal}`)}"><i style="width: ${Math.min(100, Math.round(now / goal * 100))}%"></i></div>
+      <label class="goal-in">${tr("Mon objectif par semaine", "My weekly goal")} <input type="number" id="goal" min="1" max="50" value="${goal}"></label>
+      <p class="hint">${now >= goal ? tr("Objectif atteint, bravo. Pense aussi à te reposer.", "Goal reached, well done. Remember to rest too.") : tr(`Encore ${goal - now} pour atteindre ton objectif. La qualité compte plus que le nombre : une lettre adaptée vaut mieux que trois envois rapides.`, `${goal - now} more to reach your goal. Quality matters more than numbers: one tailored letter beats three quick ones.`)}</p>
+    </section>
+    <section class="group"><h2 class="section-title" style="--k: var(--blue)">${tr("Candidatures par semaine", "Applications per week")}</h2>
+      <div class="weeks">${weeks.map((w, i) => `<div class="wk"><i style="height: ${Math.round(per[i] / max * 100)}%" title="${per[i]}"></i><b>${per[i]}</b><small>${new Date(w + "T12:00:00").toLocaleDateString(tr("fr-FR", "en-GB"), {day: "numeric", month: "short"})}</small></div>`).join("")}</div>
+    </section>
+    <section class="group"><h2 class="section-title" style="--k: var(--violet)">${tr("Où en sont tes candidatures", "Where your applications stand")}</h2>
+      <ul class="stbars">${byStatus.map(x => `<li><span>${esc(x.s[LANG])}</span><i style="--w: ${Math.round(x.n / all.length * 100)}%; --k: ${x.s.c}"></i><b>${x.n}</b></li>`).join("")}</ul>
+    </section>
+  </div>`;
+}
+document.addEventListener("click", e => {
+  const t = e.target.closest("button"); if (!t) return;
+  if (t.dataset.proof) { t.closest("details")?.removeAttribute("open"); return proofDoc(t.dataset.proof); }
+});
+document.addEventListener("input", e => { if (e.target.id === "goal") { me.goal = Math.max(1, Math.min(50, +e.target.value || 5)); save(); clearTimeout(statsHTML.t); statsHTML.t = setTimeout(() => { const v = document.activeElement === e.target; renderTrack(); if (v) $("#goal")?.focus(); }, 500); } });
+
+/* ---------- Pitch d'une minute (« Présentez-vous ») : construit avec ce qui est écrit dans le CV ---------- */
+function pitchText(o){
+  const exp = CV.find(l => l.exp), title = exp ? exp.t.split(/\s*[,(:]\s*|\s+[–-]\s+/)[0].trim() : "", yrs = cvYears($("#cvraw").value);
+  const rs = resultsFor(o).filter(r => r.st === "ok" && !["y", "h", "l", "d", "x"].includes(r.type)).sort((a, b) => (a.prio === "must" ? 0 : 1) - (b.prio === "must" ? 0 : 1));
+  const low = k => EN ? k : k.charAt(0).toLowerCase() + k.slice(1), top = rs.slice(0, 2).map(r => r.k), P = rs.find(r => r.proof && r.proof.exp)?.proof;
+  // l'exemple : la description du poste qui prouve le premier point fort, coupée proprement
+  let proof = P ? (P.t.includes(":") ? P.t.slice(P.t.indexOf(":") + 1) : P.t).trim().replace(/[.;]+$/, "") : "";
+  if (proof.length > 140) proof = proof.slice(0, 140).replace(/[,;\s]+\S*$/, "");
+  const name = me.name || personName() || tr("[ton prénom]", "[your name]"), job = appTitle(o), co = o.app.company;
+  return EN ? [
+    `My name is ${name}.`,
+    title ? `My current role: ${title}${yrs ? `, with about ${Y(yrs)} of experience` : ""}.` : "[What you do today, in one sentence.]",
+    top.length ? `My strengths: ${top.join(" and ")}.` : "[What you do best.]",
+    proof ? `For example: ${proof}.` : "[One example with a number.]",
+    `Today I would like to join ${co || "your company"} as ${job} because [your reason].`
+  ].join(" ") : [
+    `Je m'appelle ${name}.`,
+    title ? `Je suis ${low(title)}${yrs ? `, avec environ ${Y(yrs)} d'expérience` : ""}.` : "[Ce que tu fais aujourd'hui, en une phrase.]",
+    top.length ? `Mes points forts : ${top.join(" et ")}.` : "[Ce que tu fais le mieux.]",
+    proof ? `Par exemple : ${proof.charAt(0).toLowerCase() + proof.slice(1)}.` : "[Un exemple avec un chiffre.]",
+    `Aujourd'hui, je souhaite rejoindre ${co || "votre entreprise"} comme ${job} parce que [ta raison].`
+  ].join(" ");
+}
+document.addEventListener("click", e => {
+  const t = e.target.closest("button[data-pitch]"); if (!t) return;
+  const o = offers.find(x => x.id === t.dataset.pitch); o.prep = o.prep || {};
+  const cur0 = (o.prep.g1 || {}).t;
+  if (cur0 && !confirm(tr("Remplacer ta réponse actuelle par le pitch ?", "Replace your current answer with the pitch?"))) return;
+  o.prep.g1 = {t: pitchText(o)}; save(); stat("pitch"); renderTrack();
+  toast(tr("Pitch prêt : complète ce qui est entre crochets", "Pitch ready: fill in what is in brackets"));
+});
