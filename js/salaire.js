@@ -17,6 +17,19 @@ function parseSalary(t){
 }
 
 let edit = "a";
+// Onglets des étapes : même état que dans l'app (hachurés tant que l'offre et le CV ne sont pas remplis), lu dans la session gardée
+(() => {
+  let d = null; try { d = JSON.parse(localStorage.getItem(EN ? "cacolle-en-v1" : "cacolle-v1")); } catch {}
+  const o = d && (d.offers || []).find(x => x.id === d.cur) || d?.offers?.at(-1), txt = o?.text || "";
+  const ok1 = txt.trim().split(/\s+/).filter(Boolean).length >= 25 && !/^\s*https?:\/\/\S+\s*$/.test(txt), ok2 = !!d?.cv?.text?.trim();
+  $$('a.tab[href*="#etape-"]').forEach(a => {
+    const n = +a.href.slice(-1), can = n === 1 || (n === 2 && ok1) || (n >= 3 && ok1 && ok2);
+    a.classList.toggle("done", (n === 1 && ok1) || (n === 2 && ok2));
+    if (can) return;
+    a.setAttribute("aria-disabled", "true"); a.removeAttribute("href");
+    a.title = n === 2 ? tr("Colle d'abord l'offre", "Paste the offer first") : tr("Ajoute d'abord l'offre et ton CV", "Add the offer and your CV first");
+  });
+})();
 // Position du curseur pour la partie remplie de la barre (0 = tout à gauche, max = tout à droite)
 const fill = () => $$('input[type="range"]').forEach(r => r.style.setProperty("--r", (r.value - r.min) / (r.max - r.min)));
 document.addEventListener("input", e => { if (e.target.type === "range") fill(); });

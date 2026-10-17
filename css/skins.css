@@ -85,8 +85,8 @@ html[data-skin="fiche"] .tab small { color: var(--ink-soft); font-weight: 600; }
 html[data-skin="fiche"] .tab b { font-weight: 700; font-size: 15px; }
 html[data-skin="fiche"] .tab[aria-selected="true"], html[data-skin="fiche"] .tab[aria-current="page"] { background: var(--accent); color: #fff; padding: 9px 14px; }
 html[data-skin="fiche"] .tab[aria-selected="true"] small, html[data-skin="fiche"] .tab[aria-current="page"] small { color: rgba(255, 255, 255, .8); }
-html[data-skin="fiche"] .tab:disabled { background: transparent; opacity: .45; }
-html[data-skin="fiche"] .tab:hover:not(:disabled):not([aria-selected="true"]) { background: var(--paper); }
+html[data-skin="fiche"] .tab:disabled, html[data-skin="fiche"] .tab[aria-disabled="true"] { background: transparent; opacity: .45; }
+html[data-skin="fiche"] .tab:hover:not(:disabled):not([aria-disabled="true"]):not([aria-selected="true"]) { background: var(--paper); }
 
 /* Panneaux et zones */
 html[data-skin="fiche"] .panel { background: transparent; border: 0; }
