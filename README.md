@@ -16,10 +16,12 @@ Tout se passe dans le navigateur : le CV ne quitte jamais l'appareil de la perso
 
 ## État actuel
 
-- `index.html` : les 4 étapes. L'offre et le CV de départ sont des exemples fictifs.
+- `index.html` + `css/app.css` : les 4 étapes, au style de l'accueil du portfolio (classeur coloré, une couleur par étape). On n'avance que quand l'étape d'avant est remplie ; un bouton « Essayer avec un exemple » remplit tout avec des données fictives.
 - `js/lecteur.js` : lecture du vrai CV dans le navigateur. PDF (pdf.js), Word `.docx` et `.odt` (petit lecteur ZIP intégré), texte, photo ou PDF scanné (OCR Tesseract, français et anglais). Les bibliothèques ne se chargent qu'au premier fichier déposé.
-- `js/app.js` : découpage du CV en rubriques (Expériences, Compétences, Formation, Divers), comparaison avec l'offre, réécriture à trous.
-- `vendor/` : pdf.js 6.4.299 et tesseract.js 5.1.1 avec leurs licences (voir `vendor/README.txt`). Aucune requête vers un autre site, à part les polices pour l'instant.
+- `js/moteur.js` : découpage du CV en rubriques (Expériences, Compétences, Formation, Divers), comparaison avec l'offre, réécriture à trous.
+- `js/app.js` : l'interface.
+- `fonts/` : Archivo et Figtree (licence OFL), hébergées avec l'app.
+- `vendor/` : pdf.js 6.4.299 et tesseract.js 5.1.1 avec leurs licences (voir `vendor/README.txt`). Aucune requête vers un autre site.
 
 ## Lancer en local
 
@@ -35,7 +37,7 @@ puis ouvrir http://localhost:8000.
 
 - [x] Lecture réelle du CV : PDF, Word, photo, le tout en local
 - [ ] Repérage des points de l'annonce sans liste figée (dictionnaire de métiers, synonymes)
-- [ ] Polices auto-hébergées (pas de requête externe, RGPD)
+- [x] Polices auto-hébergées (pas de requête externe, RGPD)
 - [ ] Export du CV réécrit (texte, puis PDF)
 - [ ] Hébergement dans son propre LXC (Caddy, site statique)
 

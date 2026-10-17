@@ -1,114 +1,182 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Ça colle ?</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&display=swap">
+<title>Ça colle ? · ton CV face à une offre d'emploi</title>
+<meta name="description" content="Colle une offre d'emploi, ajoute ton CV et vois ce qui correspond. Gratuit, et ton CV ne quitte jamais ton appareil.">
+<meta name="theme-color" content="#fdf3e3">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/archivo-latin-900-italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts/fonts.css">
 <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
+<a class="skip-link" href="#contenu">Aller au contenu</a>
 
-<div class="wrap">
-  <header>
-    <div class="logo">
-      <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><rect x="3" y="3" width="38" height="38" rx="8" fill="var(--sheet)" stroke="var(--ink)" stroke-width="2.5" transform="rotate(-6 22 22)"/><path d="M13 23l6 6 12-14" fill="none" stroke="var(--green)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <div><h1>Ça colle ?</h1><div class="mock">Version de test</div></div>
-    </div>
-    <div class="local"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Ton CV ne quitte jamais ton appareil</div>
-  </header>
+<header class="top">
+  <a class="logo" href="./"><span>Ça colle ?</span></a>
+  <div class="top-actions">
+    <span class="pill pill-safe"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Rien n'est envoyé</span>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="Étapes">
+    <button class="tab" role="tab" data-step="1" style="--c: var(--blue)"><small>Étape 1</small><b>L'offre</b></button>
+    <button class="tab" role="tab" data-step="2" style="--c: var(--yellow)"><small>Étape 2</small><b>Ton CV</b></button>
+    <button class="tab" role="tab" data-step="3" style="--c: var(--green)"><small>Étape 3</small><b>Le résultat</b></button>
+    <button class="tab" role="tab" data-step="4" style="--c: var(--pink)"><small>Étape 4</small><b>Améliorer mon CV</b></button>
+  </nav>
+</header>
+<span id="contenu" tabindex="-1"></span>
 
-  <section>
-    <div class="steps" role="tablist" aria-label="Étapes">
-      <button class="step s1 done" role="tab" data-to="1" aria-selected="false"><span class="n"><span>1</span></span>L'offre</button>
-      <button class="step s2 done" role="tab" data-to="2" aria-selected="false"><span class="n"><span>2</span></span>Ton CV</button>
-      <button class="step s3" role="tab" data-to="3" aria-selected="true"><span class="n"><span>3</span></span>Le résultat</button>
-      <button class="step s4" role="tab" data-to="4" aria-selected="false"><span class="n"><span>4</span></span>Réécrire mon CV</button>
-    </div>
-
-    <div class="sheet">
-      <!-- 1 -->
-      <div class="panel" data-p="1">
-        <div><h2>Colle l'annonce qui t'intéresse</h2><p class="lead">Copie tout le texte de l'offre, depuis le site d'emploi ou le mail. Pas besoin de la mettre en forme.</p></div>
-        <label for="offer" class="mock">Texte de l'annonce</label>
-        <textarea id="offer" spellcheck="false"></textarea>
-        <div class="bar"><span class="meta" id="offer-meta"></span><button class="btn main" data-to="2">Continuer avec mon CV →</button></div>
-      </div>
-      <!-- 2 -->
-      <div class="panel" data-p="2">
-        <div><h2>Ajoute ton CV</h2><p class="lead">On lit le texte de ton CV directement dans ton navigateur. Rien n'est envoyé ni gardé.</p></div>
-        <div class="two">
-          <label class="drop" id="drop" for="file">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>
-            <b>Glisse ton CV ici</b><span class="meta">ou</span>
-            <span class="btn small">Choisir un fichier</span>
-            <div class="formats"><span>PDF</span><span>WORD</span><span>PHOTO</span><span>TXT</span></div>
-            <input type="file" id="file" accept=".pdf,.docx,.odt,.txt,.md,image/*" hidden>
-          </label>
-          <div style="display:grid;gap:10px;align-content:start;min-width:0">
-            <div class="file" id="filecard">
-              <svg width="30" height="36" viewBox="0 0 34 40" aria-hidden="true"><path d="M3 2h19l9 9v27H3z" fill="var(--sheet)" stroke="currentColor" stroke-width="2"/><path d="M22 2v9h9" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-              <div style="min-width:0"><b id="fname">Exemple : CV de Camille Martin</b><small id="finfo">CV fictif pour essayer</small></div>
-            </div>
-            <div class="job" id="job" hidden><p id="jobtxt"></p><div class="jbar"><i id="jbar"></i></div></div>
-            <p class="err" id="ferr" role="alert" hidden></p>
-            <button class="btn small ghost" id="sample" type="button" hidden>Revenir à l'exemple</button>
-          </div>
-        </div>
-        <div style="display:grid;gap:8px">
-          <label for="cvraw" class="mock">Texte lu dans ton CV · tu peux corriger ici</label>
-          <textarea id="cvraw" spellcheck="false" style="min-height:220px"></textarea>
-          <p class="tip" id="cvsum"></p>
-        </div>
-        <div class="bar"><button class="btn ghost" data-to="1">← L'offre</button><button class="btn main" data-to="3">Voir si ça colle →</button></div>
-      </div>
-      <!-- 3 -->
-      <div class="panel" data-p="3">
-        <div class="layout">
-          <div style="display:grid;gap:20px;min-width:0">
-            <div class="verdict">
-              <div class="bigstamp" id="stamp"><b id="pct">0%</b><small id="stamp-txt">Ça colle presque</small></div>
-              <p id="sum"></p>
-            </div>
-            <div><div class="meter" aria-hidden="true"><i class="m-ok" id="m-ok"></i><i class="m-mid" id="m-mid"></i><i class="m-no" id="m-no"></i></div></div>
-            <div class="prio" id="prio"></div>
-            <div class="filters" role="group" aria-label="Filtrer les points">
-              <button class="chip" data-f="all" aria-pressed="true">Tout</button>
-              <button class="chip no" data-f="no" aria-pressed="false">✕ Pas dans ton CV <span id="n-no"></span></button>
-              <button class="chip mid" data-f="mid" aria-pressed="false">? À préciser <span id="n-mid"></span></button>
-              <button class="chip ok" data-f="ok" aria-pressed="false">✓ Ça colle <span id="n-ok"></span></button>
-            </div>
-            <div id="groups" style="display:grid;gap:18px"></div>
-          </div>
-          <aside class="preview" aria-label="Ton CV">
-            <header>Ton CV <span class="meta">· clique un point pour le retrouver</span></header>
-            <div class="cvdoc" id="cv3"></div>
-          </aside>
-        </div>
-      </div>
-      <!-- 4 -->
-      <div class="panel" data-p="4">
-        <div class="layout">
-          <div style="display:grid;gap:16px;min-width:0">
-            <div><h2>Réécrire mon CV pour cette offre</h2><p class="lead">On te propose des phrases avec les mots de l'annonce. Tu complètes les trous avec tes vrais chiffres, puis tu ajoutes.</p></div>
-            <div class="promise"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
-              <span>On n'invente rien à ta place. Une ligne n'entre dans ton CV que si tu la remplis et que tu cliques sur <b>Ajouter</b>.</span></div>
-            <div class="sugs" id="sugs"></div>
-          </div>
-          <aside class="preview" aria-label="Ton nouveau CV">
-            <header>Ton nouveau CV <span class="meta" id="score4"></span></header>
-            <div class="cvdoc" id="cv4"></div>
-            <footer><span><ins>en vert</ins> = tes ajouts</span><button class="btn small" id="copy">Copier le texte</button></footer>
-          </aside>
-        </div>
+<main>
+<!-- ============ 1. L'OFFRE ============ -->
+<section class="panel" data-p="1" style="--c: var(--blue); --shadow: var(--orange)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <span class="label">Étape 1 sur 4</span>
+      <h1 class="big">Colle l'offre</h1>
+      <p class="lede">Copie tout le texte de l'annonce qui t'intéresse, depuis le site d'emploi ou le mail, et colle-le ici.</p>
+      <label class="sr-only" for="offer">Texte de l'annonce</label>
+      <textarea id="offer" class="sheet-input" spellcheck="false" placeholder="Exemple : « Nous recherchons un(e) employé(e) logistique… Missions : préparation de commandes… Profil : permis B… »"></textarea>
+      <div class="next-row">
+        <button class="btn" id="next1" data-go="2" disabled>Étape suivante : ton CV →</button>
+        <span class="hint" id="hint1">Colle au moins quelques lignes de l'annonce.</span>
       </div>
     </div>
-  </section>
+    <aside class="box">
+      <div class="box-head">Comment ça marche</div>
+      <div class="box-body">
+        <ol class="how">
+          <li><b>Tu colles l'offre</b> d'emploi.</li>
+          <li><b>Tu ajoutes ton CV</b> : PDF, Word ou photo.</li>
+          <li><b>Tu vois ce qui colle</b>, ce qui manque et ce qu'il faut prouver.</li>
+          <li><b>Tu améliores ton CV</b> avec des phrases à compléter.</li>
+        </ol>
+        <p class="safe">Ton CV ne quitte jamais ton appareil : tout est lu dans ton navigateur.</p>
+        <button class="btn light wide" id="demo" type="button">Essayer avec un exemple</button>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ============ 2. TON CV ============ -->
+<section class="panel" data-p="2" hidden style="--c: var(--yellow); --shadow: var(--blue)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <span class="label">Étape 2 sur 4</span>
+      <h1 class="big">Ajoute ton CV</h1>
+      <p class="lede">Glisse ton fichier ou choisis-le. On en lit le texte ici même, rien n'est envoyé ni gardé.</p>
+      <label class="drop" id="drop" for="file">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>
+        <b>Glisse ton CV ici</b>
+        <span class="btn light small">Choisir un fichier</span>
+        <input type="file" id="file" accept=".pdf,.docx,.odt,.txt,.md,image/*" class="sr-only">
+      </label>
+      <div class="job" id="job" hidden><p id="jobtxt">Lecture…</p><div class="jbar"><i id="jbar"></i></div></div>
+      <p class="err" id="ferr" role="alert" hidden></p>
+      <div class="filecard" id="filecard" hidden>
+        <span class="ok-dot" aria-hidden="true">✓</span>
+        <div><b id="fname"></b><small id="finfo"></small></div>
+        <label class="btn light small" for="file">Changer</label>
+      </div>
+      <div class="next-row">
+        <button class="btn ghost" data-go="1">← L'offre</button>
+        <button class="btn" id="next2" data-go="3" disabled>Voir si ça colle →</button>
+      </div>
+    </div>
+    <aside class="box">
+      <div class="box-head">Ce qu'on sait lire</div>
+      <div class="box-body">
+        <ul class="formats">
+          <li><b>PDF</b> le plus fiable</li>
+          <li><b>Word</b> .docx ou .odt</li>
+          <li><b>Photo</b> bien droite et nette</li>
+          <li><b>Texte</b> .txt</li>
+        </ul>
+        <p>Pour un bon résultat, garde des titres de rubrique dans ton CV : <b>Expériences</b>, <b>Compétences</b>, <b>Formation</b>.</p>
+      </div>
+    </aside>
+  </div>
+</section>
+<div class="below" data-for="2" hidden style="--c: var(--yellow)">
+  <details class="check" id="check">
+    <summary><span class="section-title" style="--k: var(--yellow)">Vérifier le texte lu</span> <span class="hint" id="cvsum"></span></summary>
+    <p class="hint">Si la lecture s'est trompée (surtout sur une photo), corrige directement ici.</p>
+    <label class="sr-only" for="cvraw">Texte lu dans ton CV</label>
+    <textarea id="cvraw" class="sheet-input" spellcheck="false"></textarea>
+  </details>
 </div>
-<div class="toast" id="toast" hidden></div>
+
+<!-- ============ 3. LE RÉSULTAT ============ -->
+<section class="panel" data-p="3" hidden style="--c: var(--green); --shadow: var(--yellow)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <span class="label">Étape 3 sur 4 · le résultat</span>
+      <h1 class="big"><span id="pct">0</span> % <small id="verdict">ça colle</small></h1>
+      <p class="lede" id="sum"></p>
+      <div class="filters" role="group" aria-label="Afficher">
+        <button class="chip" data-f="all" aria-pressed="true">Tout <span id="n-all"></span></button>
+        <button class="chip" data-f="no" aria-pressed="false" style="--k: var(--pink)">✕ Pas dans ton CV <span id="n-no"></span></button>
+        <button class="chip" data-f="mid" aria-pressed="false" style="--k: var(--yellow)">? À préciser <span id="n-mid"></span></button>
+        <button class="chip" data-f="ok" aria-pressed="false" style="--k: #fff">✓ Ça colle <span id="n-ok"></span></button>
+      </div>
+    </div>
+    <aside class="box">
+      <div class="box-head">À faire en premier</div>
+      <div class="box-body" id="prio"></div>
+    </aside>
+  </div>
+</section>
+<div class="below" data-for="3" hidden style="--c: var(--green)">
+  <div class="legend">
+    <span><i class="stamp ok">Ça colle</i> c'est dans ton CV, avec un exemple concret</span>
+    <span><i class="stamp mid">À préciser</i> c'est cité, mais rien ne le prouve</span>
+    <span><i class="stamp no">Pas dans ton CV</i> l'offre le demande, ton CV n'en parle pas</span>
+  </div>
+  <div id="groups"></div>
+</div>
+
+<!-- ============ 4. AMÉLIORER ============ -->
+<section class="panel" data-p="4" hidden style="--c: var(--pink); --shadow: var(--violet)">
+  <div class="panel-inner">
+    <div class="main-col">
+      <span class="label">Étape 4 sur 4</span>
+      <h1 class="big">Améliore ton CV</h1>
+      <p class="lede">Pour chaque point, complète la phrase avec tes vrais chiffres, puis clique sur « Ajouter ».</p>
+      <p class="promise"><b>On n'invente rien à ta place.</b> Une ligne n'entre dans ton CV que si tu la complètes toi-même.</p>
+    </div>
+    <aside class="box">
+      <div class="box-head">Ton score</div>
+      <div class="box-body score-box">
+        <b id="score4">0 %</b>
+        <span id="score4txt"></span>
+        <div class="meter" aria-hidden="true"><i id="meter4"></i></div>
+      </div>
+    </aside>
+  </div>
+</section>
+<div class="below" data-for="4" hidden style="--c: var(--pink)">
+  <div class="rewrite">
+    <div class="sugs" id="sugs"></div>
+    <aside class="box preview">
+      <div class="box-head">Ton nouveau CV <button type="button" id="copy">Copier le texte</button></div>
+      <div class="box-body cvdoc" id="cv4"></div>
+      <p class="preview-foot"><ins>Surligné</ins> = tes ajouts. Recopie-les dans ton fichier Word ou PDF.</p>
+    </aside>
+  </div>
+</div>
+</main>
+
+<footer class="foot">
+  <div class="foot-inner">
+    <h2>Rien n'est envoyé.</h2>
+    <p>Ton CV et l'offre restent dans ton navigateur. Aucun compte, aucune donnée gardée.<br><small>Une app de <a href="https://portfolio.pissits.com/">Simon Victor</a>.</small></p>
+  </div>
+</footer>
+<div class="toast" id="toast" role="status" hidden></div>
 
 <script src="js/lecteur.js"></script>
+<script src="js/moteur.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
