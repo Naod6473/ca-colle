@@ -13,10 +13,10 @@ function initComfort(){
   const pressed = () => menu.querySelectorAll("[data-comfort]").forEach(b => b.setAttribute("aria-pressed", b.dataset.comfort === "dark" ? isDark() : !!comfort[b.dataset.comfort]));
   pressed();
   darkMQ.addEventListener?.("change", () => { if (comfort.dark === undefined) { applyComfort(); pressed(); } });
-  const skinBtns = () => menu.querySelectorAll("[data-skin]").forEach(b => b.setAttribute("aria-pressed", b.dataset.skin === (comfort.skin || "tampon")));
+  const skinBtns = () => menu.querySelectorAll("button[data-skin]").forEach(b => b.setAttribute("aria-pressed", b.dataset.skin === (comfort.skin || "tampon")));
   skinBtns();
   menu.addEventListener("click", e => {
-    const s = e.target.closest("[data-skin]");
+    const s = e.target.closest("button[data-skin]");
     if (s) { comfort.skin = s.dataset.skin; applyComfort(); skinBtns(); stat("skin", {s: s.dataset.skin}); try { localStorage.setItem(COMFORT_KEY, JSON.stringify(comfort)); } catch {} return; }
     const b = e.target.closest("[data-comfort]"); if (!b) return;
     const k = b.dataset.comfort; comfort[k] = k === "dark" ? !isDark() : !comfort[k];
