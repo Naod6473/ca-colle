@@ -71,7 +71,14 @@ function showTrack(focusId){
 }
 function hideTrack(){ $("#track").hidden = true; $("#trackbelow").hidden = true; $("#trackbtn").setAttribute("aria-selected", "false"); }
 // Lien direct vers le suivi (onglet « Mes candidatures » des pages outils)
-if (location.hash === "#suivi") setTimeout(() => { showTrack(); history.replaceState(null, "", location.pathname + location.search); }, 0);
+// et vers une étape (onglets des pages outils) : on va à l'étape demandée, ou à la dernière qu'on peut atteindre
+{
+  const h = location.hash, n = +(h.match(/^#etape-([1-5])$/) || [])[1];
+  if (h === "#suivi" || n) setTimeout(() => {
+    if (n) { for (let k = n; k >= 1; k--) if (canReach(k)) { go(k); break; } } else showTrack();
+    history.replaceState(null, "", location.pathname + location.search);
+  }, 0);
+}
 function renderBadge(){
   const n = apps().reduce((s, o) => s + todosOf(o).filter(t => t.urgent).length, 0);
   $("#trackn").hidden = !n; $("#trackn").textContent = n;
