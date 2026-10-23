@@ -79,7 +79,8 @@ Your profile: 4 years of Java development, Git, English.`,
   ],
   prep: {g1: "IT engineer for 10 years: support, then systems administration, then 120 servers and 800 users at Example Industries. I am now looking for a hybrid role with more cloud.", g2: "Your move to the cloud and the size of the platform."},
   star: {s: "A storage failure stopped backups for 300 users.", a: "I moved the backups to Veeam on a new NAS over a weekend and tested restores.", r: "No data lost, backups 40% faster."},
-  fill: ["operating procedures for the support team at Example Industries, 40 guides in 2024"]
+  fill: ["operating procedures for the support team at Example Industries, 40 guides in 2024"],
+  contacts: [{name: "Claire Exemple", company: "Example Cloud Ltd", where: "Careers fair, Caen", phone: "", email: "c.exemple@example.com", next: 5, note: "Hiring a cloud administrator in the spring. Send her my CV in March."}, {name: "Paul Martin", company: "Example Industries Ltd", where: "Former colleague", phone: "07700 900456", email: "", next: null, note: "Happy to recommend me."}]
 } : {
   file: "CV_Maurice_MARCEL.pdf (démo)", info: "Profil fictif pour les tests",
   cv: `MAURICE MARCEL · Ingénieur en informatique · 32 ans
@@ -156,7 +157,8 @@ Votre profil : 4 ans de développement Java, Git, anglais.`,
   ],
   prep: {g1: "Ingénieur informatique depuis 10 ans : support, puis administration systèmes, puis 120 serveurs et 800 utilisateurs chez Exemple Industrie. Je cherche maintenant un poste hybride avec plus de cloud.", g2: "Votre passage au cloud et la taille de la plateforme."},
   star: {s: "Une panne du stockage bloquait les sauvegardes de 300 utilisateurs.", a: "J'ai migré les sauvegardes sur Veeam avec un nouveau NAS en un week-end et testé les restaurations.", r: "Aucune donnée perdue, sauvegardes 40 % plus rapides."},
-  fill: ["procédures d'exploitation pour l'équipe support chez Exemple Industrie, 40 fiches en 2024"]
+  fill: ["procédures d'exploitation pour l'équipe support chez Exemple Industrie, 40 fiches en 2024"],
+  contacts: [{name: "Claire Exemple", company: "Exemple Cloud", where: "Salon de l'emploi de Caen", phone: "", email: "c.exemple@exemple.fr", next: 5, note: "Recrute un administrateur cloud au printemps. Lui envoyer mon CV en mars."}, {name: "Paul Martin", company: "Exemple Industrie", where: "Ancien collègue", phone: "06 00 00 00 00", email: "", next: null, note: "D'accord pour me recommander."}]
 });
 const link = (t, i) => `https://exemple.fr/offres/${fold(titleOf(t)).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40)}-${1000 + i}`;
 const day = n => n == null ? "" : addDays(today(), n);
@@ -171,6 +173,8 @@ function populate(){
   cvFile = {name: D.file, info: D.info, conf: 0}; me = {...D.me};
   setCV(D.cv); showFile(cvFile.name, cvFile.info);
   D.offers.forEach((d, i) => { newOffer(d.text); cur.title = titleOf(d.text); cur.score = scoreOf(analyse(d.text)); fillApp(cur, d.app, i); });
+  // Carnet de contacts : personnes fictives, date de rappel comptée depuis aujourd'hui
+  contacts = (D.contacts || []).map((c, i) => ({id: newId() + i, name: c.name, company: c.company, where: c.where, phone: c.phone || "", email: c.email || "", next: day(c.next), note: c.note || ""}));
   D.manual.forEach((m, i) => { const o = {id: newId(), text: "", fixes: {}, over: {}, letter: {}}; offers.push(o); fillApp(o, m, 10 + i); });
   // Offre principale : la première, avec une lettre, un ajout au CV et une préparation d'entretien
   cur = offers[0]; fixes = cur.fixes; over = cur.over; $("#offer").value = cur.text;

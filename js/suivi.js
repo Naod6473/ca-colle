@@ -26,6 +26,7 @@ const fmtDate = d => d ? new Date(d + "T12:00:00").toLocaleDateString(tr("fr-FR"
 // Session relue avant ce fichier (js/app.js) : un état inconnu redevient « À postuler », l'historique reste lisible
 offers.forEach(o => { const a = o.app; if (!a) return; if (!ST[a.status]) a.status = "todo"; a.history = a.history.filter(h => ST[h.s]); if (!a.history.length) a.history = [{d: a.appliedDate || today(), s: a.status}]; });
 let trackView = "table", trackFilter = "all", trackSort = {k: "appliedDate", dir: -1}, openApp = null, prepFor = null;
+let practFor = null; // entraînement à l'entretien (js/entrainement.js)
 
 const apps = () => offers.filter(o => o.app);
 function ensureApp(o, status){
@@ -67,7 +68,7 @@ function showTrack(focusId){
   $$("[data-p]").forEach(p => p.hidden = true); $$("[data-for]").forEach(p => p.hidden = true);
   $$(".tab").forEach(t => t.removeAttribute("aria-current"));
   $("#track").hidden = false; $("#trackbelow").hidden = false; $("#trackbtn").setAttribute("aria-current", "page");
-  prepFor = null; mailFor = null;
+  prepFor = null; mailFor = null; practFor = null;
   if (focusId) { openApp = focusId; trackView = "cards"; trackFilter = "all"; }
   renderTrack();
   if (focusId) setTimeout(() => document.getElementById("app-" + focusId)?.scrollIntoView({block: "start", behavior: "smooth"}), 60);
@@ -103,7 +104,10 @@ function renderTrack(){
     ? `<ul class="todo">${todos.slice(0, 6).map(t => `<li class="${t.urgent ? "urgent" : ""}"><span><button type="button" class="linkbtn" data-openapp="${esc(t.o.id)}">${esc(appTitle(t.o))}</button>${t.o.app.company ? ` · ${esc(t.o.app.company)}` : ""}</span><small>${esc(t.t)}</small></li>`).join("")}</ul>`
     : `<p>${all.length ? tr("Rien d'urgent. Pense à noter chaque réponse.", "Nothing urgent. Remember to note every reply.") : tr("Aucune candidature pour l'instant. Ajoute-en une, ou clique sur « Suivre cette candidature » après une analyse.", "No applications yet. Add one, or click \"Track this application\" after an analysis.")}</p>`;
   const list = all.filter(o => trackFilter === "all" || grp(o) === trackFilter);
-  $("#trackfilters").hidden = !!prepFor || !!mailFor || !all.length;
+  $("#weekgoal").innerHTML = weekGoalHTML();
+  $("#trackfilters").hidden = !!prepFor || !!mailFor || !!practFor || trackView === "contacts" || !all.length;
+  if (practFor) return renderPractice(offers.find(o => o.id === practFor));
+  if (trackView === "contacts") { $("#trackout").innerHTML = contactsHTML(); return; }
   if (prepFor) return renderPrep(offers.find(o => o.id === prepFor));
   if (mailFor) return renderMail(offers.find(o => o.id === mailFor));
   if (trackView === "compare") { $("#trackout").innerHTML = compareHTML(list); return; }
@@ -144,6 +148,7 @@ function cardHTML(o){
       ${o.text.trim() ? `<button type="button" class="btn light small" data-openoffer="${esc(o.id)}">${tr("Voir l'analyse", "See the analysis")}</button>` : ""}
       <button type="button" class="btn small" data-prep="${esc(o.id)}">${tr("Préparer l'entretien", "Prepare the interview")}</button>
       <button type="button" class="btn light small" data-sheet="${esc(o.id)}">${tr("Fiche entretien (PDF)", "Interview sheet (PDF)")}</button>
+      <button type="button" class="btn light small" data-practice="${esc(o.id)}">${tr("S'entraîner", "Practise")}</button>
       <button type="button" class="btn light small" data-mail="${esc(o.id)}">${tr("Écrire un mail", "Write an email")}</button>
       ${a.next ? `<button type="button" class="btn light small" data-ics="${esc(o.id)}">${tr("Ajouter à l'agenda", "Add to calendar")}</button>` : ""}
       ${a.link && /^https?:\/\//i.test(a.link) ? `<a class="btn light small" href="${esc(a.link)}" target="_blank" rel="noopener noreferrer">${tr("Ouvrir l'annonce", "Open the ad")}</a>` : ""}
@@ -240,12 +245,12 @@ document.addEventListener("click", e => {
     toast(t.dataset.trackthis === "sent" ? tr("Candidature notée comme envoyée", "Application marked as sent") : tr("Ajoutée à ton suivi", "Added to your applications"));
     return showTrack(cur.id);
   }
-  if (t.dataset.view) { trackView = t.dataset.view; return renderTrack(); }
+  if (t.dataset.view) { trackView = t.dataset.view; prepFor = mailFor = practFor = null; return renderTrack(); }
   if (t.dataset.tf) { trackFilter = t.dataset.tf; return renderTrack(); }
   if (t.dataset.sort) { trackSort = {k: t.dataset.sort, dir: trackSort.k === t.dataset.sort ? -trackSort.dir : 1}; return renderTrack(); }
-  if (t.dataset.openapp) { openApp = t.dataset.openapp; trackView = "cards"; trackFilter = "all"; renderTrack(); return document.getElementById("app-" + openApp)?.scrollIntoView({block: "start", behavior: "smooth"}); }
+  if (t.dataset.openapp) { openApp = t.dataset.openapp; prepFor = mailFor = practFor = null; trackView = "cards"; trackFilter = "all"; renderTrack(); return document.getElementById("app-" + openApp)?.scrollIntoView({block: "start", behavior: "smooth"}); }
   if (t.dataset.openoffer) return loadOffer(t.dataset.openoffer);
-  if (t.dataset.prep) { stat("entretien-prep"); prepFor = t.dataset.prep; mailFor = null; renderTrack(); return $("#trackbelow").scrollIntoView({behavior: "smooth"}); }
+  if (t.dataset.prep) { stat("entretien-prep"); prepFor = t.dataset.prep; mailFor = null; practFor = null; renderTrack(); return $("#trackbelow").scrollIntoView({behavior: "smooth"}); }
   if (t.id === "prepback") { prepFor = null; return renderTrack(); }
   if (t.dataset.prepdl) {
     const o = offers.find(x => x.id === t.dataset.prepo), txt = prepText(o), how = t.dataset.prepdl;

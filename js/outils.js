@@ -56,16 +56,21 @@ function renderMail(o){
 /* ---------- Rappel dans l'agenda (.ics) ---------- */
 // Les lignes d'un .ics ne doivent pas dépasser 75 caractères : on les replie avec un espace en début de ligne suivante
 const fold75 = l => l.length <= 74 ? l : l.match(/.{1,73}/gu).join("\r\n ");
-function icsFor(o){
-  const a = o.app, g = ST[a.status].g, d = a.next.replace(/-/g, ""), d2 = addDays(a.next, 1).replace(/-/g, "");
-  const what = g === "talk" ? tr("Entretien", "Interview") : (a.status === "sent" || a.status === "followup" || a.status === "silent") ? tr("Relancer", "Follow up") : tr("Candidature", "Application");
+// Un événement sur une journée, avec un rappel la veille au soir (candidatures, et contacts : js/contacts.js)
+function icsEvent({uid, date, what, summary, desc, url}){
+  const d = date.replace(/-/g, ""), d2 = addDays(date, 1).replace(/-/g, "");
   const x = s => String(s || "").replace(/\\/g, "\\\\").replace(/[,;]/g, m => "\\" + m).replace(/\r?\n/g, "\\n");
-  const desc = [a.contact && tr("Contact : ", "Contact: ") + a.contact, a.link, a.notes].filter(Boolean).join("\n");
   const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+/, "");
   return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Ca colle//FR", "CALSCALE:GREGORIAN", "BEGIN:VEVENT",
-    `UID:${o.id}-${d}@ca-colle.pissits.com`, `DTSTAMP:${stamp}`, `DTSTART;VALUE=DATE:${d}`, `DTEND;VALUE=DATE:${d2}`,
-    `SUMMARY:${x(`${what}${tr(" : ", ": ")}${appTitle(o)}${a.company ? " · " + a.company : ""}`)}`, ...(desc ? [`DESCRIPTION:${x(desc)}`] : []), ...(a.link ? [`URL:${a.link}`] : []),
+    `UID:${uid}-${d}@ca-colle.pissits.com`, `DTSTAMP:${stamp}`, `DTSTART;VALUE=DATE:${d}`, `DTEND;VALUE=DATE:${d2}`,
+    `SUMMARY:${x(summary)}`, ...(desc ? [`DESCRIPTION:${x(desc)}`] : []), ...(url ? [`URL:${url}`] : []),
     "BEGIN:VALARM", "ACTION:DISPLAY", `DESCRIPTION:${x(what)}`, "TRIGGER:-PT15H", "END:VALARM", "END:VEVENT", "END:VCALENDAR"].map(fold75).join("\r\n");
+}
+function icsFor(o){
+  const a = o.app, g = ST[a.status].g;
+  const what = g === "talk" ? tr("Entretien", "Interview") : (a.status === "sent" || a.status === "followup" || a.status === "silent") ? tr("Relancer", "Follow up") : tr("Candidature", "Application");
+  const desc = [a.contact && tr("Contact : ", "Contact: ") + a.contact, a.link, a.notes].filter(Boolean).join("\n");
+  return icsEvent({uid: o.id, date: a.next, what, summary: `${what}${tr(" : ", ": ")}${appTitle(o)}${a.company ? " · " + a.company : ""}`, desc, url: a.link});
 }
 function downloadIcs(o){
   Export.download(new Blob([icsFor(o)], {type: "text/calendar;charset=utf-8"}), fileBase(appTitle(o)) + ".ics");
@@ -146,12 +151,27 @@ function exportBackup(){
   toast(tr("Fichier enregistré : ouvre-le sur ton autre appareil", "File saved: open it on your other device"));
   stat("sauvegarde", {how: "export"});
 }
+// « Envoyer ma sauvegarde » : la feuille de partage du téléphone (mail, messagerie, fichiers…) avec le fichier.
+// Chrome sur Android ne partage pas les .json : on essaie alors le même contenu en .txt (« Ouvrir une sauvegarde » lit les deux).
+// Sans partage de fichier (la plupart des ordinateurs) : téléchargement, comme « Sauvegarde complète ».
+async function shareBackup(){
+  syncOffer();
+  const json = JSON.stringify(snapshot(true), null, 1), base = tr("ca-colle-sauvegarde-", "ca-colle-backup-") + today();
+  const file = [new File([json], base + ".json", {type: "application/json"}), new File([json], base + ".txt", {type: "text/plain"})]
+    .find(f => { try { return !!navigator.canShare?.({files: [f]}); } catch { return false; } });
+  if (!file) { stat("sauvegarde-envoi-fichier"); Export.download(new Blob([json], {type: "application/json"}), base + ".json"); return toast(tr("Fichier téléchargé : envoie-le-toi par mail, puis « Ouvrir une sauvegarde » sur ton autre appareil", "File downloaded: email it to yourself, then \"Open a backup\" on your other device"), 6000); }
+  try {
+    await navigator.share({files: [file], title: tr("Ma sauvegarde Ça colle ?", "My Good fit? backup")});
+    stat("sauvegarde-envoi");
+    toast(tr("Sur ton autre appareil, ouvre ce fichier avec « Ouvrir une sauvegarde »", "On your other device, open this file with \"Open a backup\""), 5000);
+  } catch (e) { if (e?.name !== "AbortError") { Export.download(file, file.name); toast(tr("Partage impossible : le fichier est téléchargé à la place", "Sharing failed: the file was downloaded instead"), 4000); } }
+}
 // Le fichier vient peut-être de quelqu'un d'autre : il passe par cleanSave (js/app.js), qui ne garde que les champs connus
 async function importBackup(file){
   let d = null;
   try { if (file.size < 20e6) d = cleanSave(JSON.parse(await file.text())); } catch {}
-  if (!d || !(d.offers.length || d.cv.text)) return toast(tr("Ce fichier n'est pas une sauvegarde de Ça colle ?", "This file is not a Good fit? backup"), 4000);
-  if ((offers.some(o => o.text.trim() || o.app) || cvReady) && !confirm(tr("Remplacer ce qui est dans l'app par le contenu de ce fichier ?", "Replace what is in the app with the content of this file?"))) return;
+  if (!d || !(d.offers.length || d.cv.text || d.contacts.length)) return toast(tr("Ce fichier n'est pas une sauvegarde de Ça colle ?", "This file is not a Good fit? backup"), 4000);
+  if ((offers.some(o => o.text.trim() || o.app) || cvReady || contacts.length) && !confirm(tr("Remplacer ce qui est dans l'app par le contenu de ce fichier ?", "Replace what is in the app with the content of this file?"))) return;
   // tout le contenu du fichier est gardé sur l'appareil (case « Garder ma session » cochée), puis on rouvre sur le suivi
   d.keep = true; d.imported = true;
   noSave = true; clearTimeout(saveTimer); // la sauvegarde automatique à la fermeture ne doit pas écraser le fichier ouvert
@@ -164,7 +184,7 @@ async function importBackup(file){
 /* ---------- Événements ---------- */
 document.addEventListener("click", e => {
   const t = e.target.closest("button"); if (!t) return;
-  if (t.dataset.mail) { stat("mail-modele"); mailFor = t.dataset.mail; mailKind = null; prepFor = null; renderTrack(); return $("#trackbelow").scrollIntoView({behavior: "smooth"}); }
+  if (t.dataset.mail) { stat("mail-modele"); mailFor = t.dataset.mail; mailKind = null; prepFor = null; practFor = null; renderTrack(); return $("#trackbelow").scrollIntoView({behavior: "smooth"}); }
   if (t.dataset.mailkind) { mailKind = t.dataset.mailkind; return renderTrack(); }
   if (t.dataset.mailback !== undefined) { mailFor = null; return renderTrack(); }
   if (t.dataset.mailcopy !== undefined) return Export.copy($("#mailsubj").value + "\n\n" + $("#mailbody").value).then(ok => toast(ok ? tr("Mail copié", "Email copied") : tr("Copie impossible", "Copy failed")));
@@ -178,6 +198,7 @@ document.addEventListener("click", e => {
   if (t.dataset.ics) { stat("agenda"); return downloadIcs(offers.find(x => x.id === t.dataset.ics)); }
   if (t.dataset.gapfix) { stat("manque-corriger"); loadOffer(t.dataset.o); go(4); const el = document.querySelector(`.blank[data-k="${CSS.escape(t.dataset.gapfix)}"], [data-yes="${CSS.escape(t.dataset.gapfix)}"]`); if (el) setTimeout(() => { el.scrollIntoView({block: "center", behavior: "smooth"}); el.focus({preventScroll: true}); }, 60); return; }
   if (t.id === "backup") return exportBackup();
+  if (t.id === "sharebackup") return shareBackup();
   if (t.id === "restore") return $("#restorefile").click();
 });
 document.addEventListener("change", e => { if (e.target.id === "restorefile" && e.target.files[0]) { importBackup(e.target.files[0]); e.target.value = ""; } });
@@ -237,6 +258,19 @@ function statsHTML(){
     </section>
   </div>`;
 }
+// Objectif de la semaine, en haut du suivi : candidatures envoyées depuis lundi (dates locales), sur le nombre choisi
+function weekGoalHTML(){
+  const goal = +me.goal || 0, wk = monday(today());
+  const now = apps().filter(o => o.app.status !== "todo" && sentDate(o) && monday(sentDate(o)) === wk).length;
+  const opts = [...new Set([...Array(10)].map((_, i) => i + 1).concat(goal ? [goal] : []))].sort((a, b) => a - b);
+  const sel = `<label class="wg-in"><span>${tr("Objectif de la semaine", "Weekly goal")}</span><select id="weekgoalsel">${goal ? "" : `<option value="">${tr("Choisir", "Choose")}</option>`}${opts.map(n => `<option value="${n}" ${n === goal ? "selected" : ""}>${n}</option>`).join("")}</select></label>`;
+  if (!goal) return `${sel}<p class="hint">${tr("Choisis combien de candidatures tu veux envoyer par semaine. Le compte repart à zéro chaque lundi.", "Choose how many applications you want to send each week. The count starts again every Monday.")}</p>`;
+  const left = goal - now;
+  return `${sel}<p class="wg-t">${tr(`${now} sur ${goal} cette semaine`, `${now} of ${goal} this week`)}</p>
+    <div class="goalbar" role="img" aria-label="${tr(`${now} candidatures sur un objectif de ${goal}`, `${now} applications out of a goal of ${goal}`)}"><i style="width: ${Math.min(100, Math.round(now / goal * 100))}%"></i></div>
+    <p class="hint">${left > 0 ? tr(`Encore ${plural(left, tr("candidature", "application"))} d'ici dimanche.`, `${plural(left, tr("candidature", "application"))} to go by Sunday.`) : tr("Objectif atteint, bravo.", "Goal reached, well done.")}</p>`;
+}
+document.addEventListener("change", e => { if (e.target.id === "weekgoalsel" && e.target.value) { me.goal = Math.max(1, Math.min(50, +e.target.value)); stat("objectif-semaine"); save(); renderTrack(); $("#weekgoalsel")?.focus(); } });
 document.addEventListener("click", e => {
   const t = e.target.closest("button"); if (!t) return;
   if (t.dataset.proof) { t.closest("details")?.removeAttribute("open"); return proofDoc(t.dataset.proof); }
