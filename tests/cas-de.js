@@ -75,8 +75,9 @@ Ausbildung
 Ausbildung zur Fachinformatikerin Systemintegration (2017)
 Kenntnisse
 VMware, PowerShell, Englisch (fließend), Dokumentation`,
-  ok: ["Serveradministration", "Benutzerkonten und Zugriffsrechte", "Active Directory", "Monitoring", "Datensicherung und Wiederherstellung", "IT-Support", "3 Jahre Berufserfahrung", "Windows", "Linux"],
-  mid: ["Virtualisierung", "Englisch", "Technische Dokumentation"], no: ["Selbstständigkeit", "Organisationstalent"]
+  ok: ["Serveradministration", "Benutzerkonten und Zugriffsrechte", "Active Directory", "Monitoring", "Datensicherung und Wiederherstellung", "IT-Support", "3 Jahre Berufserfahrung", "Windows", "Linux", "Englisch"],
+  // Englisch (fließend) : une langue avec son niveau compte comme prouvée
+  mid: ["Virtualisierung", "Technische Dokumentation"], no: ["Selbstständigkeit", "Organisationstalent"]
 },
 {
   name: "Koch/Köchin (Gastronomie)", lang: "de",

@@ -6,6 +6,15 @@ function runCases(cases){
     const rs = analyse(text), by = Object.fromEntries(rs.map(r => [r.k, r])), fails = [];
     for (const st of ["ok", "mid", "no"]) (c[st] || []).forEach(k => { if (!by[k]) fails.push(`« ${k} » pas repéré (attendu ${st})`); else if (by[k].st !== st) fails.push(`« ${k} » : ${by[k].st} au lieu de ${st}`); });
     (c.absent || []).forEach(k => { if (by[k]) fails.push(`« ${k} » ne devrait pas sortir`); });
+    Object.entries(c.prio || {}).forEach(([k, p]) => { if (by[k] && (by[k].prio || "") !== p) fails.push(`« ${k} » : priorité « ${by[k].prio || "aucune"} » au lieu de « ${p} »`); });
+    // Ajouts de l'étape 4 : [nom du point, valeurs des cases, numéro du poste choisi], puis le texte attendu dans le CV
+    if (c.fills) {
+      c.fills.forEach(([k, vals, job]) => { const r = by[k]; if (!r?.fix) return fails.push(`ajout : « ${k} » n'a pas de phrase à trous`); fixes[k] = {vals: Object.assign({}, vals), state: "accepted", fix: r.fix, to: job != null ? jobsOf()[job]?.id : undefined}; });
+      const txt = cvLines(false).filter(l => l.raw).map(l => l.raw).join("\n");
+      (c.cvHas || []).forEach(w => { if (!txt.includes(w)) fails.push(`ajout : « ${w} » absent du CV`); });
+      (c.cvNot || []).forEach(w => { if (txt.includes(w)) fails.push(`ajout : « ${w} » ne devrait pas être dans le CV`); });
+      fixes = {};
+    }
     if (c.minPoints && rs.length < c.minPoints) fails.push(`${rs.length} points repérés, au moins ${c.minPoints} attendus`);
     Object.entries(c.proof || {}).forEach(([k, w]) => { const p = by[k]?.proof; if (!p || !fold(p.t).includes(fold(w))) fails.push(`preuve de « ${k} » : « ${p ? p.t.slice(0, 60) : "rien"} » au lieu d'une ligne avec « ${w} »`); });
     if (c.clean) {
@@ -24,6 +33,7 @@ function runCases(cases){
       const rv = cvCheck(c.cv);
       (c.review.typos || []).forEach(([w, to]) => { if (!rv.some(x => x.type === "typo" && x.word === w && x.to === to)) fails.push(`relecture : « ${w} » → « ${to} » pas proposé`); });
       (c.review.types || []).forEach(t => { if (!rv.some(x => x.type === t)) fails.push(`relecture : aucune remarque ${t}`); });
+      (c.review.notOn || []).forEach(w => { const x = rv.find(x => x.line && x.line.includes(w)); if (x) fails.push(`relecture : remarque ${x.type} sur « ${w} »`); });
       (c.review.notTypes || []).forEach(t => { if (rv.some(x => x.type === t)) fails.push(`relecture : remarque ${t} en trop (${rv.filter(x => x.type === t).map(x => x.word || x.msg).join(", ")})`); });
     }
     return {name: c.name, points: rs.length, score: scoreOf(rs), fails, rs};
