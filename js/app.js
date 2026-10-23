@@ -55,6 +55,7 @@ function gates(){
     t.title = t.disabled ? (n === 2 ? tr("Colle d'abord l'offre", "Paste the offer first") : tr("Ajoute d'abord l'offre et ton CV", "Add the offer and your CV first")) : "";
     t.classList.toggle("done", (n === 1 && offerOk()) || (n === 2 && cvReady));
   });
+  checkLang();
 }
 // Une entrée d'historique par étape (#etape-2…5, l'étape 1 sans #) et pour le suivi (#suivi) : le bouton Retour du
 // téléphone revient à l'étape d'avant au lieu de quitter l'app. navOn reste faux au démarrage (le lien direct est lu par suivi.js),
@@ -66,12 +67,13 @@ function navTo(h){
 }
 function go(n){
   if (!canReach(n)) return;
+  const moved = step !== n || !$("#track").hidden;
   if (typeof hideTrack === "function") hideTrack();
   if (step !== n) stat("etape-" + n);
   step = n; navTo(n === 1 ? "" : "#etape-" + n);
   if (n >= 2) syncOffer();
   results = analyse($("#offer").value);
-  $$(".tab").forEach(t => t.setAttribute("aria-selected", +t.dataset.step === n));
+  $$(".tab[data-step]").forEach(t => +t.dataset.step === n ? t.setAttribute("aria-current", "step") : t.removeAttribute("aria-current"));
   $$("[data-p]").forEach(p => p.hidden = +p.dataset.p !== n);
   $$("[data-for]").forEach(p => p.hidden = +p.dataset.for !== n || (n === 2 && !cvReady));
   if (n === 1) renderOffers();
@@ -80,7 +82,10 @@ function go(n){
   if (n === 5) renderLetterForm();
   gates(); save();
   if (window.scrollY > 120) $(".top").scrollIntoView({behavior: "smooth"});
+  if (go.ready && moved) focusTitle($(`[data-p="${n}"] h1`)); go.ready = true;
 }
+// Changement d'étape : le focus va sur le titre de la nouvelle étape (clavier, lecteur d'écran)
+function focusTitle(h){ if (!h) return; h.tabIndex = -1; h.focus({preventScroll: true}); }
 
 /* ---------- Étape 3 : le résultat ---------- */
 const HELP = L10N?.help || (EN ? {
@@ -169,9 +174,9 @@ function renderResult(){
   $("#groups").innerHTML = adHTML(ad) + notice + groups.map(s => {
     const list = results.filter(r => r.st === s).sort((a, b) => urgency(a) - urgency(b)); if (!list.length) return "";
     return `<section class="group"><h2 class="section-title" style="--k: ${s === "ok" ? "var(--green)" : s === "mid" ? "var(--yellow)" : "var(--pink)"}">${LABEL[s]} (${list.length})</h2><div class="points">${list.map(r => `
-      <article class="point">
+      <article class="point${PHONE.matches && s !== "ok" ? " fold" : ""}">
         <div class="point-h"><i class="stamp ${s}">${LABEL[s]}</i>${tagOf(r)}${r.manual ? `<i class="tag hand">${tr("Corrigé par toi", "Corrected by you")}</i>` : ""}</div>
-        <h3>${esc(r.k)}</h3>
+        <h3>${PHONE.matches && s !== "ok" ? `<button type="button" class="point-t" aria-expanded="false">${esc(r.k)}</button>` : esc(r.k)}</h3>
         <p>${explain(r, s)}</p>
         ${r.vocab ? `<p class="vocab">${tr(`Ton CV dit « ${esc(r.vocab.cv)} », l'offre dit « ${esc(r.vocab.offer)} ».`, `Your CV says "${esc(r.vocab.cv)}", the offer says "${esc(r.vocab.offer)}".`)}</p>` : ""}
         ${s !== "ok" && r.fix ? `<button class="btn small" data-fix="${esc(r.k)}">${tr("Corriger ce point", "Fix this point")}</button>` : ""}
@@ -191,6 +196,14 @@ function renderResult(){
       <ul class="ats">${ats.map(a => `<li class="${a.ok ? "ok" : "ko"}"><b><span aria-hidden="true">${a.ok ? "✓" : "✕"}</span> ${esc(a.label)}</b>${a.ok ? "" : `<span>${esc(a.help)}</span>`}<span class="sr-only">${a.ok ? tr(" : bon", ": good") : tr(" : à corriger", ": to fix")}</span></li>`).join("")}</ul></section>`;
 }
 
+// Téléphone : cartes « Pas dans ton CV » et « À préciser » repliées (titre + Corriger), ouvertes d'un appui sur le titre
+const PHONE = matchMedia("(max-width: 560px)");
+PHONE.addEventListener?.("change", () => { if (step === 3 && !$("[data-p='3']").hidden) renderResult(); });
+document.addEventListener("click", e => {
+  const b = e.target.closest(".point-t"); if (!b) return;
+  const open = b.getAttribute("aria-expanded") !== "true";
+  b.setAttribute("aria-expanded", open); b.closest(".point").classList.toggle("fold", !open);
+});
 // L'annonce en bref : infos clés, infos absentes, signaux d'arnaque
 function adHTML(ad){
   const red = ad.flags.filter(f => f.level === "red");
@@ -405,7 +418,19 @@ function setCV(text, typed){
   const n = CV.filter(l => l.t).length, exp = CV.filter(l => l.exp).length, secs = CV.filter(l => l.sec && !l.auto).length;
   $("#cvsum").textContent = tr(`${n} lignes · ${exp} expérience${exp > 1 ? "s" : ""} repérée${exp > 1 ? "s" : ""}` + (secs ? "" : " · aucun titre de rubrique trouvé (Expériences, Compétences…)"), `${n} lines · ${plural(exp, "job line")} found` + (secs ? "" : " · no section heading found (Experience, Skills…)"));
   $$("[data-for='2']").forEach(p => p.hidden = step !== 2 || !cvReady);
-  gates(); save();
+  syncPaste(); gates(); save();
+}
+// CV collé en texte (depuis un mail…) : même chemin que le texte lu dans un fichier
+function usePasted(v){
+  if (!cvFile.pasted) { me.name = ""; me.contact = ""; }
+  cvFile = v.trim() ? {name: "", info: tr("Texte collé", "Pasted text"), conf: 0, pasted: true} : {name: "", info: "", conf: 0};
+  $("#filecard").hidden = true; $("#ferr").hidden = true;
+  setCV(v);
+}
+function syncPaste(){
+  const pasted = !!cvFile.pasted && cvReady;
+  $("#cvpastebox").hidden = cvReady && !pasted;
+  if (!pasted && cvReady) $("#cvpaste").value = "";
 }
 function showFile(name, info){ $("#filecard").hidden = false; $("#fname").textContent = name; $("#finfo").textContent = info; }
 async function useFile(f){
@@ -629,6 +654,40 @@ function tidyOffer(){
   $("#cleaned").hidden = false; gates(); save();
 }
 $("#offer").addEventListener("paste", () => setTimeout(tidyOffer, 0));
+// Annonce dans une autre langue de l'app que la page : on propose la bonne version (sans changer tout seul)
+const LANGWORDS = {
+  fr: "le la les des du et est pour avec vous nous une dans sur au aux vos votre notre qui que poste être nos ou par",
+  en: "the and you for with our your are will to of is we this team be an as or have from",
+  de: "und der die das mit für wir sie ist ein eine zu den von auf bei ihre unsere sich oder im",
+  es: "el los las y con para por que una del es nuestro tu experiencia se al lo nuestra como",
+  it: "il gli e con per che una del della di è nostro sei esperienza nel alla dei delle sono"
+};
+const STOPS = Object.fromEntries(Object.entries(LANGWORDS).map(([l, w]) => [l, new Set(w.split(" "))]));
+function offerLang(t){
+  const toks = t.toLowerCase().match(/[a-zàâäçéèêëîïôöùûüßñíóúì]+/g) || [];
+  if (toks.length < MIN_WORDS) return null;
+  const n = Object.fromEntries(Object.keys(STOPS).map(l => [l, toks.filter(w => STOPS[l].has(w)).length]));
+  const best = Object.keys(n).sort((a, b) => n[b] - n[a])[0];
+  return best !== LANG && n[best] >= 5 && n[best] >= 2 * n[LANG] ? best : null;
+}
+const LNAME = {fr: {fr: "français", en: "anglais", de: "allemand", es: "espagnol", it: "italien"}, en: {fr: "French", en: "English", de: "German", es: "Spanish", it: "Italian"},
+  de: {fr: "Französisch", en: "Englisch", de: "Deutsch", es: "Spanisch", it: "Italienisch"}, es: {fr: "francés", en: "inglés", de: "alemán", es: "español", it: "italiano"}, it: {fr: "francese", en: "inglese", de: "tedesco", es: "spagnolo", it: "italiano"}};
+const LSWITCH = {fr: "Passer à la version française", en: "Switch to the English version", de: "Zur deutschen Version wechseln", es: "Cambiar a la versión en español", it: "Passa alla versione italiana"};
+let langSaid = null;
+function checkLang(){
+  const l = offerLang($("#offer").value);
+  let el = $("#langhint");
+  if (!l) { if (el) el.hidden = true; return; }
+  if (!el) { el = document.createElement("p"); el.id = "langhint"; el.className = "notice langhint"; $("#cleaned").after(el); }
+  el.innerHTML = `${esc(tr(`Cette annonce semble écrite en ${LNAME[LANG][l]}.`, `This ad seems to be written in ${LNAME.en[l]}.`))} ${esc(tr("L'analyse et la lettre marchent mieux dans la langue de l'annonce.", "The analysis and the letter work best in the language of the ad."))} <a href="${PAGES.app[l]}" hreflang="${l}" lang="${l}" data-handoff>${LSWITCH[l]}</a>`;
+  el.hidden = false;
+  if (langSaid !== l) { langSaid = l; stat("langue-annonce", {l}); }
+}
+// L'annonce suit dans la page de l'autre langue (gardée le temps de l'onglet, jamais envoyée)
+document.addEventListener("click", e => {
+  const a = e.target.closest("a[data-handoff]"); if (!a) return;
+  try { sessionStorage.setItem("cacolle-handoff", $("#offer").value); localStorage.setItem("cacolle-lang", a.hreflang); } catch {}
+});
 $("#unclean").addEventListener("click", () => { $("#offer").value = rawOffer; $("#cleaned").hidden = true; gates(); save(); $("#offer").focus(); });
 $("#lform").addEventListener("submit", e => e.preventDefault());
 $("#offerfile").addEventListener("change", e => useOfferFile(e.target.files[0]));
@@ -637,6 +696,9 @@ const offerBox = $("#offer");
 ["dragleave", "drop"].forEach(ev => offerBox.addEventListener(ev, e => { e.preventDefault(); offerBox.classList.remove("over"); }));
 offerBox.addEventListener("drop", e => { e.stopPropagation(); if (e.dataTransfer.files[0]) useOfferFile(e.dataTransfer.files[0]); });
 $("#file").addEventListener("change", e => useFile(e.target.files[0]));
+let pasteTimer;
+$("#cvpaste").addEventListener("input", e => { clearTimeout(pasteTimer); pasteTimer = setTimeout(() => usePasted(e.target.value), 400); });
+$("#cvraw").addEventListener("input", e => { if (cvFile.pasted) $("#cvpaste").value = e.target.value; });
 const drop = $("#drop");
 ["dragenter", "dragover"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
 ["dragleave", "drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("over"); }));
@@ -645,7 +707,7 @@ window.addEventListener("dragover", e => e.preventDefault());
 window.addEventListener("drop", e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (!f) return; if (step === 1) useOfferFile(f); else if (canReach(2)) useFile(f); });
 
 /* ---------- App installable, utilisable sans réseau ---------- */
-if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) navigator.serviceWorker.register("sw.js").catch(() => {});
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) navigator.serviceWorker.register("sw.js").then(() => navigator.serviceWorker.ready).then(r => r.active?.postMessage({lang: LANG})).catch(() => {});
 let installEvt = null;
 addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; $("#install").hidden = false; });
 $("#install").addEventListener("click", async () => { if (!installEvt) return; installEvt.prompt(); const ch = await installEvt.userChoice.catch(() => ({})); if (ch.outcome === "accepted") stat("installation"); installEvt = null; $("#install").hidden = true; });
@@ -655,6 +717,12 @@ $("#ioshint").hidden = !(/iphone|ipad/i.test(navigator.userAgent) && !navigator.
 if (!restore()) newOffer();
 gates();
 go(1);
+(() => {
+  let t = null; try { t = sessionStorage.getItem("cacolle-handoff"); sessionStorage.removeItem("cacolle-handoff"); } catch {}
+  if (!t || !t.trim()) return;
+  syncOffer(); if (cur.text.trim()) newOffer();
+  $("#offer").value = t; gates(); go(1); save();
+})();
 navOn = true;
 // « Partager vers Ça colle » depuis un site d'emploi (app installée sur téléphone) : ?title=…&text=…&url=…
 (() => {

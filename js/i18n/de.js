@@ -181,6 +181,11 @@ const I18N = {
     "J'ai retiré {0} du site (boutons, menus, mentions).": "Ich habe {0} der Website entfernt (Buttons, Menüs, Hinweise).",
     "App installée": "App installiert",
     "Annonce reçue": "Anzeige empfangen",
+    "Texte collé": "Eingefügter Text",
+    "Cette annonce semble écrite en {0}.": "Diese Anzeige scheint auf {0} geschrieben zu sein.",
+    "L'analyse et la lettre marchent mieux dans la langue de l'annonce.": "Analyse und Anschreiben funktionieren am besten in der Sprache der Anzeige.",
+    "Préparation de la lecture d'image : téléchargement d'environ {0} Mo, une seule fois…": "Bildlesen wird vorbereitet: etwa {0} MB zum Herunterladen, nur einmal…",
+    "Préparation de la lecture d'image…": "Bildlesen wird vorbereitet…",
     "Le site n'a envoyé que le lien : copie le texte de l'annonce": "Die Seite hat nur den Link geschickt: Kopier den Text der Anzeige",
     // Y(n) : le pluriel est déjà allemand (« 3 Jahre »), on le garde tel quel
     "{0} Jahre": "{0} Jahre",

@@ -70,7 +70,7 @@ body::before, .panel::before {
 .tab small { display: block; font: 700 10px/1.2 var(--body); letter-spacing: .08em; text-transform: uppercase; }
 .tab b { display: block; font: italic 900 17px/1.15 var(--display); text-transform: uppercase; letter-spacing: -.01em; }
 .tab.done small::after { content: " ✓"; }
-.tab[aria-selected="true"], .tab[aria-current="page"] { z-index: 2; padding-top: 13px; padding-bottom: 14px; margin-bottom: -2.5px; transform: none; }
+.tab[aria-current] { z-index: 2; padding-top: 13px; padding-bottom: 14px; margin-bottom: -2.5px; transform: none; }
 .tab:disabled, .tab[aria-disabled="true"] { cursor: not-allowed; opacity: .55; background: repeating-linear-gradient(135deg, var(--c) 0 8px, var(--card) 8px 11px); }
 
 /* ---------- Panneau coloré de l'étape ---------- */
@@ -592,11 +592,52 @@ html[data-skin="fiche"] .checklist input { accent-color: var(--accent); }
   .tab::before { content: attr(data-n); display: block; font: italic 900 17px/1.1 var(--display); }
   .tab::after { content: attr(data-s); display: block; margin-top: 2px; font: 700 9.5px/1.1 var(--body); letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .tab.done::before { content: attr(data-n) "✓"; }
-  .tab[aria-selected="true"], .tab[aria-current="page"] { margin-bottom: 0; padding: 6px 1px 13px; }
+  .tab[aria-current] { margin-bottom: 0; padding: 6px 1px 13px; }
   .tab #trackn { position: absolute; top: 4px; right: 3px; margin: 0; font-size: 9.5px; line-height: 16px; }
   .tab-sep { margin: 8px 1px 12px; }
   .toast { bottom: calc(92px + env(safe-area-inset-bottom, 0px)); }
 }
+
+/* Étape 2 : CV collé en texte */
+.cvpaste { width: 100%; display: grid; gap: 8px; }
+.cvpaste label { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; }
+.cvpaste label b { font: italic 900 17px/1.2 var(--display); text-transform: uppercase; }
+.cvpaste .sheet-input { min-height: 130px; }
+.preview-foot ins { color: var(--ink); font-weight: 700; }
+.langhint { margin: 0; font-size: 14px; }
+.langhint a { font-weight: 800; white-space: nowrap; }
+
+/* Téléphone (ou écran tactile) : zones à toucher d'au moins 44 px */
+@media (pointer: coarse), (max-width: 560px) {
+  .btn.small, .chip, .pill, .seg button { min-height: 44px; }
+  .box-head button { min-height: 44px; padding: 8px 14px; }
+  .linkbtn { min-height: 44px; }
+  .foot-text a, .foot-text .linkbtn, .copyhelp summary { display: inline-flex; align-items: center; min-height: 44px; }
+  .foot-text p { line-height: 1.9; }
+}
+
+/* Téléphone : en-tête sur une ligne, titres d'étape plus petits, cartes du résultat repliées */
+@media (max-width: 560px) {
+  .top { gap: 8px 10px; padding-top: 12px; }
+  .logo span { font-size: 18px; padding: 5px 8px 3px; }
+  .top-actions { flex-wrap: nowrap; gap: 6px; min-width: 0; }
+  .top-actions .pill { min-width: 44px; padding: 6px 10px; justify-content: center; }
+  .pill-safe { gap: 5px; font-size: 11px; }
+  .pill-safe .safe-more { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .panel-inner { padding-top: 22px; padding-bottom: 28px; gap: 24px; }
+  .big { font-size: 36px; line-height: .95; }
+  .lede { font-size: 16px; }
+  .next-row.tight .btn { flex: 1 1 auto; }
+  .point.fold > :is(p, .why) { display: none; }
+  .point.fold { gap: 8px; padding: 12px 14px 14px; }
+  .promise { padding: 8px 12px; font-size: 14px; }
+  .score-box { grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 4px 14px; }
+  .score-box b { font-size: 40px; }
+  .score-box .meter { grid-column: 1 / -1; width: 100%; }
+}
+.point-t { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; width: 100%; min-height: 44px; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; text-transform: inherit; cursor: pointer; }
+.point-t::after { content: "▾"; flex: none; font-style: normal; transition: transform .15s; }
+.point-t[aria-expanded="true"]::after { transform: rotate(180deg); }
 
 /* Page Infos : mentions, confidentialité, plan du site */
 .infos-body .group p { max-width: 72ch; margin: 0 0 12px; }

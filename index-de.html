@@ -43,16 +43,16 @@
     </details>
     <button class="pill pill-install" id="install" type="button" hidden>App installieren</button>
     <details class="langs" id="langmenu"><summary class="pill pill-lang" title="Sprache">DE <span class="sr-only">Sprache</span></summary><div class="lang-menu" role="group" aria-label="Sprache"><a href="./" hreflang="fr" lang="fr"><b>FR</b> Français</a><a href="index-en.html" hreflang="en" lang="en"><b>EN</b> English</a><a href="index-de.html" hreflang="de" lang="de" aria-current="true"><b>DE</b> Deutsch</a><a href="index-es.html" hreflang="es" lang="es"><b>ES</b> Español</a><a href="index-it.html" hreflang="it" lang="it"><b>IT</b> Italiano</a></div></details>
-    <span class="pill pill-safe"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Kostenlos · ohne Konto · ohne KI</span>
+    <span class="pill pill-safe"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span>Kostenlos<span class="safe-more"> · ohne Konto · ohne KI</span></span></span>
   </div>
-  <nav class="tabs" role="tablist" aria-label="Schritte">
-    <button class="tab" role="tab" data-step="1" data-n="1" data-s="Anzeige" style="--c: var(--blue)"><small>Schritt 1</small><b>Das Angebot</b></button>
-    <button class="tab" role="tab" data-step="2" data-n="2" data-s="CV" style="--c: var(--yellow)"><small>Schritt 2</small><b>Dein Lebenslauf</b></button>
-    <button class="tab" role="tab" data-step="3" data-n="3" data-s="Ergebnis" style="--c: var(--green)"><small>Schritt 3</small><b>Das Ergebnis</b></button>
-    <button class="tab" role="tab" data-step="4" data-n="4" data-s="Besser" style="--c: var(--pink)"><small>Schritt 4</small><b>Lebenslauf verbessern</b></button>
-    <button class="tab" role="tab" data-step="5" data-n="5" data-s="Brief" style="--c: var(--violet)"><small>Schritt 5</small><b>Mein Anschreiben</b></button>
+  <nav class="tabs" aria-label="Schritte">
+    <button class="tab" type="button" data-step="1" data-n="1" data-s="Anzeige" style="--c: var(--blue)"><small>Schritt 1</small><b>Das Angebot</b></button>
+    <button class="tab" type="button" data-step="2" data-n="2" data-s="CV" style="--c: var(--yellow)"><small>Schritt 2</small><b>Dein Lebenslauf</b></button>
+    <button class="tab" type="button" data-step="3" data-n="3" data-s="Ergebnis" style="--c: var(--green)"><small>Schritt 3</small><b>Das Ergebnis</b></button>
+    <button class="tab" type="button" data-step="4" data-n="4" data-s="Besser" style="--c: var(--pink)"><small>Schritt 4</small><b>Lebenslauf verbessern</b></button>
+    <button class="tab" type="button" data-step="5" data-n="5" data-s="Brief" style="--c: var(--violet)"><small>Schritt 5</small><b>Mein Anschreiben</b></button>
     <span class="tab-sep" aria-hidden="true"></span>
-    <button class="tab tab-tool" id="trackbtn" type="button" aria-selected="false" data-n="≡" data-s="Übersicht" style="--c: var(--orange)"><small>Meine Übersicht</small><b>Meine Bewerbungen <span id="trackn" hidden></span></b></button>
+    <button class="tab tab-tool" id="trackbtn" type="button" data-n="≡" data-s="Übersicht" style="--c: var(--orange)"><small>Meine Übersicht</small><b>Meine Bewerbungen <span id="trackn" hidden></span></b></button>
     <a class="tab tab-tool" href="salary-de.html" data-n="€" data-s="Gehalt" style="--c: var(--teal)"><small>Werkzeug</small><b>Brutto → Netto</b></a>
   </nav>
 </header>
@@ -149,6 +149,10 @@
         <span class="btn light small">Datei auswählen</span>
         <input type="file" id="file" accept=".pdf,.docx,.odt,.txt,.md,image/*" class="sr-only">
       </label>
+      <div class="cvpaste" id="cvpastebox">
+        <label for="cvpaste"><b>Oder füge den Text deines Lebenslaufs ein</b> <span class="hint">zum Beispiel aus einer E-Mail</span></label>
+        <textarea id="cvpaste" class="sheet-input" rows="5" spellcheck="false" placeholder="Füge hier den Text deines Lebenslaufs ein."></textarea>
+      </div>
       <div class="job" id="job" hidden><p id="jobtxt">Wird gelesen…</p><div class="jbar"><i id="jbar"></i></div></div>
       <p class="err" id="ferr" role="alert" hidden></p>
       <div class="filecard" id="filecard" hidden>
@@ -190,7 +194,7 @@
     <div class="main-col">
       <span class="label">Schritt 3 von 5 · das Ergebnis</span>
       <h1 class="big"><span id="pct">0</span> % <small id="verdict">das passt</small></h1>
-      <p class="lede" id="sum"></p>
+      <p class="lede" id="sum" aria-live="polite"></p>
       <div class="filters" role="group" aria-label="Anzeigen">
         <button class="chip" data-f="all" aria-pressed="true">Alle <span id="n-all"></span></button>
         <button class="chip" data-f="no" aria-pressed="false" style="--k: var(--pink)">✕ Fehlt im Lebenslauf <span id="n-no"></span></button>
@@ -241,7 +245,7 @@
     </div>
     <aside class="box">
       <div class="box-head">Dein Ergebnis</div>
-      <div class="box-body score-box">
+      <div class="box-body score-box" aria-live="polite">
         <b id="score4">0 %</b>
         <span id="score4txt"></span>
         <div class="meter" aria-hidden="true"><i id="meter4"></i></div>

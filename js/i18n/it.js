@@ -182,6 +182,11 @@ const I18N = {
     "J'ai retiré {0} du site (boutons, menus, mentions).": "Ho tolto {0} del sito (pulsanti, menu, avvisi).",
     "App installée": "App installata",
     "Annonce reçue": "Annuncio ricevuto",
+    "Texte collé": "Testo incollato",
+    "Cette annonce semble écrite en {0}.": "Questo annuncio sembra scritto in {0}.",
+    "L'analyse et la lettre marchent mieux dans la langue de l'annonce.": "L'analisi e la lettera funzionano meglio nella lingua dell'annuncio.",
+    "Préparation de la lecture d'image : téléchargement d'environ {0} Mo, une seule fois…": "Preparazione della lettura delle immagini: circa {0} MB da scaricare, una sola volta…",
+    "Préparation de la lecture d'image…": "Preparazione della lettura delle immagini…",
     "Le site n'a envoyé que le lien : copie le texte de l'annonce": "Il sito ha inviato solo il link: copia il testo dell'annuncio",
     // ---------- confort.js, demo.js ----------
     "À faire en premier : ": "Da fare per primo: ",
