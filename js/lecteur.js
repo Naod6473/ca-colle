@@ -9,21 +9,35 @@ const loaded = {};
 const load = (src) => loaded[src] || (loaded[src] = new Promise((ok, ko) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = () => ko(new Error("load " + src)); document.head.append(s); }));
 
 let progress = () => {};
-let ocrWorker = null, ocrBase = 0, ocrSpan = 1;
-async function ocrWorkerGet() {
-  if (ocrWorker) return ocrWorker;
+let ocrWorker = null, ocrLangs = [], ocrBase = 0, ocrSpan = 1;
+// Lecture d'image : d'abord la seule langue de la page (fra sur les pages françaises), l'anglais seulement si la lecture est mauvaise.
+// Téléchargé une seule fois (puis gardé par le navigateur) : on annonce la taille avant de commencer.
+const OCR_FIRST = EN ? "eng" : [].concat(L10N?.ocr || "fra")[0];
+const MB = { core: 4.1, eng: 3, fra: .7, deu: 1.3, spa: 2.1, ita: 1.7 };
+const seen = k => { try { return !!localStorage.getItem("cacolle-ocr-" + k); } catch { return false; } };
+const mark = k => { try { localStorage.setItem("cacolle-ocr-" + k, "1"); } catch {} };
+const sizeMsg = (langs) => {
+  const mb = (seen("core") ? 0 : MB.core) + langs.filter(l => !seen(l)).reduce((n, l) => n + (MB[l] || 2), 0);
+  return mb ? tr(`Préparation de la lecture d'image : téléchargement d'environ ${Math.max(1, Math.round(mb))} Mo, une seule fois…`, `Getting image reading ready: about ${Math.max(1, Math.round(mb))} MB to download, only once…`) : tr("Préparation de la lecture d'image…", "Getting image reading ready…");
+};
+async function ocrWorkerGet(langs) {
+  if (ocrWorker && ocrLangs.join() === langs.join()) return ocrWorker;
+  const msg = sizeMsg(langs);
+  progress(.05, msg);
+  if (ocrWorker) { await ocrWorker.reinitialize(langs); ocrLangs = langs; langs.forEach(mark); return ocrWorker; }
   await load(LIB.tess);
-  ocrWorker = await Tesseract.createWorker(L10N?.ocr ? [].concat(L10N.ocr, "eng") : ["fra", "eng"], 1, {
+  ocrWorker = await Tesseract.createWorker(langs, 1, {
     workerPath: abs(LIB.tessWorker), corePath: abs(LIB.core), langPath: abs(LIB.lang), workerBlobURL: false,
     logger: (m) => {
       if (m.status === "recognizing text") progress(ocrBase + m.progress * ocrSpan, tr(`Lecture de l'image : ${Math.round(m.progress * 100)} %`, `Reading the image: ${Math.round(m.progress * 100)}%`));
-      else if (/load|initializ/.test(m.status)) progress(.05 + (m.progress || 0) * .1, tr("Préparation de la lecture d'image (la première fois seulement)…", "Getting image reading ready (first time only)…"));
+      else if (/load|initializ/.test(m.status)) progress(.05 + (m.progress || 0) * .1, msg);
     },
   });
+  ocrLangs = langs; mark("core"); langs.forEach(mark);
   return ocrWorker;
 }
-async function ocr(images) {
-  const w = await ocrWorkerGet();
+async function ocrPass(images, langs) {
+  const w = await ocrWorkerGet(langs);
   let out = "", conf = 0;
   for (let i = 0; i < images.length; i++) {
     ocrBase = .15 + .85 * i / images.length; ocrSpan = .85 / images.length;
@@ -31,6 +45,13 @@ async function ocr(images) {
     out += data.text + "\n"; conf += data.confidence;
   }
   return { text: out, conf: Math.round(conf / images.length) };
+}
+async function ocr(images) {
+  const r = await ocrPass(images, [OCR_FIRST]);
+  if (OCR_FIRST === "eng" || r.conf >= 70) return r;
+  // Lecture difficile (CV en partie en anglais ?) : deuxième essai avec l'anglais en plus, on garde la meilleure
+  const r2 = await ocrPass(images, [OCR_FIRST, "eng"]);
+  return r2.conf > r.conf ? r2 : r;
 }
 
 // Mini lecteur ZIP (DOCX et ODT sont des ZIP) : répertoire central + DecompressionStream, sans bibliothèque

@@ -42,16 +42,16 @@
     </details>
     <button class="pill pill-install" id="install" type="button" hidden>Instalar la app</button>
     <details class="langs" id="langmenu"><summary class="pill pill-lang" title="Idioma">ES <span class="sr-only">Idioma</span></summary><div class="lang-menu" role="group" aria-label="Idioma"><a href="./" hreflang="fr" lang="fr"><b>FR</b> Français</a><a href="index-en.html" hreflang="en" lang="en"><b>EN</b> English</a><a href="index-de.html" hreflang="de" lang="de"><b>DE</b> Deutsch</a><a href="index-es.html" hreflang="es" lang="es" aria-current="true"><b>ES</b> Español</a><a href="index-it.html" hreflang="it" lang="it"><b>IT</b> Italiano</a></div></details>
-    <span class="pill pill-safe"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Gratis · sin cuenta · sin IA</span>
+    <span class="pill pill-safe"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span>Gratis<span class="safe-more"> · sin cuenta · sin IA</span></span></span>
   </div>
-  <nav class="tabs" role="tablist" aria-label="Pasos">
-    <button class="tab" role="tab" data-step="1" data-n="1" data-s="Oferta" style="--c: var(--blue)"><small>Paso 1</small><b>La oferta</b></button>
-    <button class="tab" role="tab" data-step="2" data-n="2" data-s="CV" style="--c: var(--yellow)"><small>Paso 2</small><b>Tu CV</b></button>
-    <button class="tab" role="tab" data-step="3" data-n="3" data-s="Resultado" style="--c: var(--green)"><small>Paso 3</small><b>El resultado</b></button>
-    <button class="tab" role="tab" data-step="4" data-n="4" data-s="Mejorar" style="--c: var(--pink)"><small>Paso 4</small><b>Mejorar mi CV</b></button>
-    <button class="tab" role="tab" data-step="5" data-n="5" data-s="Carta" style="--c: var(--violet)"><small>Paso 5</small><b>Mi carta</b></button>
+  <nav class="tabs" aria-label="Pasos">
+    <button class="tab" type="button" data-step="1" data-n="1" data-s="Oferta" style="--c: var(--blue)"><small>Paso 1</small><b>La oferta</b></button>
+    <button class="tab" type="button" data-step="2" data-n="2" data-s="CV" style="--c: var(--yellow)"><small>Paso 2</small><b>Tu CV</b></button>
+    <button class="tab" type="button" data-step="3" data-n="3" data-s="Resultado" style="--c: var(--green)"><small>Paso 3</small><b>El resultado</b></button>
+    <button class="tab" type="button" data-step="4" data-n="4" data-s="Mejorar" style="--c: var(--pink)"><small>Paso 4</small><b>Mejorar mi CV</b></button>
+    <button class="tab" type="button" data-step="5" data-n="5" data-s="Carta" style="--c: var(--violet)"><small>Paso 5</small><b>Mi carta</b></button>
     <span class="tab-sep" aria-hidden="true"></span>
-    <button class="tab tab-tool" id="trackbtn" type="button" aria-selected="false" data-n="≡" data-s="Seguir" style="--c: var(--orange)"><small>Mi seguimiento</small><b>Mis candidaturas <span id="trackn" hidden></span></b></button>
+    <button class="tab tab-tool" id="trackbtn" type="button" data-n="≡" data-s="Seguir" style="--c: var(--orange)"><small>Mi seguimiento</small><b>Mis candidaturas <span id="trackn" hidden></span></b></button>
     <a class="tab tab-tool" href="salary-es.html" data-n="€" data-s="Salario" style="--c: var(--teal)"><small>Herramienta</small><b>Bruto → neto</b></a>
   </nav>
 </header>
@@ -148,6 +148,10 @@
         <span class="btn light small">Elegir un archivo</span>
         <input type="file" id="file" accept=".pdf,.docx,.odt,.txt,.md,image/*" class="sr-only">
       </label>
+      <div class="cvpaste" id="cvpastebox">
+        <label for="cvpaste"><b>O pega el texto de tu CV</b> <span class="hint">por ejemplo, desde un correo</span></label>
+        <textarea id="cvpaste" class="sheet-input" rows="5" spellcheck="false" placeholder="Pega aquí el texto de tu CV."></textarea>
+      </div>
       <div class="job" id="job" hidden><p id="jobtxt">Leyendo…</p><div class="jbar"><i id="jbar"></i></div></div>
       <p class="err" id="ferr" role="alert" hidden></p>
       <div class="filecard" id="filecard" hidden>
@@ -189,7 +193,7 @@
     <div class="main-col">
       <span class="label">Paso 3 de 5 · el resultado</span>
       <h1 class="big"><span id="pct">0</span> % <small id="verdict">encaja</small></h1>
-      <p class="lede" id="sum"></p>
+      <p class="lede" id="sum" aria-live="polite"></p>
       <div class="filters" role="group" aria-label="Mostrar">
         <button class="chip" data-f="all" aria-pressed="true">Todo <span id="n-all"></span></button>
         <button class="chip" data-f="no" aria-pressed="false" style="--k: var(--pink)">✕ No está en tu CV <span id="n-no"></span></button>
@@ -240,7 +244,7 @@
     </div>
     <aside class="box">
       <div class="box-head">Tu puntuación</div>
-      <div class="box-body score-box">
+      <div class="box-body score-box" aria-live="polite">
         <b id="score4">0 %</b>
         <span id="score4txt"></span>
         <div class="meter" aria-hidden="true"><i id="meter4"></i></div>

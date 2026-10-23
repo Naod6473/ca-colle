@@ -42,16 +42,16 @@
     </details>
     <button class="pill pill-install" id="install" type="button" hidden>Installa l'app</button>
     <details class="langs" id="langmenu"><summary class="pill pill-lang" title="Lingua">IT <span class="sr-only">Lingua</span></summary><div class="lang-menu" role="group" aria-label="Lingua"><a href="./" hreflang="fr" lang="fr"><b>FR</b> Français</a><a href="index-en.html" hreflang="en" lang="en"><b>EN</b> English</a><a href="index-de.html" hreflang="de" lang="de"><b>DE</b> Deutsch</a><a href="index-es.html" hreflang="es" lang="es"><b>ES</b> Español</a><a href="index-it.html" hreflang="it" lang="it" aria-current="true"><b>IT</b> Italiano</a></div></details>
-    <span class="pill pill-safe"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Gratis · senza account · senza IA</span>
+    <span class="pill pill-safe"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span>Gratis<span class="safe-more"> · senza account · senza IA</span></span></span>
   </div>
-  <nav class="tabs" role="tablist" aria-label="Passi">
-    <button class="tab" role="tab" data-step="1" data-n="1" data-s="Offerta" style="--c: var(--blue)"><small>Passo 1</small><b>L'offerta</b></button>
-    <button class="tab" role="tab" data-step="2" data-n="2" data-s="CV" style="--c: var(--yellow)"><small>Passo 2</small><b>Il tuo CV</b></button>
-    <button class="tab" role="tab" data-step="3" data-n="3" data-s="Risultato" style="--c: var(--green)"><small>Passo 3</small><b>Il risultato</b></button>
-    <button class="tab" role="tab" data-step="4" data-n="4" data-s="Migliora" style="--c: var(--pink)"><small>Passo 4</small><b>Migliora il mio CV</b></button>
-    <button class="tab" role="tab" data-step="5" data-n="5" data-s="Lettera" style="--c: var(--violet)"><small>Passo 5</small><b>La mia lettera</b></button>
+  <nav class="tabs" aria-label="Passi">
+    <button class="tab" type="button" data-step="1" data-n="1" data-s="Offerta" style="--c: var(--blue)"><small>Passo 1</small><b>L'offerta</b></button>
+    <button class="tab" type="button" data-step="2" data-n="2" data-s="CV" style="--c: var(--yellow)"><small>Passo 2</small><b>Il tuo CV</b></button>
+    <button class="tab" type="button" data-step="3" data-n="3" data-s="Risultato" style="--c: var(--green)"><small>Passo 3</small><b>Il risultato</b></button>
+    <button class="tab" type="button" data-step="4" data-n="4" data-s="Migliora" style="--c: var(--pink)"><small>Passo 4</small><b>Migliora il mio CV</b></button>
+    <button class="tab" type="button" data-step="5" data-n="5" data-s="Lettera" style="--c: var(--violet)"><small>Passo 5</small><b>La mia lettera</b></button>
     <span class="tab-sep" aria-hidden="true"></span>
-    <button class="tab tab-tool" id="trackbtn" type="button" aria-selected="false" data-n="≡" data-s="Segui" style="--c: var(--orange)"><small>Il mio registro</small><b>Le mie candidature <span id="trackn" hidden></span></b></button>
+    <button class="tab tab-tool" id="trackbtn" type="button" data-n="≡" data-s="Segui" style="--c: var(--orange)"><small>Il mio registro</small><b>Le mie candidature <span id="trackn" hidden></span></b></button>
     <a class="tab tab-tool" href="salary-it.html" data-n="€" data-s="Stipendio" style="--c: var(--teal)"><small>Strumento</small><b>Lordo → netto</b></a>
   </nav>
 </header>
@@ -148,6 +148,10 @@
         <span class="btn light small">Scegli un file</span>
         <input type="file" id="file" accept=".pdf,.docx,.odt,.txt,.md,image/*" class="sr-only">
       </label>
+      <div class="cvpaste" id="cvpastebox">
+        <label for="cvpaste"><b>Oppure incolla il testo del tuo CV</b> <span class="hint">per esempio da una mail</span></label>
+        <textarea id="cvpaste" class="sheet-input" rows="5" spellcheck="false" placeholder="Incolla qui il testo del tuo CV."></textarea>
+      </div>
       <div class="job" id="job" hidden><p id="jobtxt">Lettura…</p><div class="jbar"><i id="jbar"></i></div></div>
       <p class="err" id="ferr" role="alert" hidden></p>
       <div class="filecard" id="filecard" hidden>
@@ -189,7 +193,7 @@
     <div class="main-col">
       <span class="label">Passo 3 di 5 · il risultato</span>
       <h1 class="big"><span id="pct">0</span> % <small id="verdict">calza</small></h1>
-      <p class="lede" id="sum"></p>
+      <p class="lede" id="sum" aria-live="polite"></p>
       <div class="filters" role="group" aria-label="Mostra">
         <button class="chip" data-f="all" aria-pressed="true">Tutti <span id="n-all"></span></button>
         <button class="chip" data-f="no" aria-pressed="false" style="--k: var(--pink)">✕ Non nel tuo CV <span id="n-no"></span></button>
@@ -240,7 +244,7 @@
     </div>
     <aside class="box">
       <div class="box-head">Il tuo punteggio</div>
-      <div class="box-body score-box">
+      <div class="box-body score-box" aria-live="polite">
         <b id="score4">0 %</b>
         <span id="score4txt"></span>
         <div class="meter" aria-hidden="true"><i id="meter4"></i></div>

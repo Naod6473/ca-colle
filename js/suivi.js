@@ -61,15 +61,16 @@ const appTitle = o => o.app.job || o.title || titleOf(o.text || "") || tr("Candi
 function showTrack(focusId){
   syncOffer();
   $$("[data-p]").forEach(p => p.hidden = true); $$("[data-for]").forEach(p => p.hidden = true);
-  $$(".tab").forEach(t => t.setAttribute("aria-selected", "false"));
-  $("#track").hidden = false; $("#trackbelow").hidden = false; $("#trackbtn").setAttribute("aria-selected", "true");
+  $$(".tab").forEach(t => t.removeAttribute("aria-current"));
+  $("#track").hidden = false; $("#trackbelow").hidden = false; $("#trackbtn").setAttribute("aria-current", "page");
   prepFor = null; mailFor = null;
   if (focusId) { openApp = focusId; trackView = "cards"; trackFilter = "all"; }
   renderTrack();
   if (focusId) setTimeout(() => document.getElementById("app-" + focusId)?.scrollIntoView({block: "start", behavior: "smooth"}), 60);
   else if (window.scrollY > 120) $(".top").scrollIntoView({behavior: "smooth"});
+  if (!focusId) focusTitle($("#track h1"));
 }
-function hideTrack(){ $("#track").hidden = true; $("#trackbelow").hidden = true; $("#trackbtn").setAttribute("aria-selected", "false"); }
+function hideTrack(){ $("#track").hidden = true; $("#trackbelow").hidden = true; $("#trackbtn").removeAttribute("aria-current"); }
 // Lien direct vers le suivi (onglet « Mes candidatures » des pages outils)
 // et vers une étape (onglets des pages outils) : on va à l'étape demandée, ou à la dernière qu'on peut atteindre
 {

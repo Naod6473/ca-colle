@@ -26,6 +26,13 @@ function initComfort(){
   // Langue choisie à la main : plus de redirection automatique selon le navigateur
   document.addEventListener("click", e => { const a = e.target.closest(".lang-menu a[hreflang]"); if (a) try { localStorage.setItem("cacolle-lang", a.hreflang); } catch {} });
   document.addEventListener("click", e => { [menu, document.getElementById("langmenu"), document.getElementById("iomenu")].forEach(m => { if (m?.open && (!m.contains(e.target) || e.target.closest(".io-item > b, button.io-item"))) m.open = false; }); });
+  // Échap ferme les menus Aa, langue et Import / Export, et rend le focus à leur bouton
+  document.addEventListener("keydown", e => {
+    if (e.key !== "Escape") return;
+    const m = [menu, document.getElementById("langmenu"), document.getElementById("iomenu")].find(m => m?.open);
+    if (!m) return;
+    m.open = false; m.querySelector("summary")?.focus(); e.preventDefault();
+  });
 
   // Écouter le résultat : synthèse vocale du navigateur, rien n'est envoyé par l'app
   const say = document.getElementById("listen");

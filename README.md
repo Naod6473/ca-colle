@@ -15,7 +15,7 @@ Tout se passe dans le navigateur : le CV ne quitte jamais l'appareil de la perso
 ## État actuel
 
 - `index.html` + `css/app.css` : les 5 étapes, au style de l'accueil du portfolio (classeur coloré, une couleur par étape). On n'avance que quand l'étape d'avant est remplie ; « Essayer avec un exemple » remplit tout avec des données fictives.
-- `js/lecteur.js` : lecture du CV ou de l'offre dans le navigateur. PDF (pdf.js), Word `.docx` et `.odt` (petit lecteur ZIP intégré), texte, photo ou PDF scanné (OCR Tesseract : français et anglais, ou la langue de la page et l'anglais).
+- `js/lecteur.js` : lecture du CV ou de l'offre dans le navigateur. PDF (pdf.js), Word `.docx` et `.odt` (petit lecteur ZIP intégré), texte, photo ou PDF scanné (OCR Tesseract : d'abord la seule langue de la page, l'anglais en plus seulement si la lecture est mauvaise ; la taille du téléchargement est annoncée).
 - `js/moteur.js` : dictionnaire tous métiers (compétences, savoir-être, permis, horaires, langues, diplômes, années d'expérience) plus repérage des autres lignes de l'annonce, comparaison avec le CV, phrases à trous, mots de l'annonce, test robot recruteur.
 - `js/export.js` : fabrique le fichier Word (.docx) dans le navigateur, impression PDF, copie.
 - `js/app.js` : l'interface, les offres multiples, la lettre, la session gardée, « Pourquoi ce tampon ? » (avec correction à la main d'un tampon ou retrait d'un point).
@@ -34,7 +34,7 @@ Tout se passe dans le navigateur : le CV ne quitte jamais l'appareil de la perso
 - Partager vers Ça colle : `share_target` dans les manifestes. Sur téléphone, après installation, « Partager » depuis un site d'emploi ouvre l'app avec le texte de l'annonce (ou le lien, avec l'aide pour copier le texte).
 - `salaire.html` / `salary-en.html` + `js/salaire.js` : brut → net (même en-tête et onglets que l'app). Trois colonnes en France : brut, net, net après impôt, toutes modifiables. France : taux moyens par statut (non-cadre 22 %, cadre 25 %, fonction publique 15 %, libéral 45 %, portage 51 %), temps de travail, 12 à 16 mois, prélèvement à la source. Royaume-Uni : impôt + National Insurance 2025/26, pension. Ouvert depuis le salaire de « L'annonce en bref » (`?s=`).
 - `js/demo.js` (temporaire) : mode démo pour les tests. Taper « démo » hors d'un champ, l'écrire seul dans la case de l'offre, ou ouvrir `?demo` : profil fictif de Maurice MARCEL (ingénieur informatique), 5 offres, 7 candidatures, lettre, préparation d'entretien. À retirer avec sa ligne `<script>` et son entrée dans `sw.js`.
-- `manifest.webmanifest`, `sw.js`, `icons/` : app installable sur téléphone et utilisable sans réseau après la première visite.
+- `manifest.webmanifest`, `sw.js`, `icons/` : app installable sur téléphone et utilisable sans réseau après la première visite. Seules les pages de la langue utilisée sont préchargées ; `vendor/` et les polices sont dans un cache à part gardé d'une version à l'autre (lecteur PDF gardé à son premier usage) ; réseau d'abord avec 3,5 s d'attente au plus avant la copie locale.
 - `tests/` : banc de test (offres et CV fictifs, résultats attendus). `node tests/run.js` (ou `node tests/run.js en`, `de`, `es`, `it` ; cas propres à chaque langue dans `tests/cas-xx.js`), ou ouvrir `/tests/` dans le navigateur. À lancer après chaque changement du moteur.
 - Session : rien n'est gardé par défaut. Si la case du pied de page est cochée, le CV, les offres et les réponses restent dans le navigateur (localStorage) ; un bouton efface tout.
 - `fonts/` : Archivo et Figtree (licence OFL), hébergées avec l'app.

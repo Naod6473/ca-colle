@@ -83,10 +83,10 @@ html[data-skin="fiche"] .tabs { gap: 4px; padding: 5px; margin: 6px 16px 0 0; ba
 html[data-skin="fiche"] .tab { border: 0; border-radius: 11px; background: transparent; transform: none; padding: 9px 14px; margin: 0; }
 html[data-skin="fiche"] .tab small { color: var(--ink-soft); font-weight: 600; }
 html[data-skin="fiche"] .tab b { font-weight: 700; font-size: 15px; }
-html[data-skin="fiche"] .tab[aria-selected="true"], html[data-skin="fiche"] .tab[aria-current="page"] { background: var(--accent); color: #fff; padding: 9px 14px; }
-html[data-skin="fiche"] .tab[aria-selected="true"] small, html[data-skin="fiche"] .tab[aria-current="page"] small { color: rgba(255, 255, 255, .8); }
+html[data-skin="fiche"] .tab[aria-current] { background: var(--accent); color: #fff; padding: 9px 14px; }
+html[data-skin="fiche"] .tab[aria-current] small { color: rgba(255, 255, 255, .8); }
 html[data-skin="fiche"] .tab:disabled, html[data-skin="fiche"] .tab[aria-disabled="true"] { background: transparent; opacity: .45; }
-html[data-skin="fiche"] .tab:hover:not(:disabled):not([aria-disabled="true"]):not([aria-selected="true"]) { background: var(--paper); }
+html[data-skin="fiche"] .tab:hover:not(:disabled):not([aria-disabled="true"]):not([aria-current]) { background: var(--paper); }
 
 /* Panneaux et zones */
 html[data-skin="fiche"] .panel { background: transparent; border: 0; }
@@ -202,6 +202,7 @@ html[data-skin="fiche"] [data-p="3"] .big { color: var(--accent); }
   }
   html.c-dark[data-skin="fiche"] :is(.big small, .box-head, .score-box b, #pct, .sal-res > div b, .btn.ghost, [data-p="3"] .big) { color: var(--accent-t); }
   html.c-dark[data-skin="fiche"] :is(.label, .pill-safe, .apps-table.compare .best, .sal-col legend, ins, .comfort-menu button[aria-pressed="true"]) { color: #15142B; }
+  html.c-dark[data-skin="fiche"] .pill-safe svg { color: #2c6a12; }
   html.c-dark[data-skin="fiche"] .btn:hover:not(:disabled) { background: #4B48E0; }
   html.c-dark[data-skin="fiche"] .btn:disabled { background: #34355A; color: #8A89A8; }
   html.c-dark[data-skin="fiche"] .section-title::before { outline-color: rgba(236, 235, 250, .2); }
@@ -214,8 +215,13 @@ html[data-skin="fiche"] [data-p="3"] .big { color: var(--accent); }
 
 @media (max-width: 560px) {
   html[data-skin="fiche"] .tabs { width: auto; max-width: none; margin: 0; padding: 0 4px calc(8px + env(safe-area-inset-bottom, 0px)); border-radius: 0; border-top: 1.5px solid var(--hair); background: var(--card); box-shadow: 0 -6px 20px rgba(21, 20, 43, .08) !important; }
-  html[data-skin="fiche"] .tab, html[data-skin="fiche"] .tab[aria-selected="true"], html[data-skin="fiche"] .tab[aria-current="page"] { margin: 0; padding: 7px 1px 9px; border-radius: 0 0 12px 12px; }
-  html[data-skin="fiche"] .tab small, html[data-skin="fiche"] .tab b, html[data-skin="fiche"] .tab[aria-selected="true"] small { font-size: 0; line-height: 0; }
+  html[data-skin="fiche"] .tab, html[data-skin="fiche"] .tab[aria-current] { margin: 0; padding: 7px 1px 9px; border-radius: 0 0 12px 12px; }
+  html[data-skin="fiche"] .tab small, html[data-skin="fiche"] .tab b, html[data-skin="fiche"] .tab[aria-current] small { font-size: 0; line-height: 0; }
   html[data-skin="fiche"] .tab::before { font: 800 16px/1.1 var(--body); }
   html[data-skin="fiche"] .tab-sep { margin: 10px 1px 14px; }
+  html[data-skin="fiche"] .logo { gap: 7px; }
+  html[data-skin="fiche"] .logo::before { width: 30px; height: 30px; border-radius: 9px; font-size: 18px; }
+  html[data-skin="fiche"] .logo span { font-size: 19px; }
+  html[data-skin="fiche"] .pill { font-size: 12px; }
 }
+html[data-skin="fiche"] .cvpaste label b { font: 800 17px/1.2 var(--body); text-transform: none; }
