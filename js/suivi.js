@@ -85,7 +85,7 @@ function openHash(){
     if (n) { for (let k = n; k >= 1; k--) if (canReach(k)) { go(k); break; } } else if (h === "#suivi") showTrack();
   } finally { navReplace = false; }
 }
-if (location.hash === "#suivi" || /^#etape-[1-5]$/.test(location.hash)) setTimeout(openHash, 0);
+if (location.hash === "#suivi" || /^#etape-[1-5]$/.test(location.hash)) addEventListener("DOMContentLoaded", openHash);
 addEventListener("popstate", openHash);
 function renderBadge(){
   const n = apps().reduce((s, o) => s + todosOf(o).filter(t => t.urgent).length, 0);
