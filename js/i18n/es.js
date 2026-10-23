@@ -210,7 +210,7 @@ const I18N = {
     "As-tu déjà fait ça : {0} ?": "¿Ya has hecho esto: {0}?",
     "Un mot seul ne prouve rien : ajoute un fait concret.": "Una palabra sola no prueba nada: añade un hecho concreto.",
     "L'offre le demande : prouve-le par un fait, pas par un adjectif.": "La oferta lo pide: pruébalo con un hecho, no con un adjetivo.",
-    " {un fait qui montre {0} ? {1}}.": " {¿un hecho que muestre {0}? {1}}.",
+    " {0} : {un fait qui montre {1} ? {2}}.": " {0}: {¿un hecho que muestre {1}? {2}}.",
     "Dis à quoi il te sert, ça parle plus qu'un nom de logiciel.": "Di para qué lo usas: dice más que el nombre de un programa.",
     "{0} ({pour quoi faire ? {1}})": "{0} ({¿para qué? {1}})",
     "Sais-tu utiliser {0} ?": "¿Sabes usar {0}?",
@@ -230,9 +230,9 @@ const I18N = {
     "{0} {spécialité et année ? ex : Employé de commerce, 2020}": "{0} {¿especialidad y año? p. ej.: Actividades Comerciales, 2020}",
     "Une expérience équivalente compte souvent autant : mets-la en avant dans ta lettre.": "Una experiencia equivalente suele contar lo mismo: destácala en tu carta.",
     "C'est cité, mais sans exemple concret.": "Lo mencionas, pero sin un ejemplo concreto.",
-    " {un exemple concret ? ex : où, combien, pendant combien de temps}.": " {¿un ejemplo concreto? p. ej.: dónde, cuánto, durante cuánto tiempo}.",
+    " {0} : {un exemple concret ? ex : où, combien, pendant combien de temps}.": " {0}: {¿un ejemplo concreto? p. ej.: dónde, cuánto, durante cuánto tiempo}.",
     "As-tu déjà fait ça ?": "¿Ya has hecho esto?",
-    " {ce que tu as fait ? ex : où, combien, pendant combien de temps}.": " {¿qué hiciste? p. ej.: dónde, cuánto, durante cuánto tiempo}.",
+    " {0} : {ce que tu as fait ? ex : où, combien, pendant combien de temps}.": " {0}: {¿qué hiciste? p. ej.: dónde, cuánto, durante cuánto tiempo}.",
     "Pas grave : mets en avant ce qui s'en rapproche le plus.": "No pasa nada: destaca lo que más se parezca.",
     "{0} ans d'expérience": "{0} años de experiencia",
     "1 an d'expérience": "1 año de experiencia",
@@ -278,6 +278,10 @@ const I18N = {
     "Adresse email personnelle": "Email personal",
     "Une adresse Gmail, Hotmail ou Yahoo pour une entreprise : vérifie qu'elle existe vraiment (site, SIRET, avis).": "Un email de Gmail, Hotmail o Yahoo para una empresa: comprueba que existe de verdad (web, CIF, opiniones).",
     "Lieu": "Lugar",
+    "Entreprise": "Empresa",
+    "Dans quel poste ?": "¿En qué puesto?",
+    "en tant que": "como",
+    "chez": "en",
     "« {0} » s'écrit « {1} »": "«{0}» se escribe «{1}»",
     "« {0} » ne dit pas ce que tu as fait toi-même. Préfère un verbe d'action : « organisé », « géré », « préparé », « vendu »…": "«{0}» no dice lo que hiciste tú. Mejor un verbo de acción: «organicé», «gestioné», «preparé», «vendí»…",
     "Phrase de {0} mots : coupe-la en deux, un recruteur lit vite.": "Frase de {0} palabras: pártela en dos, quien selecciona lee rápido.",
@@ -604,7 +608,7 @@ Tu perfil: 4 años de desarrollo en Java, Git, inglés.`,
     ],
     prep: {g1: "Ingeniero informático desde hace 10 años: soporte, luego administración de sistemas y después 120 servidores y 800 usuarios en Ejemplo Industria. Ahora busco un puesto híbrido con más cloud.", g2: "Su paso a la nube y el tamaño de la plataforma."},
     star: {s: "Una avería del almacenamiento bloqueaba las copias de seguridad de 300 usuarios.", a: "Migré las copias a Veeam con un NAS nuevo en un fin de semana y probé las restauraciones.", r: "Ningún dato perdido, copias un 40 % más rápidas."},
-    fill: ["en Ejemplo Industria, 2 proyectos en 2024"]
+    fill: ["procedimientos de explotación para el equipo de soporte en Ejemplo Industria, 40 fichas en 2024"]
   },
 
   // Titres de rubriques du CV (texte sans accents, en minuscules)
@@ -626,6 +630,8 @@ Tu perfil: 4 años de desarrollo en Java, Git, inglés.`,
     "CACES (chariot élévateur)": ["Carné de carretillero", "carretiller\\w*|carretillas? elevadoras?|toro mecanico|transpaletas?|apiladoras?", "carretilla frontal y retráctil, 2023"],
     "Expédition et emballage": ["Expedición y embalaje", "expedicion(es)?|embala\\w*|empaquet\\w*|envasado", "200 paquetes al día"],
     "Manutention": ["Manipulación de cargas", "manipulacion de (cargas|mercancias?)|carga y descarga|cargas pesadas|mozo de carga", "carga de camiones"],
+    "Livraison": ["Reparto", "reparto (de |a )?(paquetes|paqueteria|mercancias?|domicilio|pedidos)|repartidor\\w*|mensajer\\w*", "100 paquetes al día", "repart\\w*|paquet\\w*|\\brutas?\\b|mensajer\\w*"],
+    "Conduite de véhicule": ["Conducción", "conductor\\w*|chofer\\w*|conduccion de (vehiculos|furgonetas|camiones)|furgoneta", "rutas diarias por la ciudad", "conduc\\w*|chofer|repart\\w*|furgoneta|camion\\w*"],
     // Venta, comercio
     "Encaissement": ["Cobro en caja", "cajer[oa]s?|\\bcobros? en caja|\\bcobrar\\b|manejo de caja|\\bcaja\\b|\\btpv\\b", "hasta 300 clientes al día", "cajer\\w*|\\bcobr\\w*|\\bcaja\\b|\\btpv\\b"],
     "Accueil des clients": ["Atención al público", "atencion al publico|acogida de (clientes|pacientes|visitantes)|recib\\w* a (los )?(clientes|visitantes|pacientes)|dar la bienvenida", "80 clientes al día", "atencion|atend\\w*|recib\\w*"],
@@ -635,6 +641,7 @@ Tu perfil: 4 años de desarrollo en Java, Git, inglés.`,
     "Relation client": ["Atención al cliente", "atencion al cliente|servicio al cliente|satisfaccion del cliente|fidelizacion|reclamaciones|quejas|devoluciones|postventa", "gestión de reclamaciones"],
     "Prospection": ["Prospección", "prospecci\\w*|captacion de (nuevos )?clientes|nuevos clientes|puerta fria", "20 clientes nuevos en un año"],
     "Négociation": ["Negociación", "negocia\\w*", "negociación con 15 proveedores"],
+    "CRM": ["CRM", "\\bcrm\\b", "seguimiento de 150 clientes en Salesforce"],
     // Cuidados, salud, infancia
     "Accompagnement des personnes âgées": ["Atención a personas mayores", "personas mayores|tercera edad|geriatri\\w*|residencias? de mayores|personas dependientes|(situacion|grado|ley) de dependencia", "6 personas atendidas cada semana"],
     "Aide à domicile": ["Ayuda a domicilio", "ayuda a domicilio|auxiliar de ayuda a domicilio|\\bsad\\b|atencion domiciliaria|cuidador\\w*|atencion sociosanitaria", "visitas a 6 personas"],
@@ -651,6 +658,7 @@ Tu perfil: 4 años de desarrollo en Java, Git, inglés.`,
     "Bar": ["Barra", "\\bbarra\\b|barista|cocteler\\w*|cocteles", "bebidas calientes"],
     "Réception hôtelière": ["Recepción de hotel", "recepcionista|recepcion (de hotel|hotelera)|check-?in|\\breservas\\b", "recepción y reservas, 40 habitaciones"],
     "Entretien et nettoyage": ["Limpieza", "limpieza|limpiador\\w*|camarer[oa]s? de pisos", "limpieza de 800 m² de oficinas"],
+    "Machines de nettoyage": ["Máquinas de limpieza", "fregadora\\w*|barredora\\w*|rotativa de limpieza|maquinas? de limpieza|maquinaria de limpieza", "fregadora en 2.000 m²"],
     // Construcción, industria, técnica
     "Lecture de plans": ["Lectura de planos", "lectura de planos|leer (e interpretar )?planos|interpretacion de planos|planos tecnicos", "planos de obra"],
     "Habilitation électrique": ["Habilitación eléctrica", "habilitacion electrica|riesgo electrico|trabajos en tension|instalador autorizado", "2024"],
@@ -707,6 +715,8 @@ Tu perfil: 4 años de desarrollo en Java, Git, inglés.`,
     "HTML / CSS": ["HTML / CSS", "\\bhtml\\b", "páginas web adaptables"],
     "SQL": ["SQL", "bases? de datos", "consultas a una base de clientes"],
     "Cloud": ["Nube (cloud)", "\\bnube\\b", "migración a Microsoft 365"],
+    "Git": ["Git", "\\bgit\\b", "ramas y revisiones de código en equipo"],
+    "Docker": ["Docker", "\\bk8s\\b", "contenedores para 3 aplicaciones"],
     "Gestion de projet": ["Gestión de proyectos", "gestion de proyectos?|jefe de proyectos?|direccion de proyectos?|liderar (los )?proyectos?|project manager", "proyecto de 6 meses, 3 personas", "gestion de proyectos?|jefe de proyectos?|proyectos?"],
     "Management d'équipe": ["Gestión de equipos", "gestion de equipos?\\b(?! informaticos)|liderazgo de equipos?|dirigir (un |el )?equipo|coordinar (un |el )?equipo|jefe de equipo|responsable de equipo|encargad[oa] de tienda", "equipo de 5 personas"],
     // Cualidades y condiciones, todas las profesiones
@@ -734,6 +744,11 @@ Tu perfil: 4 años de desarrollo en Java, Git, inglés.`,
 
   // Motifs de l'analyse (texte sans accents, en minuscules)
   re: {
+    // Niveau de langue, morceaux sans compétence (avantages, entreprise, candidature), noms d'entreprise dans le titre
+    langLevel: "nativ[oa]|bilingue|fluido|nivel (alto|medio|basico|avanzado|intermedio|[abc][12])|alto|medio|basico|avanzado|intermedio|lengua materna",
+    noiseLabel: "^\\s*[-•*–·]*\\s*(ofrecemos|que ofrecemos|beneficios|salario|retribucion|como inscribirse)\\s*:",
+    noise: "\\b(ofrecemos|que ofrecemos|beneficios sociales|seguro medico|ticket restaurante|cheques? (comida|restaurante)|retribucion flexible|envia\\w* (tu|el|su) (cv|curriculum)|inscribete|somos (una|un|la|el)|nuestra (empresa|compania)|empresa (lider|de \\d+))\\b",
+    company: "^(supermercado|restaurante|hotel|clinica|hospital|despacho|agencia|panaderia|empresa|farmacia|taller|cafeteria)\\b",
     // Message d'erreur à l'étape de l'offre : « ton CV » devient « l'offre »
     cvWord: "tu CV", offerWord: "la oferta",
     // Annonce de bureau ou d'informatique : on propose de demander pour le télétravail
@@ -806,12 +821,15 @@ Tu perfil: 4 años de desarrollo en Java, Git, inglés.`,
   },
 
   // Lettre de motivation (même forme que la version anglaise de js/app.js)
+  // La carta concuerda con Señora / Señor (L.g : "f", "m" o sin precisar)
+  letterGender: true,
   letter({job, at, why, L, gaps}){
     const when = d => L.when ? L.when.trim() : d;
+    const ready = L.g === "f" ? "Estoy dispuesta a formarme" : L.g === "m" ? "Estoy dispuesto a formarme" : "Tengo ganas de formarme";
     return {
       classic: {subj: `Asunto: candidatura al puesto de ${job}`, open: `He leído con mucho interés su oferta para el puesto de ${job}${at}.${why}`, intro: "Esto es lo que puedo aportar:", extra: "", close: `Estoy disponible ${when("en breve")} y me encantaría reunirme con ustedes para hablarlo.`, bye: "Atentamente,"},
       dynamic: {subj: `Asunto: candidatura «${job}»`, open: `Su oferta para el puesto de ${job}${at} me ha dado ganas de escribirles enseguida.${why}`, intro: "Lo que aporto, en concreto:", extra: "", close: `Estoy disponible ${when("desde ya")} y me encantaría contárselo en persona.`, bye: "Un cordial saludo,"},
-      change: {subj: `Asunto: candidatura al puesto de ${job} (cambio de profesión)`, open: `Quiero poner mi experiencia al servicio de una nueva profesión, y su oferta para el puesto de ${job}${at} encaja justo con este proyecto.${why}`, intro: "Lo que me ha enseñado mi trayectoria y puedo aprovechar en este puesto:", extra: gaps.length ? `Estoy dispuesto/a a formarme en lo que todavía no conozco, como ${gaps.join(" y ")}.` : "Estoy dispuesto/a a formarme en lo que todavía no conozco.", close: `Estoy disponible ${when("en breve")} y me encantaría reunirme con ustedes para hablarlo.`, bye: "Atentamente,"},
+      change: {subj: `Asunto: candidatura al puesto de ${job} (cambio de profesión)`, open: `Quiero poner mi experiencia al servicio de una nueva profesión, y su oferta para el puesto de ${job}${at} encaja justo con este proyecto.${why}`, intro: "Lo que me ha enseñado mi trayectoria y puedo aprovechar en este puesto:", extra: gaps.length ? `${ready} en lo que todavía no conozco, como ${gaps.join(" y ")}.` : `${ready} en lo que todavía no conozco.`, close: `Estoy disponible ${when("en breve")} y me encantaría reunirme con ustedes para hablarlo.`, bye: "Atentamente,"},
       study: {subj: `Asunto: candidatura para prácticas o FP dual: ${job}`, open: `Busco unas prácticas o una plaza de FP dual [indica cuál, con las fechas o el horario y tu centro de estudios] como ${job}${at}.${why}`, intro: "Lo que ya puedo aportar:", extra: "Tengo muchas ganas de aprender sobre el terreno y de crecer con su equipo.", close: `Estoy disponible ${when("en breve")} y me encantaría reunirme con ustedes para hablarlo.`, bye: "Atentamente,"}
     };
   },

@@ -79,7 +79,7 @@ Your profile: 4 years of Java development, Git, English.`,
   ],
   prep: {g1: "IT engineer for 10 years: support, then systems administration, then 120 servers and 800 users at Example Industries. I am now looking for a hybrid role with more cloud.", g2: "Your move to the cloud and the size of the platform."},
   star: {s: "A storage failure stopped backups for 300 users.", a: "I moved the backups to Veeam on a new NAS over a weekend and tested restores.", r: "No data lost, backups 40% faster."},
-  fill: ["at Example Industries, 2 projects in 2024"]
+  fill: ["operating procedures for the support team at Example Industries, 40 guides in 2024"]
 } : {
   file: "CV_Maurice_MARCEL.pdf (démo)", info: "Profil fictif pour les tests",
   cv: `MAURICE MARCEL · Ingénieur en informatique · 32 ans
@@ -156,7 +156,7 @@ Votre profil : 4 ans de développement Java, Git, anglais.`,
   ],
   prep: {g1: "Ingénieur informatique depuis 10 ans : support, puis administration systèmes, puis 120 serveurs et 800 utilisateurs chez Exemple Industrie. Je cherche maintenant un poste hybride avec plus de cloud.", g2: "Votre passage au cloud et la taille de la plateforme."},
   star: {s: "Une panne du stockage bloquait les sauvegardes de 300 utilisateurs.", a: "J'ai migré les sauvegardes sur Veeam avec un nouveau NAS en un week-end et testé les restaurations.", r: "Aucune donnée perdue, sauvegardes 40 % plus rapides."},
-  fill: ["chez Exemple Industrie, 2 projets en 2024"]
+  fill: ["procédures d'exploitation pour l'équipe support chez Exemple Industrie, 40 fiches en 2024"]
 });
 const link = (t, i) => `https://exemple.fr/offres/${fold(titleOf(t)).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40)}-${1000 + i}`;
 const day = n => n == null ? "" : addDays(today(), n);
@@ -175,7 +175,8 @@ function populate(){
   // Offre principale : la première, avec une lettre, un ajout au CV et une préparation d'entretien
   cur = offers[0]; fixes = cur.fixes; over = cur.over; $("#offer").value = cur.text;
   Object.assign(cur.letter, D.letter);
-  const r = analyse(cur.text).find(r => r.fix && !r.fix.ask && r.st !== "ok" && (r.fix.tpl.match(/\{/g) || []).length === 1);
+  // Ajout au CV sur un point précis (« Documentation technique »), pas sur le premier venu
+  const r = analyse(cur.text).find(r => r.id === (D.fillPoint || "Documentation technique") && r.fix && (r.fix.tpl.match(/\{/g) || []).length === 1);
   if (r) { fixes[r.k] = {vals: {0: D.fill[0]}, state: "accepted", fix: r.fix}; }
   cur.score = scoreOf(analyse(cur.text));
   const qs = interviewQs(cur), star = qs.find(q => !q.one);

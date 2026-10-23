@@ -31,7 +31,9 @@ const apps = () => offers.filter(o => o.app);
 function ensureApp(o, status){
   if (!o.app) {
     const job = (o.letter && o.letter.job) || (o.text.trim() ? titleOf(o.text).split(/\s+[–-]\s+/)[0].replace(GENDER, "").trim() : "");
-    o.app = {job, company: (o.letter && o.letter.company) || "", offerDate: "", appliedDate: "", status: "todo", next: "", contact: "", link: "", notes: "", history: [{d: today(), s: "todo"}]};
+    // Entreprise et adresse mail du recruteur lues dans l'annonce, si la lettre ne les donne pas
+    const ad = o.text.trim() ? adCheck(o.text) : {};
+    o.app = {job, company: (o.letter && o.letter.company) || ad.company || "", offerDate: "", appliedDate: "", status: "todo", next: "", contact: ad.email || "", link: "", notes: "", history: [{d: today(), s: "todo"}]};
   }
   if (status && o.app.status !== status) setStatus(o, status);
   return o.app;

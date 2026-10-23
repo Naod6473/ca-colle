@@ -249,6 +249,148 @@ BTEC Level 3 IT, 2018`,
   mid: ["Backup and restore", "Windows"], absent: ["Excel", "Qualification: Licence"], no: ["Technical documentation", "Communication skills", "Driving licence"]
 },
 {
+  // Revue du 23 octobre 2026 : lignes d'avantages, d'entreprise et « comment postuler » sans compétence
+  name: "Annonce avec avantages et présentation de l'entreprise",
+  offer: `Magasinier H/F – CDI – Caen
+Notre société de 200 salariés, leader du négoce de matériaux, recrute pour son entrepôt.
+Missions :
+- Réception des marchandises et rangement
+- Préparation de commandes
+- Vous travaillez sous la supervision du chef d'équipe, en lien avec les infirmiers du site
+- Vous rejoignez une équipe de 5 personnes pilotée par un manager bienveillant
+Avantages : tickets restaurant, mutuelle, 13e mois, accès bar et salle de sport.
+Véhicule de service et téléphone portable fournis.
+Vous serez formé(e) en interne sur nos outils.
+Envoyez votre CV au service RH : recrutement@exemple-materiaux.fr`,
+  cv: `Paul Exemple · Caen · paul@exemple.fr · 06 10 20 30 40
+Expériences
+Magasinier, Entrepôt Exemple (2018 - 2024) : réception de 30 palettes par jour, préparation de commandes (80 par jour).
+Compétences
+Excel`,
+  ok: ["Réception des marchandises", "Préparation de commandes"],
+  absent: ["Gestion des incidents (ITIL)", "Recrutement", "Accueil téléphonique", "Management d'équipe", "Supervision", "Soins infirmiers", "Bar", "Écoute", "Vente", "Vous serez formé(e) en interne sur nos outils"],
+  ad: {facts: {place: "Caen"}}
+},
+{
+  name: "Chauffeur livreur (revue)",
+  offer: `Chauffeur livreur VL (H/F) – CDD 3 mois – Lille
+Missions :
+- Livraison de colis chez les particuliers et professionnels (80 à 120 points par jour)
+- Chargement du véhicule et vérification de la tournée
+- Respect du code de la route et des consignes de sécurité
+Profil :
+- Permis B depuis plus de 3 ans exigé
+- Ponctualité et sens du service
+Horaires : 7h - 15h du lundi au samedi. 11,88 € brut de l'heure.`,
+  cv: `Karim Exemple · Roubaix · karim@exemple.fr · 07 11 22 33 44
+Expérience
+Livreur, Colis Exemple (2021 - 2024) : tournées de 100 colis par jour sur la métropole lilloise, scan des colis, chargement du camion le matin.
+Préparateur de commandes, Entrepôt Nord Exemple (2019 - 2021) : picking, 150 commandes par jour.
+Compétences
+Permis B (2016), GPS, ponctuel`,
+  ok: ["Livraison", "Conduite de véhicule", "Manutention", "Permis B"], prio: {"Permis B": "must"},
+  ad: {facts: {hours: "7h - 15h", salary: "11,88 €", place: "Lille"}}
+},
+{
+  name: "Aide-soignante : diplôme obligatoire cité d'abord dans le titre",
+  offer: `Aide-soignant(e) H/F – CDI – EHPAD Les Tilleuls – Angers
+Missions :
+- Aide à la toilette, à l'habillage et aux repas
+- Surveillance de l'état de santé et transmissions à l'équipe infirmière
+Profil :
+- Diplôme d'État d'aide-soignant (DEAS) obligatoire
+- Disponible les week-ends (roulement 1 week-end sur 2)
+Salaire : 1 950 € brut mensuel + primes`,
+  cv: `Nadia Exemple · Angers · nadia@exemple.fr · 06 12 34 56 78
+Expériences professionnelles
+Aide-soignante, Clinique Exemple (2020 - aujourd'hui) : soins d'hygiène et de confort pour 12 patients, aide au lever et au coucher.
+Agent de service hospitalier, EHPAD Exemple (2017 - 2020) : bionettoyage des chambres, aide aux repas des résidents.
+Formation
+DEAS, IFAS Exemple (2020)`,
+  ok: ["Diplôme d'aide-soignant", "Aide à la toilette", "Préparation des repas"], prio: {"Diplôme d'aide-soignant": "must"}, absent: ["Soins infirmiers"],
+  ad: {facts: {company: "EHPAD Les Tilleuls", place: "Angers", salary: "1 950 €"}}
+},
+{
+  name: "Développeur : sigles courts, langue avec niveau",
+  offer: `Développeur web (H/F) – CDI – Nantes
+Vos missions :
+- Développer de nouvelles fonctionnalités en React et Node.js
+- Participer aux revues de code et aux cérémonies agiles
+Profil :
+- Maîtrise de TypeScript, PostgreSQL et Git
+- Docker serait un plus
+- Anglais technique
+Salaire : 42-50 k€, télétravail hybride.`,
+  cv: `Thomas Exemple · Nantes · thomas@exemple.fr · 06 55 44 33 22
+Expériences
+Développeur front-end, Agence Exemple (2021 - 2024) : applications React et TypeScript pour 15 clients, revues de code avec Git.
+Compétences
+JavaScript, Scrum, Docker
+Langues
+Anglais courant (TOEIC 900)`,
+  ok: ["JavaScript", "Git", "Anglais"], mid: ["Docker", "Participer aux revues de code et aux cérémonies agiles"],
+  ad: {facts: {salary: "42-50 k€"}}
+},
+{
+  name: "Comptable : fourchette de salaire, ajouts sans parenthèse au milieu d'un nom",
+  offer: `Comptable général H/F – CDI – Bordeaux
+- La saisie et la révision des écritures comptables
+Profil :
+- Maîtrise de Sage et d'Excel (tableaux croisés dynamiques)
+- Rigueur
+Rémunération : 32 à 36 k€ selon profil.`,
+  cv: `Julie Exemple · Bordeaux · julie@exemple.fr · 06 98 76 54 32
+Expériences professionnelles
+Assistante comptable, Cabinet Exemple (2019 - 2024) : tenue de 40 dossiers clients, saisie des achats et des ventes.
+Compétences
+Sage 100, Excel (RECHERCHEV, TCD), rigueur`,
+  mid: ["Logiciel de gestion (ERP)", "Excel", "Rigueur"],
+  ad: {facts: {salary: "32 à 36 k€", place: "Bordeaux"}},
+  fills: [["Logiciel de gestion (ERP)", {0: "saisie des écritures"}], ["Excel", {0: "rapprochements"}], ["Rigueur", {0: "zéro erreur de TVA en 2023"}]],
+  cvHas: ["Sage 100 (saisie des écritures)", "Excel (RECHERCHEV, TCD, rapprochements)", "Rigueur : zéro erreur de TVA en 2023."], cvNot: ["Sage (", ") 100"]
+},
+{
+  name: "Caissière : poste sur plusieurs lignes, choix du poste, disponibilités",
+  offer: `Employé(e) libre-service H/F - Supermarché Les Halles du Bocage
+Saint-Lô (50) - CDI - 35 h / semaine
+Missions :
+- Mise en rayon des produits frais
+- Encaissement en caisse et en caisse automatique
+- Réception des livraisons et gestion des stocks
+Profil :
+- Disponible le samedi, travail en coupure
+- Permis B indispensable
+Salaire : 1 850 € brut mensuel + 13e mois + tickets restaurant.
+Envoyer CV et lettre à recrutement@halles-exemple.fr`,
+  cv: `Sylvie Exemple
+12 rue des Lilas, 50000 Saint-Lô
+06 12 34 56 78 - sylvie@exemple.fr
+
+EXPÉRIENCES
+2016 - 2025 : Hôtesse de caisse, Supermarché Exemple Plus, Saint-Lô
+- Encaissement des clients, tenue de caisse, rendu de monnaie
+- Mise en rayon le matin
+
+2012 - 2016 : Employée de ménage, Société Exemple Net, Coutances
+- Entretien des bureaux
+
+COMPÉTENCES
+Caisse, ponctualité
+
+FORMATION
+CAP Employé de vente spécialisé, 2011
+
+Permis B, véhicule personnel`,
+  ok: ["Mise en rayon", "Encaissement", "Permis B"], no: ["Horaires décalés", "Réception des marchandises"],
+  absent: ["Disponible le samedi, travail en coupure", "Gestion des incidents (ITIL)", "Recrutement"],
+  proof: {"Encaissement": "Encaissement des clients"},
+  ad: {facts: {company: "Supermarché Les Halles du Bocage", place: "Saint-Lô", hours: "35 h / semaine"}},
+  review: {notOn: ["2016 - 2025", "2012 - 2016"]},
+  fills: [["Réception des marchandises", {0: "livraisons du matin, 20 palettes"}, 0], ["Gestion des stocks", {0: "inventaire de fin d'année"}, 1]],
+  cvHas: ["Réception des marchandises : livraisons du matin, 20 palettes.", "Gestion des stocks : inventaire de fin d'année."],
+  cvNot: ["Saint-Lô Réception", "matin Réception"]
+},
+{
   name: "Annonce arnaque (vérif annonce)",
   offer: `Agent de saisie à domicile – Lyon
 Travail depuis chez vous, sans expérience. Gagnez 300 € par jour !

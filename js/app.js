@@ -222,18 +222,26 @@ function ensureFix(r){
   else if (f.state !== "accepted" && f.state !== "skipped") f.fix = r.fix;
   return fixes[r.k];
 }
-const whereOf = line => !line ? tr("tes compétences", "your skills") : line.exp ? tr("ton expérience : ", "your job: ") + line.t.split(/[,:(]/)[0].slice(0, 60) : line.kind === "edu" ? tr("ta formation", "your education") : tr("tes compétences", "your skills");
+const whereOf = line => !line ? tr("tes compétences", "your skills") : line.exp ? tr("ton expérience : ", "your job: ") + ((jobOf(line.id)?.title || line.t.replace(RANGE, "").replace(/^[\s:–-]+/, "").split(/[,:(]/)[0]).slice(0, 60)) : line.kind === "edu" ? tr("ta formation", "your education") : tr("tes compétences", "your skills");
+// Case à remplir : la question en étiquette visible au-dessus, l'exemple dans la case
+const splitPh = ph => { const i = ph.indexOf("?"); return i > 0 ? [ph.slice(0, i + 1).trim(), ph.slice(i + 1).trim()] : [ph, ""]; };
 const READY = () => tr("Prêt.", "Ready."), FILL = () => tr("Remplis les cases jaunes.", "Fill in the yellow boxes.");
 function renderRewrite(){
   const list = results.filter(r => r.fix && (r.st !== "ok" || r.fixedNow)).sort((a, b) => urgency(a) - urgency(b));
-  $("#sugs").innerHTML = list.map(r => {
-    const f = ensureFix(r), fix = f.fix, line = CV.find(l => l.id === targetId(fix)); let i = 0;
-    const blanks = esc(fix.tpl).replace(/\{([^}]+)\}/g, (m, ph) => { const j = i++; return `<input class="blank" data-k="${esc(r.k)}" data-i="${j}" placeholder="${esc(ph)}" value="${esc(f.vals[j] || "")}" size="${Math.max(8, Math.min(40, ph.length - 4))}" aria-label="${esc(ph)}">`; });
+  const jobs = jobsOf();
+  $("#sugs").innerHTML = list.map((r, n) => {
+    const f = ensureFix(r), fix = f.fix, line = CV.find(l => l.id === targetId(fix, f.to)); let i = 0;
+    const labels = blanksOf(fix.tpl).map((ph, j) => `<label class="blank-l" for="b${n}-${j}">${esc(splitPh(ph)[0].replace(/^(¿?)(\p{L})/u, (m, a, b) => a + b.toUpperCase()))}</label>`).join("");
+    const blanks = esc(fix.tpl).replace(/\{([^}]+)\}/g, (m, ph) => { const j = i++, [, hint] = splitPh(ph); return `<input class="blank" id="b${n}-${j}" data-k="${esc(r.k)}" data-i="${j}" placeholder="${esc(hint || "…")}" value="${esc(f.vals[j] || "")}" size="${Math.max(8, Math.min(40, (hint || ph).length))}">`; });
+    // Ajout dans une expérience : la personne choisit le poste (le premier par défaut)
+    const pick = fix.line === "exp" && !fix.find && jobs.length > 1 && f.state !== "accepted"
+      ? `<span class="where"><label for="to${n}">${tr("Dans quel poste ?", "In which job?")}</label> <select class="stsel to-sel" id="to${n}" data-to="${esc(r.k)}">${jobs.map(j => `<option value="${j.id}" ${(jobs.find(x => x.id === f.to) || jobs[0]) === j ? "selected" : ""}>${esc(j.title.slice(0, 60))}</option>`).join("")}</select></span>`
+      : `<span class="where">${tr("Dans", "In")} ${esc(whereOf(line))}</span>`;
     let body;
     if (f.state === "open") body = `<div class="ask">${esc(fix.ask)} <button class="btn small" data-yes="${esc(r.k)}">${tr("Oui", "Yes")}</button><button class="btn light small" data-no="${esc(r.k)}">${tr("Non", "No")}</button></div>`;
     else if (f.state === "skipped") body = `<p>${esc(fix.nope || tr("Point laissé de côté.", "Point set aside."))}</p><div class="sug-a"><button class="btn light small" data-undo="${esc(r.k)}">${tr("Revenir sur ce point", "Go back to this point")}</button></div>`;
     else body = `${fix.why ? `<p>${esc(fix.why)}</p>` : ""}
-      <span class="where">${tr("Dans", "In")} ${esc(whereOf(line))}</span>
+      ${pick}${labels}
       <div class="sentence">${fix.find ? `<span class="old">${esc(fix.find)}</span> → ` : "… "}${blanks}</div>
       <div class="sug-a">${f.state === "accepted"
         ? `<i class="stamp ok">${tr("Ajouté", "Added")}</i><button class="btn light small" data-undo="${esc(r.k)}">${tr("Retirer", "Remove")}</button>`
@@ -273,6 +281,8 @@ function prefillLetter(){
   if (!me.contact) me.contact = [all.match(/[\w.+-]+@[\w-]+\.[a-z.]{2,}/i)?.[0], tel?.[0]].filter(Boolean).join(" · ");
   const L = cur.letter;
   if (L.job === undefined) L.job = titleOf($("#offer").value).split(/\s+[–-]\s+/)[0].replace(GENDER, "").trim();
+  // Entreprise lue dans le titre de l'annonce (« Vendeur – Boulangerie Les Blés – Caen ») : modifiable dans le formulaire
+  if (L.company === undefined) L.company = adCheck($("#offer").value).company || "";
   if (!L.strengths) L.strengths = results.filter(r => r.st === "ok" && r.type !== "y" && r.type !== "h").slice(0, 3).map(r => r.k);
   return head;
 }
@@ -281,6 +291,9 @@ function renderLetterForm(){
   const L = cur.letter;
   $("#l-name").value = me.name; $("#l-contact").value = me.contact;
   $$("[data-tone]").forEach(b => b.setAttribute("aria-pressed", b.dataset.tone === (L.tone || "classic")));
+  // Madame / Monsieur : accords de la lettre (« heureuse », « prêt »), seulement dans les langues qui en ont besoin
+  $("#l-gender").hidden = !(LANG === "fr" || L10N?.letterGender);
+  $$("[data-g]").forEach(b => b.setAttribute("aria-pressed", b.dataset.g === (L.g || "n")));
   $("#l-company").value = L.company || ""; $("#l-job").value = L.job || ""; $("#l-why").value = L.why || ""; $("#l-when").value = L.when || "";
   const oks = results.filter(r => r.st === "ok" && r.type !== "y");
   $("#l-strengths").innerHTML = oks.length ? oks.map(r => `<label class="str"><input type="checkbox" data-str="${esc(r.k)}" ${L.strengths.includes(r.k) ? "checked" : ""}> <span><b>${esc(r.k)}</b><small>${esc(clip(excerpt(r, false)))}</small></span></label>`).join("")
@@ -289,15 +302,47 @@ function renderLetterForm(){
 }
 const sentence = t => { t = t.trim(); t = t.charAt(0).toUpperCase() + t.slice(1); return /[.!?…]$/.test(t) ? t : t + "."; };
 const clip = t => t.replace(/^…\s*|\s*…$/g, "").replace(/^\(?\d{4}\s*[-–]\s*\d{4}\)\s*:?\s*/, "").replace(/\s*:\s*$/, "").trim();
+// Ce que montre le CV pour un point fort : la tâche sans les dates ni l'intitulé du poste, et le poste à part
+function taskOf(r){
+  const P = r.proof, job = P?.id && jobOf(P.id);
+  if (!P || !job) return {x: clip(excerpt(r, false)).replace(RANGE, "").replace(/^[\s:–-]+|[\s,;:–-]+$/g, ""), job: null};
+  // Ligne d'intitulé ou de dates : le poste suffit
+  if (job.multi && (P.id === job.id || dateOnly(P.t))) return {x: "", job};
+  let t = P.t;
+  if (!job.multi) {
+    const c = t.search(/\s:\s|:\s/);
+    if (c >= 0) { if (c > P.i) return {x: "", job}; t = t.slice(t.indexOf(":", c) + 1); }
+  }
+  // Ligne longue : son début, coupé à un mot (le même extrait pour tous les points de la ligne)
+  t = t.replace(RANGE, " ").replace(/\s+/g, " ").replace(/^[\s:–-]+|[\s.,;:–-]+$/g, "").trim();
+  if (t.length > 150) t = t.slice(0, t.lastIndexOf(" ", 150)).replace(/[\s.,;:–-]+$/, "") + "…";
+  return {x: t, job, id: P.id};
+}
+// « en tant qu'hôtesse de caisse chez Supermarché Marché Plus », « as an order picker at FreshMart »
+const asRole = j => {
+  const role = LANG === "de" || /^\p{Lu}{2}/u.test(j.role) ? j.role : j.role.charAt(0).toLowerCase() + j.role.slice(1);
+  const as = LANG === "fr" ? (/^[aeiouyhàâéèêîïôûœ]/i.test(role) ? "en tant qu'" : "en tant que ") : EN ? (/^[aeiou]/i.test(role) ? "as an " : "as a ") : tr("en tant que", "as") + " ";
+  return as + role + (j.company ? " " + tr("chez", "at") + " " + j.company : "");
+};
 function letterText(){
   const L = cur.letter, job = L.job || tr("[intitulé du poste]", "[job title]"), co = L.company || tr("[nom de l'entreprise]", "[company name]");
-  // Les points forts prouvés par la même ligne du CV sont regroupés : « - Préparation de commandes, contrôle qualité : … »
-  const groups = [];
+  // Les points forts prouvés par la même ligne du CV sont regroupés ; le poste n'est cité qu'une fois
+  // « - Encaissement des clients, tenue de caisse, en tant qu'hôtesse de caisse chez … » ; pas de « Mise en rayon : Mise en rayon le matin »
+  const groups = [], low = r => /^.[a-zà-ÿ]/.test(r.k) && LANG !== "de" && r.type !== "o" ? r.k.charAt(0).toLowerCase() + r.k.slice(1) : r.k;
   results.filter(r => L.strengths.includes(r.k) && r.st === "ok").forEach(r => {
-    const x = clip(excerpt(r, false)), g = x && groups.find(g => g.x === x);
-    if (g) g.k.push(/^.[a-zà-ÿ]/.test(r.k) ? r.k.charAt(0).toLowerCase() + r.k.slice(1) : r.k); else groups.push({k: [r.k], x});
+    const {x, job: j, id} = taskOf(r), key = x ? id || x : j ? "@" + j.id : "", g = key && groups.find(g => g.key === key);
+    if (g) g.k.push(low(r)); else groups.push({k: [r.k], x, j, key});
   });
-  const strong = groups.map(g => `- ${g.k.join(", ")}${g.x ? tr(" : ", ": ") + g.x : ""}`);
+  const said = new Set();
+  const strong = groups.map(g => {
+    const F = fold(g.x), w = fold(g.k[0]).split(/[\s'(]+/).find(w => w.length >= 4) || fold(g.k[0]);
+    const head = g.x && g.k.length === 1 && (F.includes(fold(g.k[0])) || F.startsWith(w.slice(0, 6))) ? g.x : g.k.join(", ") + (g.x ? tr(" : ", ": ") + g.x : "");
+    const role = g.j && !said.has(g.j.id) && g.j.role ? (said.add(g.j.id), ", " + asRole(g.j)) : "";
+    return `- ${head}${role}`;
+  });
+  // Madame / Monsieur / sans préciser : « heureuse », « heureux », ou une tournure neutre
+  const g = L.g || "n", glad = {f: "je serais heureuse de vous rencontrer", m: "je serais heureux de vous rencontrer", n: "ce serait un plaisir de vous rencontrer"}[g] || "ce serait un plaisir de vous rencontrer";
+  const ready = {f: "Je suis prête à me former", m: "Je suis prêt à me former", n: "J'ai envie de me former"}[g] || "J'ai envie de me former";
   const tone = L.tone || "classic", at = L.company ? tr(" chez " + L.company, " at " + L.company) : "";
   const why = L.why ? " " + sentence(L.why) : tr(" [pourquoi ce poste ou cette entreprise]", " [why this job or company]");
   // Ce que l'offre demande et que le CV ne montre pas encore : seulement cité, jamais inventé
@@ -309,10 +354,10 @@ function letterText(){
     change: {subj: `Application for the position of ${job} (career change)`, open: `I am moving into a new line of work, and your offer for the position of ${job}${at} matches that plan exactly.${why}`, intro: "What my background has taught me and I can bring to this role:", extra: gaps.length ? `I am ready to train in what I do not know yet, such as ${gaps.join(" and ")}.` : "I am ready to train in whatever I do not know yet.", close: `I am available ${L.when ? L.when.trim() : "soon"} and would be glad to meet you to talk about it.`, bye: "Yours sincerely,"},
     study: {subj: `Application for an apprenticeship or internship: ${job}`, open: `I am looking for an apprenticeship or internship [say which, with the dates or the schedule and your school] as ${job}${at}.${why}`, intro: "What I can already bring:", extra: "I am keen to learn on the job and to grow with your team.", close: `I am available ${L.when ? L.when.trim() : "soon"} and would be glad to meet you to talk about it.`, bye: "Yours sincerely,"}
   } : {
-    classic: {subj: `Objet : candidature au poste « ${job} »`, open: `Votre offre pour le poste « ${job} »${at} a retenu toute mon attention.${why}`, intro: "Voici ce que je peux vous apporter :", extra: "", close: `Je suis disponible ${L.when ? L.when.trim() : "rapidement"} et je serais heureux·se de vous rencontrer pour en parler.`, bye: "Je vous prie d'agréer, Madame, Monsieur, mes salutations distinguées."},
+    classic: {subj: `Objet : candidature au poste « ${job} »`, open: `Votre offre pour le poste « ${job} »${at} a retenu toute mon attention.${why}`, intro: "Voici ce que je peux vous apporter :", extra: "", close: `Je suis disponible ${L.when ? L.when.trim() : "rapidement"} et ${glad} pour en parler.`, bye: "Je vous prie d'agréer, Madame, Monsieur, mes salutations distinguées."},
     dynamic: {subj: `Objet : candidature « ${job} »`, open: `Votre offre pour le poste « ${job} »${at} m'a donné envie de vous écrire tout de suite.${why}`, intro: "Ce que j'apporte, concrètement :", extra: "", close: `Je suis disponible ${L.when ? L.when.trim() : "dès maintenant"} et j'aimerais beaucoup vous en dire plus de vive voix.`, bye: "Bien cordialement,"},
-    change: {subj: `Objet : candidature au poste « ${job} » (reconversion)`, open: `Je souhaite mettre mon expérience au service d'un nouveau métier, et votre offre pour le poste « ${job} »${at} correspond exactement à ce projet.${why}`, intro: "Ce que mon parcours m'a appris et que je peux mettre à profit :", extra: gaps.length ? `Je suis prêt·e à me former sur ce que je ne connais pas encore, comme ${gaps.join(" et ")}.` : "Je suis prêt·e à me former sur ce que je ne connais pas encore.", close: `Je suis disponible ${L.when ? L.when.trim() : "rapidement"} et je serais heureux·se de vous rencontrer pour en parler.`, bye: "Je vous prie d'agréer, Madame, Monsieur, mes salutations distinguées."},
-    study: {subj: `Objet : candidature en alternance ou en stage « ${job} »`, open: `Je recherche une alternance ou un stage [précise lequel, avec les dates ou le rythme et ton école] au poste « ${job} »${at}.${why}`, intro: "Ce que je peux déjà vous apporter :", extra: "J'ai envie d'apprendre sur le terrain et de progresser avec votre équipe.", close: `Je suis disponible ${L.when ? L.when.trim() : "rapidement"} et je serais heureux·se de vous rencontrer pour en parler.`, bye: "Je vous prie d'agréer, Madame, Monsieur, mes salutations distinguées."}
+    change: {subj: `Objet : candidature au poste « ${job} » (reconversion)`, open: `Je souhaite mettre mon expérience au service d'un nouveau métier, et votre offre pour le poste « ${job} »${at} correspond exactement à ce projet.${why}`, intro: "Ce que mon parcours m'a appris et que je peux mettre à profit :", extra: gaps.length ? `${ready} sur ce que je ne connais pas encore, comme ${gaps.join(" et ")}.` : `${ready} sur ce que je ne connais pas encore.`, close: `Je suis disponible ${L.when ? L.when.trim() : "rapidement"} et ${glad} pour en parler.`, bye: "Je vous prie d'agréer, Madame, Monsieur, mes salutations distinguées."},
+    study: {subj: `Objet : candidature en alternance ou en stage « ${job} »`, open: `Je recherche une alternance ou un stage [précise lequel, avec les dates ou le rythme et ton école] au poste « ${job} »${at}.${why}`, intro: "Ce que je peux déjà vous apporter :", extra: "J'ai envie d'apprendre sur le terrain et de progresser avec votre équipe.", close: `Je suis disponible ${L.when ? L.when.trim() : "rapidement"} et ${glad} pour en parler.`, bye: "Je vous prie d'agréer, Madame, Monsieur, mes salutations distinguées."}
   };
   const t = T[tone] || T.classic;
   return [
@@ -587,6 +632,7 @@ document.addEventListener("click", e => {
     if (cur && cur.id === t.dataset.deloffer) { cur = null; $("#offer").value = ""; newOffer(); gates(); }
     renderOffers(); return save();
   }
+  if (t.dataset.g) { cur.letter.g = t.dataset.g; $$("[data-g]").forEach(b => b.setAttribute("aria-pressed", b === t)); renderLetter(); return save(); }
   if (t.dataset.tone) { cur.letter.tone = t.dataset.tone; $$("[data-tone]").forEach(b => b.setAttribute("aria-pressed", b === t)); stat("lettre-ton", {t: t.dataset.tone}); renderLetter(); return save(); }
   if (t.dataset.share) { stat("bilan", {how: t.dataset.share}); return exportSummary(t.dataset.share); }
   if (t.dataset.typo) {
@@ -638,6 +684,7 @@ document.addEventListener("input", e => {
   if (t.dataset.check) { (cur.check = cur.check || {})[t.dataset.check] = t.checked; renderChecklist(); return save(); }
 });
 document.addEventListener("change", e => {
+  if (e.target.dataset.to !== undefined) { const k = e.target.dataset.to; fixes[k].to = e.target.value; renderRewrite(); save(); $$("[data-to]").find(x => x.dataset.to === k)?.focus(); return; }
   // décochée : le CV et les offres sont retirés de l'appareil, le suivi des candidatures reste (« Effacer mes données » enlève tout)
   if (e.target.id === "keep" && saveNow() !== false) { toast(keep() ? tr("Ta session restera sur cet appareil", "Your session will stay on this device") : offers.some(o => o.app) ? tr("Ton CV et tes offres ne sont plus gardés. Ton suivi reste sur cet appareil.", "Your CV and offers are no longer kept. Your tracker stays on this device.") : tr("Plus rien n'est gardé sur cet appareil", "Nothing is kept on this device any more"), 4000); }
 });
