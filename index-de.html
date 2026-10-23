@@ -35,6 +35,7 @@
       <div class="comfort-menu" role="group" aria-label="Komfortmodus">
         <div class="skins" role="group" aria-label="Aussehen"><b>Aussehen</b><button type="button" data-skin="tampon" aria-pressed="true">Stempel</button><button type="button" data-skin="fiche" aria-pressed="false">Karteikarte</button></div>
         <button type="button" data-comfort="big" aria-pressed="false">Größere Schrift</button>
+        <button type="button" data-comfort="simple" aria-pressed="false">Einfache Wörter</button>
         <button type="button" data-comfort="contrast" aria-pressed="false">Hoher Kontrast</button>
         <button type="button" data-comfort="dark" aria-pressed="false">Dunkelmodus</button>
         <button type="button" data-comfort="calm" aria-pressed="false">Weniger Bewegung</button>
@@ -66,7 +67,8 @@
       <div class="resume" id="resume" hidden><b>Deine Sitzung ist wieder da.</b> <span id="resumetxt"></span> <button class="btn light small" id="wipe2" type="button">Alles löschen</button></div>
       <span class="label">Schritt 1 von 5</span>
       <h1 class="big">Füg das Angebot ein</h1>
-      <p class="lede">Kopier den Text der Stellenanzeige, die dich interessiert, und füg ihn hier ein, oder häng sie als Datei an.</p>
+      <p class="lede full-only">Kopier den Text der Stellenanzeige, die dich interessiert, und füg ihn hier ein, oder häng sie als Datei an.</p>
+      <ul class="simple-lines simple-only"><li><span aria-hidden="true">📋</span> Kopier den Text der Anzeige.</li><li><span aria-hidden="true">👉</span> Füg ihn hier ein.</li><li><span aria-hidden="true">📎</span> Oder häng eine Datei an.</li></ul>
       <label class="sr-only" for="offer">Text der Stellenanzeige</label>
       <textarea id="offer" class="sheet-input" spellcheck="false" placeholder="Füg hier den Text der Stellenanzeige ein oder zieh eine Datei hierher (PDF, Word, Screenshot)."></textarea>
       <div class="attach">
@@ -142,7 +144,8 @@
     <div class="main-col">
       <span class="label">Schritt 2 von 5</span>
       <h1 class="big">Dein Lebenslauf</h1>
-      <p class="lede">Zieh deine Datei hierher oder wähl sie aus. Der Text wird direkt hier gelesen: Deine Datei wird weder verschickt noch gespeichert.</p>
+      <p class="lede full-only">Zieh deine Datei hierher oder wähl sie aus. Der Text wird direkt hier gelesen: Deine Datei wird weder verschickt noch gespeichert.</p>
+      <ul class="simple-lines simple-only"><li><span aria-hidden="true">📄</span> Leg deinen Lebenslauf hier ab.</li><li><span aria-hidden="true">🔒</span> Er bleibt auf deinem Gerät.</li><li><span aria-hidden="true">✍️</span> Kein Lebenslauf? Wir machen ihn zusammen.</li></ul>
       <label class="drop" id="drop" for="file">
         <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>
         <b>Lebenslauf hierher ziehen</b>
@@ -153,6 +156,8 @@
         <label for="cvpaste"><b>Oder füge den Text deines Lebenslaufs ein</b> <span class="hint">zum Beispiel aus einer E-Mail</span></label>
         <textarea id="cvpaste" class="sheet-input" rows="5" spellcheck="false" placeholder="Füge hier den Text deines Lebenslaufs ein."></textarea>
       </div>
+      <div class="nocv" id="nocvbox"><button class="btn light small" id="nocv" type="button" aria-expanded="false" aria-controls="cvbuild">Ich habe keinen Lebenslauf</button> <span class="hint">Wir machen ihn zusammen, mit ein paar Fragen.</span></div>
+      <div class="cvbuild" id="cvbuild" hidden></div>
       <div class="job" id="job" hidden><p id="jobtxt">Wird gelesen…</p><div class="jbar"><i id="jbar"></i></div></div>
       <p class="err" id="ferr" role="alert" hidden></p>
       <div class="filecard" id="filecard" hidden>
@@ -160,6 +165,7 @@
         <div><b id="fname"></b><small id="finfo"></small></div>
         <label class="btn light small" for="file">Ändern</label>
       </div>
+      <div class="cvlib" id="cvlib" hidden></div>
       <div class="next-row">
         <button class="btn ghost" data-go="1">← Das Angebot</button>
         <button class="btn" id="next2" data-go="3" disabled>Passt das? Ansehen →</button>
@@ -193,7 +199,7 @@
   <div class="panel-inner">
     <div class="main-col">
       <span class="label">Schritt 3 von 5 · das Ergebnis</span>
-      <h1 class="big"><span id="pct">0</span> % <small id="verdict">das passt</small></h1>
+      <h1 class="big"><span class="full-only"><span id="pct">0</span> % <small id="verdict">das passt</small></span><span class="simple-only" id="pct10"></span></h1>
       <p class="lede" id="sum" aria-live="polite"></p>
       <div class="filters" role="group" aria-label="Anzeigen">
         <button class="chip" data-f="all" aria-pressed="true">Alle <span id="n-all"></span></button>
@@ -318,7 +324,8 @@
     <div class="main-col">
       <span class="label">Meine Übersicht</span>
       <h1 class="big">Meine Bewerbungen</h1>
-      <p class="lede">Notier, wo du dich beworben hast, wie weit jede Bewerbung ist und wann du nachfassen solltest.</p>
+      <p class="lede full-only">Notier, wo du dich beworben hast, wie weit jede Bewerbung ist und wann du nachfassen solltest.</p>
+      <ul class="simple-lines simple-only"><li><span aria-hidden="true">📝</span> Notier deine Bewerbungen.</li><li><span aria-hidden="true">⏰</span> Wir sagen dir, wann du nachfassen kannst.</li></ul>
       <div class="track-bar">
         <button class="btn small" id="addapp" type="button">+ Bewerbung hinzufügen</button>
         <details class="share proofmenu iomenu" id="iomenu"><summary class="btn light small">Import / Export <span aria-hidden="true">▾</span></summary><div class="share-body io-body">
@@ -377,6 +384,7 @@
 <script src="js/moteur.js"></script>
 <script src="js/export.js"></script>
 <script src="js/app.js"></script>
+<script src="js/mescv.js"></script>
 <script src="js/suivi.js"></script>
 <script src="js/outils.js"></script>
 <script src="js/confort.js"></script>

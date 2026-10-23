@@ -35,6 +35,7 @@
       <div class="comfort-menu" role="group" aria-label="Modalità comfort">
         <div class="skins" role="group" aria-label="Aspetto"><b>Aspetto</b><button type="button" data-skin="tampon" aria-pressed="true">Timbro</button><button type="button" data-skin="fiche" aria-pressed="false">Scheda</button></div>
         <button type="button" data-comfort="big" aria-pressed="false">Testo più grande</button>
+        <button type="button" data-comfort="simple" aria-pressed="false">Parole semplici</button>
         <button type="button" data-comfort="contrast" aria-pressed="false">Contrasto forte</button>
         <button type="button" data-comfort="dark" aria-pressed="false">Modalità scura</button>
         <button type="button" data-comfort="calm" aria-pressed="false">Meno animazioni</button>
@@ -66,7 +67,8 @@
       <div class="resume" id="resume" hidden><b>La tua sessione è tornata.</b> <span id="resumetxt"></span> <button class="btn light small" id="wipe2" type="button">Cancella tutto</button></div>
       <span class="label">Passo 1 di 5</span>
       <h1 class="big">Incolla l'offerta</h1>
-      <p class="lede">Copia il testo dell'annuncio che ti interessa e incollalo qui, oppure allegalo come file.</p>
+      <p class="lede full-only">Copia il testo dell'annuncio che ti interessa e incollalo qui, oppure allegalo come file.</p>
+      <ul class="simple-lines simple-only"><li><span aria-hidden="true">📋</span> Copia il testo dell'annuncio.</li><li><span aria-hidden="true">👉</span> Incollalo qui.</li><li><span aria-hidden="true">📎</span> Oppure allega un file.</li></ul>
       <label class="sr-only" for="offer">Testo dell'annuncio</label>
       <textarea id="offer" class="sheet-input" spellcheck="false" placeholder="Incolla qui il testo dell'annuncio, o trascinaci sopra un file (PDF, Word, screenshot)."></textarea>
       <div class="attach">
@@ -142,7 +144,8 @@
     <div class="main-col">
       <span class="label">Passo 2 di 5</span>
       <h1 class="big">Aggiungi il tuo CV</h1>
-      <p class="lede">Trascina il tuo file o sceglilo. Il testo viene letto qui: il file non viene né inviato né salvato.</p>
+      <p class="lede full-only">Trascina il tuo file o sceglilo. Il testo viene letto qui: il file non viene né inviato né salvato.</p>
+      <ul class="simple-lines simple-only"><li><span aria-hidden="true">📄</span> Metti qui il tuo CV.</li><li><span aria-hidden="true">🔒</span> Resta sul tuo dispositivo.</li><li><span aria-hidden="true">✍️</span> Non hai un CV? Lo facciamo insieme.</li></ul>
       <label class="drop" id="drop" for="file">
         <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>
         <b>Trascina qui il tuo CV</b>
@@ -153,6 +156,8 @@
         <label for="cvpaste"><b>Oppure incolla il testo del tuo CV</b> <span class="hint">per esempio da una mail</span></label>
         <textarea id="cvpaste" class="sheet-input" rows="5" spellcheck="false" placeholder="Incolla qui il testo del tuo CV."></textarea>
       </div>
+      <div class="nocv" id="nocvbox"><button class="btn light small" id="nocv" type="button" aria-expanded="false" aria-controls="cvbuild">Non ho un CV</button> <span class="hint">Lo facciamo insieme, con poche domande.</span></div>
+      <div class="cvbuild" id="cvbuild" hidden></div>
       <div class="job" id="job" hidden><p id="jobtxt">Lettura…</p><div class="jbar"><i id="jbar"></i></div></div>
       <p class="err" id="ferr" role="alert" hidden></p>
       <div class="filecard" id="filecard" hidden>
@@ -160,6 +165,7 @@
         <div><b id="fname"></b><small id="finfo"></small></div>
         <label class="btn light small" for="file">Cambia</label>
       </div>
+      <div class="cvlib" id="cvlib" hidden></div>
       <div class="next-row">
         <button class="btn ghost" data-go="1">← L'offerta</button>
         <button class="btn" id="next2" data-go="3" disabled>Vedi se calza →</button>
@@ -193,7 +199,7 @@
   <div class="panel-inner">
     <div class="main-col">
       <span class="label">Passo 3 di 5 · il risultato</span>
-      <h1 class="big"><span id="pct">0</span> % <small id="verdict">calza</small></h1>
+      <h1 class="big"><span class="full-only"><span id="pct">0</span> % <small id="verdict">calza</small></span><span class="simple-only" id="pct10"></span></h1>
       <p class="lede" id="sum" aria-live="polite"></p>
       <div class="filters" role="group" aria-label="Mostra">
         <button class="chip" data-f="all" aria-pressed="true">Tutti <span id="n-all"></span></button>
@@ -318,7 +324,8 @@
     <div class="main-col">
       <span class="label">Il mio registro</span>
       <h1 class="big">Le mie candidature</h1>
-      <p class="lede">Segna dove hai inviato la candidatura, a che punto è ognuna e quando sollecitare.</p>
+      <p class="lede full-only">Segna dove hai inviato la candidatura, a che punto è ognuna e quando sollecitare.</p>
+      <ul class="simple-lines simple-only"><li><span aria-hidden="true">📝</span> Segna le tue candidature.</li><li><span aria-hidden="true">⏰</span> Ti diciamo quando sollecitare.</li></ul>
       <div class="track-bar">
         <button class="btn small" id="addapp" type="button">+ Aggiungi una candidatura</button>
         <details class="share proofmenu iomenu" id="iomenu"><summary class="btn light small">Importa / Esporta <span aria-hidden="true">▾</span></summary><div class="share-body io-body">
@@ -377,6 +384,7 @@
 <script src="js/moteur.js"></script>
 <script src="js/export.js"></script>
 <script src="js/app.js"></script>
+<script src="js/mescv.js"></script>
 <script src="js/suivi.js"></script>
 <script src="js/outils.js"></script>
 <script src="js/confort.js"></script>

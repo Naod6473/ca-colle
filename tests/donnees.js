@@ -1,11 +1,11 @@
 // node tests/donnees.js : relecture des données gardées ou importées (cleanSave, js/app.js), dates locales, nombres du brut → net (js/salaire.js)
 const fs = require("fs"), vm = require("vm"), path = require("path"), assert = require("assert");
 const src = f => fs.readFileSync(path.join(__dirname, "..", f), "utf8");
-const app = src("js/app.js"), sal = src("js/salaire.js");
+const app = src("js/app.js"), sal = src("js/salaire.js"), mescv = src("js/mescv.js");
 const part = (s, a, b) => s.slice(s.indexOf(a), s.indexOf(b, s.indexOf(a)));
 const ctx = {CACOLLE_LANG: "fr", console};
 vm.createContext(ctx);
-vm.runInContext(src("js/lang.js") + "\n" + part(app, "const ymd =", "function restore(") + part(sal, "const toNum =", "const show =") + "\nthis.cleanSave = cleanSave; this.ymd = ymd; this.num = num;", ctx);
+vm.runInContext(src("js/lang.js") + "\n" + part(app, "const ymd =", "function restore(") + part(sal, "const toNum =", "const show =") + "\nconst cap = s => s.charAt(0).toUpperCase() + s.slice(1);\n" + part(mescv, "const trimT =", "function renderBuild(") + "\nthis.cleanSave = cleanSave; this.ymd = ymd; this.num = num; this.buildText = buildText;", ctx);
 let n = 0; const ok = (name, f) => { try { f(); n++; } catch (e) { console.log("✕ " + name + "\n    " + e.message); process.exitCode = 1; } };
 const bk = o => ({v: 1, cv: {text: "Jean Test"}, me: {}, offers: [o]});
 
@@ -33,5 +33,25 @@ ok("date locale", () => assert.strictEqual(ctx.ymd(new Date(2026, 0, 5, 0, 30)),
 ok("nombres écrits à la main", () => {
   const t = {"1.850": 1850, "1 850": 1850, "1,850": 1850, "1'850": 1850, "1.850,50": 1850.5, "1,850.50": 1850.5, "12.50": 12.5, "12,50": 12.5, "0.850": 0.85, "11.88": 11.88, "45 000 €": 45000, "1.234.567": 1234567, "": 0};
   for (const [s, v] of Object.entries(t)) assert.strictEqual(ctx.num(s), v, s);
+});
+ok("CV gardés : 5 au plus, ids sûrs, textes seulement, CV en cours relié", () => {
+  const many = Array.from({length: 7}, (_, i) => ({id: "c" + i, name: "CV " + i, text: "Texte " + i, date: "2026-10-0" + (i + 1)}));
+  const d = ctx.cleanSave({v: 1, cv: {text: "x", lib: "c1", built: "oui"}, cvs: [{id: '"><b>', text: "x"}, {id: "vide", text: "  "}, {id: "c0", text: "a", name: {x: 1}, date: "hier", evil: 1}, ...many], offers: []});
+  assert.strictEqual(d.cvs.length, 5);
+  assert.deepStrictEqual(JSON.parse(JSON.stringify(d.cvs[0])), {id: "c0", name: "CV", text: "a", date: ""});
+  assert.strictEqual(d.cv.lib, "c1"); assert.strictEqual(d.cv.built, undefined);
+  assert.strictEqual(ctx.cleanSave({v: 1, cv: {text: "x", lib: "zz"}, offers: []}).cv.lib, undefined);
+  assert.strictEqual(ctx.cleanSave({v: 1, offers: []}).cvs.length, 0);
+});
+ok("formulaire « Je n'ai pas de CV » : champs connus, textes seulement", () => {
+  const d = ctx.cleanSave({v: 1, offers: [], cvForm: {name: "Léa", city: 5, evil: "x", jobs: [{role: "Vendeuse", t1: ["x"], z: 1}, "x", ...Array(10).fill({role: "r"})]}});
+  assert.strictEqual(d.cvForm.name, "Léa"); assert.strictEqual(d.cvForm.city, undefined); assert.strictEqual(d.cvForm.evil, undefined);
+  assert.strictEqual(d.cvForm.jobs.length, 8); assert.deepStrictEqual(JSON.parse(JSON.stringify(d.cvForm.jobs[0])), {role: "Vendeuse"});
+  assert.strictEqual(ctx.cleanSave({v: 1, offers: [], cvForm: "x"}).cvForm, null);
+});
+ok("CV fait avec les questions : seulement ce qui est tapé, titres reconnus", () => {
+  const t = ctx.buildText({name: " Léa  Exemple ", city: "Caen", phone: "", mail: "lea@exemple.fr", jobs: [{role: "vendeuse", company: "Boulangerie du centre", dates: "2021 - 2024", t1: "accueil des clients", t2: ""}, {}], edu: "CAP Employé de commerce (2020)\n\n", skills: "caisse\nmise en rayon", langs: "", hobbies: ""});
+  assert.strictEqual(t, "Léa Exemple · Caen · lea@exemple.fr\n\nExpériences\nVendeuse, Boulangerie du centre (2021 - 2024)\n- Accueil des clients\n\nFormation\nCAP Employé de commerce (2020)\n\nCompétences\nCaisse, mise en rayon");
+  assert.strictEqual(ctx.buildText({jobs: [{}]}), "");
 });
 console.log(process.exitCode ? "Échec" : `Tout est bon (${n} vérifications)`);

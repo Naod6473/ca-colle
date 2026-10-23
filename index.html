@@ -34,6 +34,7 @@
       <div class="comfort-menu" role="group" aria-label="Mode confort">
         <div class="skins" role="group" aria-label="Apparence"><b>Apparence</b><button type="button" data-skin="tampon" aria-pressed="true">Tampon</button><button type="button" data-skin="fiche" aria-pressed="false">Fiche</button></div>
         <button type="button" data-comfort="big" aria-pressed="false">Texte plus gros</button>
+        <button type="button" data-comfort="simple" aria-pressed="false">Mots simples</button>
         <button type="button" data-comfort="contrast" aria-pressed="false">Contraste fort</button>
         <button type="button" data-comfort="dark" aria-pressed="false">Mode sombre</button>
         <button type="button" data-comfort="calm" aria-pressed="false">Moins d'animations</button>
@@ -65,7 +66,8 @@
       <div class="resume" id="resume" hidden><b>Ta session est revenue.</b> <span id="resumetxt"></span> <button class="btn light small" id="wipe2" type="button">Tout effacer</button></div>
       <span class="label">Étape 1 sur 5</span>
       <h1 class="big">Colle l'offre</h1>
-      <p class="lede">Copie le texte de l'annonce qui t'intéresse et colle-le ici, ou joins-la en fichier.</p>
+      <p class="lede full-only">Copie le texte de l'annonce qui t'intéresse et colle-le ici, ou joins-la en fichier.</p>
+      <ul class="simple-lines simple-only"><li><span aria-hidden="true">📋</span> Copie le texte de l'annonce.</li><li><span aria-hidden="true">👉</span> Colle-le ici.</li><li><span aria-hidden="true">📎</span> Ou joins un fichier.</li></ul>
       <label class="sr-only" for="offer">Texte de l'annonce</label>
       <textarea id="offer" class="sheet-input" spellcheck="false" placeholder="Colle ici le texte de l'annonce, ou glisse un fichier dessus (PDF, Word, capture d'écran)."></textarea>
       <div class="attach">
@@ -141,7 +143,8 @@
     <div class="main-col">
       <span class="label">Étape 2 sur 5</span>
       <h1 class="big">Ajoute ton CV</h1>
-      <p class="lede">Glisse ton fichier ou choisis-le. On en lit le texte ici même : ton fichier n'est ni envoyé ni gardé.</p>
+      <p class="lede full-only">Glisse ton fichier ou choisis-le. On en lit le texte ici même : ton fichier n'est ni envoyé ni gardé.</p>
+      <ul class="simple-lines simple-only"><li><span aria-hidden="true">📄</span> Mets ton CV ici.</li><li><span aria-hidden="true">🔒</span> Il reste sur ton appareil.</li><li><span aria-hidden="true">✍️</span> Pas de CV ? On le fait ensemble.</li></ul>
       <label class="drop" id="drop" for="file">
         <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>
         <b>Glisse ton CV ici</b>
@@ -152,6 +155,8 @@
         <label for="cvpaste"><b>Ou colle le texte de ton CV</b> <span class="hint">par exemple depuis un mail</span></label>
         <textarea id="cvpaste" class="sheet-input" rows="5" spellcheck="false" placeholder="Colle ici le texte de ton CV."></textarea>
       </div>
+      <div class="nocv" id="nocvbox"><button class="btn light small" id="nocv" type="button" aria-expanded="false" aria-controls="cvbuild">Je n'ai pas de CV</button> <span class="hint">On le fait ensemble, en quelques questions.</span></div>
+      <div class="cvbuild" id="cvbuild" hidden></div>
       <div class="job" id="job" hidden><p id="jobtxt">Lecture…</p><div class="jbar"><i id="jbar"></i></div></div>
       <p class="err" id="ferr" role="alert" hidden></p>
       <div class="filecard" id="filecard" hidden>
@@ -159,6 +164,7 @@
         <div><b id="fname"></b><small id="finfo"></small></div>
         <label class="btn light small" for="file">Changer</label>
       </div>
+      <div class="cvlib" id="cvlib" hidden></div>
       <div class="next-row">
         <button class="btn ghost" data-go="1">← L'offre</button>
         <button class="btn" id="next2" data-go="3" disabled>Voir si ça colle →</button>
@@ -192,7 +198,7 @@
   <div class="panel-inner">
     <div class="main-col">
       <span class="label">Étape 3 sur 5 · le résultat</span>
-      <h1 class="big"><span id="pct">0</span> % <small id="verdict">ça colle</small></h1>
+      <h1 class="big"><span class="full-only"><span id="pct">0</span> % <small id="verdict">ça colle</small></span><span class="simple-only" id="pct10"></span></h1>
       <p class="lede" id="sum" aria-live="polite"></p>
       <div class="filters" role="group" aria-label="Afficher">
         <button class="chip" data-f="all" aria-pressed="true">Tout <span id="n-all"></span></button>
@@ -317,7 +323,8 @@
     <div class="main-col">
       <span class="label">Mon suivi</span>
       <h1 class="big">Mes candidatures</h1>
-      <p class="lede">Note où tu as postulé, où en est chaque candidature et quand relancer.</p>
+      <p class="lede full-only">Note où tu as postulé, où en est chaque candidature et quand relancer.</p>
+      <ul class="simple-lines simple-only"><li><span aria-hidden="true">📝</span> Note tes candidatures.</li><li><span aria-hidden="true">⏰</span> On te dit quand relancer.</li></ul>
       <div class="track-bar">
         <button class="btn small" id="addapp" type="button">+ Ajouter une candidature</button>
         <details class="share proofmenu iomenu" id="iomenu"><summary class="btn light small">Import / Export <span aria-hidden="true">▾</span></summary><div class="share-body io-body">
@@ -376,6 +383,7 @@
 <script src="js/moteur.js"></script>
 <script src="js/export.js"></script>
 <script src="js/app.js"></script>
+<script src="js/mescv.js"></script>
 <script src="js/suivi.js"></script>
 <script src="js/outils.js"></script>
 <script src="js/confort.js"></script>

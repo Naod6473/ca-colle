@@ -34,6 +34,7 @@
       <div class="comfort-menu" role="group" aria-label="Comfort mode">
         <div class="skins" role="group" aria-label="Look"><b>Look</b><button type="button" data-skin="tampon" aria-pressed="true">Stamp</button><button type="button" data-skin="fiche" aria-pressed="false">Card</button></div>
         <button type="button" data-comfort="big" aria-pressed="false">Bigger text</button>
+        <button type="button" data-comfort="simple" aria-pressed="false">Simple words</button>
         <button type="button" data-comfort="contrast" aria-pressed="false">High contrast</button>
         <button type="button" data-comfort="dark" aria-pressed="false">Dark mode</button>
         <button type="button" data-comfort="calm" aria-pressed="false">Less motion</button>
@@ -65,7 +66,8 @@
       <div class="resume" id="resume" hidden><b>Your session is back.</b> <span id="resumetxt"></span> <button class="btn light small" id="wipe2" type="button">Erase everything</button></div>
       <span class="label">Step 1 of 5</span>
       <h1 class="big">Paste the offer</h1>
-      <p class="lede">Copy the text of the job ad you like and paste it here, or attach it as a file.</p>
+      <p class="lede full-only">Copy the text of the job ad you like and paste it here, or attach it as a file.</p>
+      <ul class="simple-lines simple-only"><li><span aria-hidden="true">📋</span> Copy the text of the ad.</li><li><span aria-hidden="true">👉</span> Paste it here.</li><li><span aria-hidden="true">📎</span> Or attach a file.</li></ul>
       <label class="sr-only" for="offer">Text of the job ad</label>
       <textarea id="offer" class="sheet-input" spellcheck="false" placeholder="Paste the text of the job ad here, or drop a file on it (PDF, Word, screenshot)."></textarea>
       <div class="attach">
@@ -141,7 +143,8 @@
     <div class="main-col">
       <span class="label">Step 2 of 5</span>
       <h1 class="big">Add your CV</h1>
-      <p class="lede">Drop your file or choose it. Its text is read right here: your file is neither sent nor stored.</p>
+      <p class="lede full-only">Drop your file or choose it. Its text is read right here: your file is neither sent nor stored.</p>
+      <ul class="simple-lines simple-only"><li><span aria-hidden="true">📄</span> Put your CV here.</li><li><span aria-hidden="true">🔒</span> It stays on your device.</li><li><span aria-hidden="true">✍️</span> No CV? Let's make one together.</li></ul>
       <label class="drop" id="drop" for="file">
         <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>
         <b>Drop your CV here</b>
@@ -152,6 +155,8 @@
         <label for="cvpaste"><b>Or paste the text of your CV</b> <span class="hint">for example from an email</span></label>
         <textarea id="cvpaste" class="sheet-input" rows="5" spellcheck="false" placeholder="Paste the text of your CV here."></textarea>
       </div>
+      <div class="nocv" id="nocvbox"><button class="btn light small" id="nocv" type="button" aria-expanded="false" aria-controls="cvbuild">I don't have a CV</button> <span class="hint">Let's make one together, in a few questions.</span></div>
+      <div class="cvbuild" id="cvbuild" hidden></div>
       <div class="job" id="job" hidden><p id="jobtxt">Reading…</p><div class="jbar"><i id="jbar"></i></div></div>
       <p class="err" id="ferr" role="alert" hidden></p>
       <div class="filecard" id="filecard" hidden>
@@ -159,6 +164,7 @@
         <div><b id="fname"></b><small id="finfo"></small></div>
         <label class="btn light small" for="file">Change</label>
       </div>
+      <div class="cvlib" id="cvlib" hidden></div>
       <div class="next-row">
         <button class="btn ghost" data-go="1">← The offer</button>
         <button class="btn" id="next2" data-go="3" disabled>See if it fits →</button>
@@ -192,7 +198,7 @@
   <div class="panel-inner">
     <div class="main-col">
       <span class="label">Step 3 of 5 · the result</span>
-      <h1 class="big"><span id="pct">0</span> % <small id="verdict">it fits</small></h1>
+      <h1 class="big"><span class="full-only"><span id="pct">0</span> % <small id="verdict">it fits</small></span><span class="simple-only" id="pct10"></span></h1>
       <p class="lede" id="sum" aria-live="polite"></p>
       <div class="filters" role="group" aria-label="Show">
         <button class="chip" data-f="all" aria-pressed="true">All <span id="n-all"></span></button>
@@ -317,7 +323,8 @@
     <div class="main-col">
       <span class="label">My tracker</span>
       <h1 class="big">My applications</h1>
-      <p class="lede">Note where you applied, where each application stands and when to follow up.</p>
+      <p class="lede full-only">Note where you applied, where each application stands and when to follow up.</p>
+      <ul class="simple-lines simple-only"><li><span aria-hidden="true">📝</span> Note your applications.</li><li><span aria-hidden="true">⏰</span> We tell you when to follow up.</li></ul>
       <div class="track-bar">
         <button class="btn small" id="addapp" type="button">+ Add an application</button>
         <details class="share proofmenu iomenu" id="iomenu"><summary class="btn light small">Import / Export <span aria-hidden="true">▾</span></summary><div class="share-body io-body">
@@ -376,6 +383,7 @@
 <script src="js/moteur.js"></script>
 <script src="js/export.js"></script>
 <script src="js/app.js"></script>
+<script src="js/mescv.js"></script>
 <script src="js/suivi.js"></script>
 <script src="js/outils.js"></script>
 <script src="js/confort.js"></script>
