@@ -9,7 +9,7 @@
 const VERSION = "cacolle-2026-10-23b", LIB = "cacolle-lib-1", WAIT = 3500;
 const COMMON = [
   "css/app.css", "css/skins.css", "fonts/fonts.css",
-  "js/lang.js", "js/lecteur.js", "js/moteur.js", "js/suivi.js", "js/outils.js", "js/fiches.js", "js/confort.js", "js/demo.js", "js/export.js", "js/app.js", "js/salaire.js",
+  "js/lang.js", "js/lecteur.js", "js/moteur.js", "js/suivi.js", "js/outils.js", "js/fiches.js", "js/confort.js", "js/demo.js", "js/export.js", "js/app.js", "js/mescv.js", "js/salaire.js",
   "favicon.svg", "icons/icon-192.png", "icons/icon-512.png"
 ];
 const FONTS = ["archivo-latin-700-normal", "archivo-latin-800-italic", "archivo-latin-900-italic", "archivo-latin-900-normal",

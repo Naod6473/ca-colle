@@ -1,6 +1,6 @@
-// Mode confort : gros texte, contraste fort, moins d'animations, mode sombre (suit le téléphone tant qu'on n'a pas choisi), et lecture à voix haute du résultat.
+// Mode confort : gros texte, contraste fort, moins d'animations, mots simples (phrases courtes, un picto par idée, score sur 10), mode sombre (suit le téléphone tant qu'on n'a pas choisi), et lecture à voix haute du résultat.
 // Ce réglage d'affichage reste sur l'appareil (aucune donnée personnelle dedans).
-const COMFORT_KEY = "cacolle-confort", COMFORTS = ["big", "contrast", "calm"];
+const COMFORT_KEY = "cacolle-confort", COMFORTS = ["big", "contrast", "calm", "simple"];
 let comfort = {};
 try { comfort = JSON.parse(localStorage.getItem(COMFORT_KEY)) || {}; } catch {}
 const darkMQ = matchMedia("(prefers-color-scheme: dark)"), isDark = () => comfort.dark ?? darkMQ.matches;
@@ -21,6 +21,7 @@ function initComfort(){
     const b = e.target.closest("[data-comfort]"); if (!b) return;
     const k = b.dataset.comfort; comfort[k] = k === "dark" ? !isDark() : !comfort[k];
     applyComfort(); pressed(); if (comfort[k]) stat("confort", {k});
+    if (k === "simple") document.dispatchEvent(new Event("cacolle-simple")); // « Mots simples » : l'app réécrit ce qu'elle a affiché
     try { localStorage.setItem(COMFORT_KEY, JSON.stringify(comfort)); } catch {}
   });
   // Langue choisie à la main : plus de redirection automatique selon le navigateur
@@ -42,8 +43,8 @@ function initComfort(){
     if (speechSynthesis.speaking) { speechSynthesis.cancel(); say.setAttribute("aria-pressed", "false"); return; }
     const top = [...document.querySelectorAll("#prio .prio-list b")].map(b => b.textContent);
     const text = [
-      document.querySelector("[data-p='3'] .big")?.textContent.replace(/\s+/g, " ").trim(),
-      document.getElementById("sum")?.textContent,
+      document.querySelector(document.documentElement.classList.contains("c-simple") ? "#pct10" : "[data-p='3'] .big .full-only")?.textContent.replace(/\s+/g, " ").trim(),
+      spoken(document.getElementById("sum")),
       top.length ? tr("À faire en premier : ", "First things to do: ") + top.join(", ") + "." : "",
       document.querySelector(".adcheck .alert b")?.textContent || ""
     ].filter(Boolean).join(" ");
@@ -55,6 +56,19 @@ function initComfort(){
   });
 }
 initComfort();
+// Texte lu à voix haute : sans les pictos (aria-hidden)
+function spoken(el){ if (!el) return ""; const c = el.cloneNode(true); c.querySelectorAll("[aria-hidden='true']").forEach(x => x.remove()); return c.textContent.replace(/\s+/g, " ").trim(); }
+// « Mots simples » à l'étape 3 : une idée par ligne, un picto par idée (appelé par renderResult, js/app.js)
+function simpleSum(c, t, must){
+  const li = (pic, txt) => `<span class="sl"><span class="pic" aria-hidden="true">${pic}</span> ${esc(txt)}</span>`;
+  return [
+    li("✅", tr(`Ton CV montre ${plural(c.ok, "chose")} sur ${t}.`, `Your CV shows ${plural(c.ok, "thing")} out of ${t}.`)),
+    c.mid ? li("✍️", tr(`${plural(c.mid, "chose")} à mieux expliquer.`, `${plural(c.mid, "thing")} to explain better.`)) : "",
+    c.no ? li("❌", tr(`Il manque ${plural(c.no, "chose")}.`, `${plural(c.no, "thing")} missing.`)) : "",
+    must ? li("⚠️", must > 1 ? tr(`Dont ${must} choses très importantes.`, `${must} of them are very important.`) : tr("Dont 1 chose très importante.", "1 of them is very important.")) : "",
+    c.no || c.mid ? li("👉", tr("On les ajoute ensemble.", "Let's add them together.")) : li("🎉", tr("Ton CV est prêt pour cette offre.", "Your CV is ready for this offer."))
+  ].join("");
+}
 
 // Onglets des étapes : même état que dans l'app (hachurés tant que l'offre et le CV ne sont pas remplis), lu dans la session gardée
 (() => {

@@ -225,3 +225,14 @@ html[data-skin="fiche"] [data-p="3"] .big { color: var(--accent); }
   html[data-skin="fiche"] .pill { font-size: 12px; }
 }
 html[data-skin="fiche"] .cvpaste label b { font: 800 17px/1.2 var(--body); text-transform: none; }
+/* Étape 2 : CV gardés et « Je n'ai pas de CV » */
+html[data-skin="fiche"] .cvlib, html[data-skin="fiche"] .cvbuild { border: 0; border-radius: 20px; box-shadow: var(--soft) !important; }
+html[data-skin="fiche"] .cvlib-h, html[data-skin="fiche"] .bpart > legend { font: 800 17px/1.2 var(--body); text-transform: none; }
+html[data-skin="fiche"] .bjob { border: 1.5px dashed var(--hair); border-radius: 14px; }
+html[data-skin="fiche"] .cvlib-in input { border: 1.5px solid var(--hair); border-radius: 10px; }
+html[data-skin="fiche"] .cvlib-list li.best > button:first-child { background: var(--ok-bg); color: var(--ink); }
+html[data-skin="fiche"] .cvlib-list li.on.best > button:first-child { background: var(--accent); color: #fff; }
+html[data-skin="fiche"].c-simple .btn { font-size: 17px; }
+html[data-skin="fiche"].c-simple .btn.small { font-size: 15px; }
+@media screen { html.c-dark .cvlib, html.c-dark .cvbuild { box-shadow: 5px 5px 0 rgba(0, 0, 0, .45), 5px 5px 0 1.5px var(--ink); } }
+@media screen { html.c-dark[data-skin="fiche"] .cvlib, html.c-dark[data-skin="fiche"] .cvbuild { box-shadow: var(--soft) !important; } }

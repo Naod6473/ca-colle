@@ -7,6 +7,7 @@ let step = 1, filter = "all", results = [], cvReady = false;
 let cvFile = {name: "", info: "", conf: 0};
 let me = {name: "", contact: ""};          // pour la lettre, commun à toutes les offres
 let offers = [], cur = null;               // offres comparées au même CV
+let cvs = [], build = null;                // CV gardés (5 au plus) et formulaire « Je n'ai pas de CV » : js/mescv.js
 
 const words = t => t.trim() ? t.trim().split(/\s+/).length : 0;
 const isLink = t => /^\s*(https?:\/\/|www\.)\S+\s*$/i.test(t);
@@ -38,7 +39,7 @@ function renderOffers(){
   const list = offers.filter(o => o.text && o.text.trim());
   $("#offersbox").hidden = list.length < 1 || !cvReady;
   $("#offers").innerHTML = list.map(o => `<li class="${o === cur ? "on" : ""}">
-    <button type="button" data-offer="${esc(o.id)}"><b>${esc(o.title || titleOf(o.text))}</b>${o.score != null ? `<span class="score">${esc(o.score)} %</span>` : ""}</button>
+    <button type="button" data-offer="${esc(o.id)}"><b>${esc(o.title || titleOf(o.text))}</b>${o.score != null ? `<span class="score">${esc(typeof pctTxt === "function" ? pctTxt(o.score) : o.score + " %")}</span>` : ""}</button>
     <button type="button" class="del" data-deloffer="${esc(o.id)}" aria-label="${tr("Retirer cette offre", "Remove this offer")}">✕</button></li>`).join("");
 }
 
@@ -77,6 +78,7 @@ function go(n){
   $$("[data-p]").forEach(p => p.hidden = +p.dataset.p !== n);
   $$("[data-for]").forEach(p => p.hidden = +p.dataset.for !== n || (n === 2 && !cvReady));
   if (n === 1) renderOffers();
+  if (n === 2 && typeof renderCvLib === "function") renderCvLib();
   if (n === 3) renderResult();
   if (n === 4) renderRewrite();
   if (n === 5) renderLetterForm();
@@ -151,18 +153,19 @@ function whyHTML(r){
 }
 function renderResult(){
   const c = countOf(results), p = scoreOf(results), t = results.length;
-  $("#pct").textContent = p;
+  $("#pct").textContent = p; $("#pct10").textContent = tr(`${Math.round(p / 10)} sur 10`, `${Math.round(p / 10)} out of 10`);
   $("#verdict").textContent = !t ? tr("à vérifier", "to check") : p >= 80 ? tr("ça colle !", "it fits!") : p >= 50 ? tr("ça colle presque", "almost there") : tr("à retravailler", "needs work");
   const must = results.filter(r => r.prio === "must" && r.st === "no").length;
   $("#sum").textContent = !t ? tr("Je n'ai reconnu aucun point dans cette offre.", "I did not recognise any point in this offer.")
     : tr(`L'offre demande ${plural(t, "chose")}. Ton CV en prouve ${c.ok}, en cite ${c.mid} sans exemple et n'en parle pas pour ${c.no}.`, `The offer asks for ${plural(t, "thing")}. Your CV proves ${c.ok}, mentions ${c.mid} without an example and says nothing about ${c.no}.`)
       + (!must ? "" : must > 1 ? tr(` Attention : ${must} points indispensables manquent.`, ` Careful: ${must} essential points are missing.`) : tr(" Attention : un point indispensable manque.", " Careful: one essential point is missing."));
+  if (t && document.documentElement.classList.contains("c-simple")) $("#sum").innerHTML = simpleSum(c, t, must);
   $("#n-all").textContent = t; ["ok", "mid", "no"].forEach(s => $("#n-" + s).textContent = c[s]);
 
   const todo = results.filter(r => r.st !== "ok").sort((a, b) => urgency(a) - urgency(b)).slice(0, 3);
   $("#prio").innerHTML = !t ? `<p>${tr("Rien à corriger pour l'instant.", "Nothing to fix for now.")}</p>`
     : todo.length ? `<ul class="prio-list">${todo.map(r => `<li><b>${esc(r.k)}</b><small>${r.st === "no" ? tr("absent de ton CV", "missing from your CV") : tr("à prouver avec un exemple", "needs an example")}${r.prio === "must" ? tr(" · indispensable", " · essential") : ""}</small>${r.fix ? `<button class="btn small" data-fix="${esc(r.k)}">${tr("Corriger", "Fix")}</button>` : ""}</li>`).join("")}</ul>
-      <button class="btn wide" data-go="4">${tr("Améliorer mon CV →", "Improve my CV →")}</button>`
+      <button class="btn wide" data-go="4">${document.documentElement.classList.contains("c-simple") ? tr("Ajouter ce qui manque →", "Add what is missing →") : tr("Améliorer mon CV →", "Improve my CV →")}</button>`
     : `<p><b>${tr("Rien d'urgent.", "Nothing urgent.")}</b> ${tr("Ton CV couvre tout ce que demande l'offre.", "Your CV covers everything the offer asks for.")}</p><button class="btn wide" data-go="5">${tr("Préparer ma lettre →", "Write my letter →")}</button>`;
 
   const groups = ["no", "mid", "ok"].filter(s => filter === "all" || filter === s);
@@ -196,6 +199,8 @@ function renderResult(){
       <ul class="ats">${ats.map(a => `<li class="${a.ok ? "ok" : "ko"}"><b><span aria-hidden="true">${a.ok ? "✓" : "✕"}</span> ${esc(a.label)}</b>${a.ok ? "" : `<span>${esc(a.help)}</span>`}<span class="sr-only">${a.ok ? tr(" : bon", ": good") : tr(" : à corriger", ": to fix")}</span></li>`).join("")}</ul></section>`;
 }
 
+// « Mots simples » changé dans le menu Aa (js/confort.js) : le résultat est réécrit
+document.addEventListener("cacolle-simple", () => { if (step === 3 && $("#track").hidden) renderResult(); if (step === 1) renderOffers(); });
 // Téléphone : cartes « Pas dans ton CV » et « À préciser » repliées (titre + Corriger), ouvertes d'un appui sur le titre
 const PHONE = matchMedia("(max-width: 560px)");
 PHONE.addEventListener?.("change", () => { if (step === 3 && !$("[data-p='3']").hidden) renderResult(); });
@@ -468,11 +473,12 @@ async function exportSummary(how){
 let cvTimer;
 function setCV(text, typed){
   CV = parseCV(text); cvReady = text.trim().length > 0;
+  const kept = cvs.find(c => c.id === cvFile.lib); if (kept && cvReady && kept.text !== text) { kept.text = text; kept.date = ymd(new Date()); }
   if (!typed) $("#cvraw").value = text;
   const n = CV.filter(l => l.t).length, exp = CV.filter(l => l.exp).length, secs = CV.filter(l => l.sec && !l.auto).length;
   $("#cvsum").textContent = tr(`${n} lignes · ${exp} expérience${exp > 1 ? "s" : ""} repérée${exp > 1 ? "s" : ""}` + (secs ? "" : " · aucun titre de rubrique trouvé (Expériences, Compétences…)"), `${n} lines · ${plural(exp, "job line")} found` + (secs ? "" : " · no section heading found (Experience, Skills…)"));
   $$("[data-for='2']").forEach(p => p.hidden = step !== 2 || !cvReady);
-  syncPaste(); gates(); save();
+  syncPaste(); if (typeof syncNoCv === "function") { syncNoCv(); renderCvLib(); } gates(); save();
 }
 // CV collé en texte (depuis un mail…) : même chemin que le texte lu dans un fichier
 function usePasted(v){
@@ -542,7 +548,7 @@ function saveNow(){
 function snapshot(full = keep()){
   if (cur) { cur.text = $("#offer").value; cur.title = titleOf(cur.text); }
   if (!full) return {v: 1, keep: false, me: me.goal ? {goal: me.goal} : {}, offers: offers.filter(o => o.app).map(o => ({id: o.id, title: o.title, app: o.app}))};
-  return {v: 1, cv: {text: $("#cvraw").value, ...cvFile}, me, cur: cur?.id, offers: offers.filter(o => o.text.trim() || o.app).map(o => ({id: o.id, text: o.text, title: o.title, score: o.score, fixes: o.fixes, over: o.over, letter: o.letter, app: o.app, prep: o.prep, check: o.check}))};
+  return {v: 1, cv: {text: $("#cvraw").value, ...cvFile}, cvs, cvForm: build, me, cur: cur?.id, offers: offers.filter(o => o.text.trim() || o.app).map(o => ({id: o.id, text: o.text, title: o.title, score: o.score, fixes: o.fixes, over: o.over, letter: o.letter, app: o.app, prep: o.prep, check: o.check}))};
 }
 function save(){ clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, 400); }
 addEventListener("pagehide", saveNow);
@@ -588,9 +594,20 @@ function cleanSave(d){
     list.push(x);
   }
   const cv = isObj(d.cv) ? {text: str(d.cv.text), name: str(d.cv.name, 300), info: str(d.cv.info, 300), conf: typeof d.cv.conf === "number" && isFinite(d.cv.conf) ? d.cv.conf : 0} : {text: ""};
+  // CV gardés (5 au plus) et formulaire « Je n'ai pas de CV » : des textes seulement
+  const cvs = [], cvIds = new Set();
+  for (const c of Array.isArray(d.cvs) ? d.cvs : []) {
+    if (cvs.length >= 5 || !isObj(c) || typeof c.id !== "string" || !/^[a-z0-9]{1,40}$/.test(c.id) || cvIds.has(c.id) || !str(c.text).trim()) continue;
+    cvIds.add(c.id); cvs.push({id: c.id, name: str(c.name, 40).trim() || "CV", text: str(c.text), date: isDay(c.date) ? c.date : ""});
+  }
+  if (isObj(d.cv) && cvIds.has(d.cv.lib)) cv.lib = d.cv.lib;
+  if (isObj(d.cv) && d.cv.built === true) cv.built = true;
+  const F = d.cvForm, cvForm = isObj(F) ? {...strsOf(F, ["name", "city", "phone", "mail", "edu", "skills", "langs", "hobbies", "out"], 5000),
+    jobs: (Array.isArray(F.jobs) ? F.jobs : []).filter(isObj).slice(0, 8).map(j => strsOf(j, ["role", "company", "dates", "t1", "t2"], 500))} : null;
+  if (cvForm && !cvForm.jobs.length) cvForm.jobs.push({});
   const m = strsOf(d.me, ["name", "contact"], 500), g = isObj(d.me) ? +d.me.goal : 0;
   if (g >= 1 && g <= 50) m.goal = Math.round(g);
-  return {v: 1, keep: d.keep !== false, cv, me: {name: m.name || "", contact: m.contact || "", ...(m.goal ? {goal: m.goal} : {})}, cur: seen.has(d.cur) ? d.cur : undefined, offers: list};
+  return {v: 1, keep: d.keep !== false, cv, cvs, cvForm, me: {name: m.name || "", contact: m.contact || "", ...(m.goal ? {goal: m.goal} : {})}, cur: seen.has(d.cur) ? d.cur : undefined, offers: list};
 }
 function restore(){
   let raw = null, d = null;
@@ -602,7 +619,8 @@ function restore(){
   cur = d.keep ? offers.find(o => o.id === d.cur) || offers[offers.length - 1] || null : null;
   if (cur) { fixes = cur.fixes; over = cur.over; $("#offer").value = cur.text; } else newOffer();
   me = d.me;
-  if (d.keep && d.cv.text) { cvFile = {name: d.cv.name, info: d.cv.info, conf: d.cv.conf}; setCV(d.cv.text); showFile(d.cv.name || "Ton CV", d.cv.info || ""); }
+  if (d.keep) { cvs = d.cvs; build = d.cvForm; }
+  if (d.keep && d.cv.text) { cvFile = {name: d.cv.name, info: d.cv.info, conf: d.cv.conf, ...(d.cv.lib && {lib: d.cv.lib}), ...(d.cv.built && {built: true})}; setCV(d.cv.text); showFile(d.cv.name || "Ton CV", d.cv.info || ""); }
   if (d.keep) {
     $("#resume").hidden = false;
     $("#resumetxt").textContent = [cvReady && tr("Ton CV", "Your CV"), offers.length && plural(offers.length, tr("offre", "offer"))].filter(Boolean).join(tr(" et ", " and ")) + (cvReady || offers.length ? tr(" sont là.", " are here.") : "");
