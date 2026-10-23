@@ -326,11 +326,13 @@
           <button class="io-item" id="csv" type="button"><b>Tabla para Excel</b><small>Todas tus candidaturas, para abrir en una hoja de cálculo</small></button>
           <div class="io-item io-proof"><b>Justificante de búsqueda de empleo</b><small>Una página para imprimir o guardar en PDF</small><span class="export"><button class="btn small" type="button" data-proof="month">Este mes</button><button class="btn light small" type="button" data-proof="last">El mes pasado</button><button class="btn light small" type="button" data-proof="all">Todo</button></span></div>
           <button class="io-item" id="backup" type="button"><b>Copia completa</b><small>Un archivo con todo tu seguimiento, para guardarlo o cambiar de dispositivo</small></button>
+          <button class="io-item" id="sharebackup" type="button"><b>Enviar mi copia</b><small>Envíatela (correo, WhatsApp…) y luego «Abrir una copia» en tu otro dispositivo</small></button>
           <p class="io-h">Importar</p>
           <button class="io-item" id="restore" type="button"><b>Abrir una copia</b><small>Recuperar un seguimiento guardado con «Copia completa»</small></button>
         </div></details>
-        <input type="file" id="restorefile" accept=".json,application/json" hidden>
+        <input type="file" id="restorefile" accept=".json,.txt,application/json,text/plain" hidden>
       </div>
+      <div class="weekgoal" id="weekgoal"></div>
       <p class="notice" id="tracknokeep" hidden>Tu seguimiento se guarda en este dispositivo, sin tu CV ni el texto de las ofertas: tendrás que volver a ponerlos la próxima vez. <button class="btn small" id="keepon" type="button">Guardarlos también</button></p>
     </div>
     <aside class="box">
@@ -346,6 +348,7 @@
       <button type="button" data-view="cards" aria-pressed="false">Fichas</button>
       <button type="button" data-view="compare" aria-pressed="false">Comparar</button>
       <button type="button" data-view="stats" aria-pressed="false">Estadísticas</button>
+      <button type="button" data-view="contacts" aria-pressed="false">Contactos</button>
     </div>
     <div class="filters" role="group" aria-label="Filtro" id="trackfilters">
       <button class="chip" type="button" data-tf="all" aria-pressed="true">Todas <span id="tf-all"></span></button>
@@ -379,6 +382,8 @@
 <script src="js/app.js"></script>
 <script src="js/suivi.js"></script>
 <script src="js/outils.js"></script>
+<script src="js/entrainement.js"></script>
+<script src="js/contacts.js"></script>
 <script src="js/confort.js"></script>
 <script src="js/demo.js"></script><!-- mode démo temporaire -->
 </body>

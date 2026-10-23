@@ -325,11 +325,13 @@
           <button class="io-item" id="csv" type="button"><b>Spreadsheet for Excel</b><small>All your applications, to open in a spreadsheet</small></button>
           <div class="io-item io-proof"><b>Proof of job search</b><small>One page to print or save as PDF</small><span class="export"><button class="btn small" type="button" data-proof="month">This month</button><button class="btn light small" type="button" data-proof="last">Last month</button><button class="btn light small" type="button" data-proof="all">All</button></span></div>
           <button class="io-item" id="backup" type="button"><b>Full backup</b><small>One file with your whole tracker, to keep it or move to another device</small></button>
+          <button class="io-item" id="sharebackup" type="button"><b>Send my backup</b><small>Send it to yourself (email, WhatsApp…), then “Open a backup” on your other device</small></button>
           <p class="io-h">Import</p>
           <button class="io-item" id="restore" type="button"><b>Open a backup</b><small>Pick up a tracker saved with “Full backup”</small></button>
         </div></details>
-        <input type="file" id="restorefile" accept=".json,application/json" hidden>
+        <input type="file" id="restorefile" accept=".json,.txt,application/json,text/plain" hidden>
       </div>
+      <div class="weekgoal" id="weekgoal"></div>
       <p class="notice" id="tracknokeep" hidden>Your tracker is kept on this device, without your CV or the text of the offers: you will need to add them again next time. <button class="btn small" id="keepon" type="button">Keep them too</button></p>
     </div>
     <aside class="box">
@@ -345,6 +347,7 @@
       <button type="button" data-view="cards" aria-pressed="false">Cards</button>
       <button type="button" data-view="compare" aria-pressed="false">Compare</button>
       <button type="button" data-view="stats" aria-pressed="false">Statistics</button>
+      <button type="button" data-view="contacts" aria-pressed="false">Contacts</button>
     </div>
     <div class="filters" role="group" aria-label="Filter" id="trackfilters">
       <button class="chip" type="button" data-tf="all" aria-pressed="true">All <span id="tf-all"></span></button>
@@ -378,6 +381,8 @@
 <script src="js/app.js"></script>
 <script src="js/suivi.js"></script>
 <script src="js/outils.js"></script>
+<script src="js/entrainement.js"></script>
+<script src="js/contacts.js"></script>
 <script src="js/confort.js"></script>
 <script src="js/demo.js"></script><!-- mode démo temporaire -->
 </body>

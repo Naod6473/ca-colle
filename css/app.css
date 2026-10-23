@@ -573,6 +573,27 @@ html[data-skin="fiche"] .goalbar { background: var(--card); }
 html[data-skin="fiche"] .goalbar i, html[data-skin="fiche"] .wk i { background: var(--accent); }
 html[data-skin="fiche"] .stbars i { background: linear-gradient(90deg, var(--accent) var(--w), var(--card) var(--w)); }
 
+/* Objectif de la semaine (en haut du suivi), entraînement à l'entretien, carnet de contacts */
+.weekgoal { display: grid; gap: 8px; max-width: 520px; margin-top: 18px; padding: 14px 16px; border: var(--line); border-radius: 10px; background: var(--card); box-shadow: 4px 4px 0 var(--ink); }
+.weekgoal:empty { display: none; }
+.weekgoal .hint, .wg-t { margin: 0; }
+.wg-in { display: flex; justify-content: space-between; align-items: center; gap: 10px; font: 700 12px/1.2 var(--body); text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); }
+.wg-in select { min-height: 40px; padding: 6px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); font: 800 15px var(--body); cursor: pointer; }
+.wg-t { font: italic 900 20px/1.1 var(--display); text-transform: uppercase; }
+.weekgoal .goalbar { height: 16px; }
+.practice .pr-q, .practice .pr-clock { display: grid; gap: 8px; max-width: 760px; padding: 16px 18px; border: var(--line); border-radius: 10px; background: var(--card); box-shadow: 4px 4px 0 var(--ink); }
+.practice p { margin: 0; }
+.pr-q h3 { margin: 0; font: 800 20px/1.3 var(--body); }
+.pr-n, .pr-from, .pr-lab { font: 700 12px/1.2 var(--body); text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); }
+.pr-q .btn { justify-self: start; }
+.pr-clock { justify-items: center; text-align: center; }
+.pr-time { font: italic 900 56px/1 var(--display); font-variant-numeric: tabular-nums; }
+.practice .pr-clock .export { justify-content: center; }
+.ct-note { margin: 0; font-size: 14px; color: var(--ink-soft); overflow-wrap: anywhere; }
+html[data-skin="fiche"] :is(.weekgoal, .practice .pr-q, .practice .pr-clock) { border: 0; border-radius: 20px; box-shadow: var(--soft) !important; }
+html[data-skin="fiche"] :is(.wg-t, .pr-time) { font-family: var(--body); font-style: normal; font-weight: 800; text-transform: none; }
+html[data-skin="fiche"] .pr-time { color: var(--accent); }
+
 /* Check-list avant d'envoyer */
 .checklist { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-width: 760px; }
 .checklist li { display: flex; gap: 10px; align-items: flex-start; padding: 10px 14px; border: 2px solid var(--ink); border-radius: 8px; background: var(--card); font-weight: 600; }
@@ -670,12 +691,20 @@ button.io-item:hover, button.io-item:focus-visible { background: var(--sky-bg, r
 .io-proof .export { margin-top: 6px; flex-wrap: wrap; }
 @media (max-width: 560px) {
   .track-tools { flex-direction: column; align-items: stretch; }
-  .seg { display: grid; grid-template-columns: repeat(4, 1fr); }
-  .seg button { padding: 8px 4px; font-size: 11.5px; }
   .iomenu .io-body { width: calc(100vw - 32px); }
 }
 html[data-skin="fiche"] .seg { border: 1.5px solid var(--hair); border-radius: 999px; box-shadow: none; overflow: hidden; }
 html[data-skin="fiche"] .seg button { border-left-width: 1.5px; border-color: var(--hair); font-style: normal; font-weight: 700; text-transform: none; font-size: 14px; }
+/* Téléphone et petite tablette : les 5 vues sur deux lignes (3 + 2) */
+@media (max-width: 640px) {
+  .track-tools { flex-direction: column; align-items: stretch; }
+  .seg { display: grid; grid-template-columns: repeat(6, 1fr); }
+  .seg button { grid-column: span 2; padding: 8px 4px; font-size: 11.5px; }
+  .seg button:nth-child(n+4) { grid-column: span 3; border-top: 2px solid var(--ink); }
+  .seg button:nth-child(4) { border-left: 0; }
+  html[data-skin="fiche"] .seg { border-radius: 18px; }
+  html[data-skin="fiche"] .seg button:nth-child(n+4) { border-top-width: 1.5px; }
+}
 .iomenu .share-body { position: static; margin-top: 10px; }
 .gaps { margin-top: 34px; }
 /* Téléphone : chaque ligne du tableau devient une petite fiche (poste, entreprise, état, dates) */

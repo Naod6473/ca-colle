@@ -29,6 +29,17 @@ ok("clés inconnues retirées, __proto__ ignoré", () => {
 });
 ok("pas une sauvegarde", () => { assert.strictEqual(ctx.cleanSave([1]), null); assert.strictEqual(ctx.cleanSave({v: 2}), null); assert.strictEqual(ctx.cleanSave("x"), null); });
 ok("suivi seul (case décochée)", () => assert.strictEqual(ctx.cleanSave({v: 1, keep: false, offers: []}).keep, false));
+ok("carnet de contacts : champs connus, bons types, date vérifiée", () => {
+  const d = ctx.cleanSave({v: 1, offers: [], contacts: [
+    {id: "c1", name: "Mme Exemple", where: "Salon", company: 5, phone: "02 00 00 00 00", email: "x@exemple.fr", note: "n", next: "2026-10-30", evil: "<img>"},
+    {id: 'c2"><img src=x>', name: "piège"}, {id: "c1", name: "doublon"}, "x", {id: "c3", next: "demain", note: {a: 1}}
+  ]});
+  assert.strictEqual(d.contacts.length, 2);
+  assert.deepStrictEqual(JSON.parse(JSON.stringify(d.contacts[0])), {id: "c1", name: "Mme Exemple", where: "Salon", company: "", phone: "02 00 00 00 00", email: "x@exemple.fr", note: "n", next: "2026-10-30"});
+  assert.strictEqual(d.contacts[1].next, ""); assert.strictEqual(d.contacts[1].note, "");
+  assert.strictEqual(ctx.cleanSave({v: 1, offers: []}).contacts.length, 0);
+  assert.strictEqual(ctx.cleanSave({v: 1, offers: [], contacts: "x"}).contacts.length, 0);
+});
 ok("date locale", () => assert.strictEqual(ctx.ymd(new Date(2026, 0, 5, 0, 30)), "2026-01-05"));
 ok("nombres écrits à la main", () => {
   const t = {"1.850": 1850, "1 850": 1850, "1,850": 1850, "1'850": 1850, "1.850,50": 1850.5, "1,850.50": 1850.5, "12.50": 12.5, "12,50": 12.5, "0.850": 0.85, "11.88": 11.88, "45 000 €": 45000, "1.234.567": 1234567, "": 0};

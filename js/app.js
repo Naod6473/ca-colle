@@ -7,6 +7,7 @@ let step = 1, filter = "all", results = [], cvReady = false;
 let cvFile = {name: "", info: "", conf: 0};
 let me = {name: "", contact: ""};          // pour la lettre, commun à toutes les offres
 let offers = [], cur = null;               // offres comparées au même CV
+let contacts = [];                         // carnet de contacts du suivi (js/contacts.js)
 
 const words = t => t.trim() ? t.trim().split(/\s+/).length : 0;
 const isLink = t => /^\s*(https?:\/\/|www\.)\S+\s*$/i.test(t);
@@ -521,7 +522,7 @@ function saveNow(){
   if (noSave) return;
   const d = snapshot();
   try {
-    if (d.keep === false && !d.offers.length) localStorage.removeItem(STORE);
+    if (d.keep === false && !d.offers.length && !d.contacts.length) localStorage.removeItem(STORE);
     else localStorage.setItem(STORE, JSON.stringify(d));
     saveNow.warned = 0; return true;
   } catch {
@@ -532,8 +533,8 @@ function saveNow(){
 // full : tout (case cochée, ou fichier de sauvegarde) ; sinon le suivi seulement
 function snapshot(full = keep()){
   if (cur) { cur.text = $("#offer").value; cur.title = titleOf(cur.text); }
-  if (!full) return {v: 1, keep: false, me: me.goal ? {goal: me.goal} : {}, offers: offers.filter(o => o.app).map(o => ({id: o.id, title: o.title, app: o.app}))};
-  return {v: 1, cv: {text: $("#cvraw").value, ...cvFile}, me, cur: cur?.id, offers: offers.filter(o => o.text.trim() || o.app).map(o => ({id: o.id, text: o.text, title: o.title, score: o.score, fixes: o.fixes, over: o.over, letter: o.letter, app: o.app, prep: o.prep, check: o.check}))};
+  if (!full) return {v: 1, keep: false, me: me.goal ? {goal: me.goal} : {}, contacts, offers: offers.filter(o => o.app).map(o => ({id: o.id, title: o.title, app: o.app}))};
+  return {v: 1, cv: {text: $("#cvraw").value, ...cvFile}, me, contacts, cur: cur?.id, offers: offers.filter(o => o.text.trim() || o.app).map(o => ({id: o.id, text: o.text, title: o.title, score: o.score, fixes: o.fixes, over: o.over, letter: o.letter, app: o.app, prep: o.prep, check: o.check}))};
 }
 function save(){ clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, 400); }
 addEventListener("pagehide", saveNow);
@@ -581,14 +582,24 @@ function cleanSave(d){
   const cv = isObj(d.cv) ? {text: str(d.cv.text), name: str(d.cv.name, 300), info: str(d.cv.info, 300), conf: typeof d.cv.conf === "number" && isFinite(d.cv.conf) ? d.cv.conf : 0} : {text: ""};
   const m = strsOf(d.me, ["name", "contact"], 500), g = isObj(d.me) ? +d.me.goal : 0;
   if (g >= 1 && g <= 50) m.goal = Math.round(g);
-  return {v: 1, keep: d.keep !== false, cv, me: {name: m.name || "", contact: m.contact || "", ...(m.goal ? {goal: m.goal} : {})}, cur: seen.has(d.cur) ? d.cur : undefined, offers: list};
+  // Carnet de contacts : texte seulement, date de rappel au format AAAA-MM-JJ
+  const people = [], seenP = new Set();
+  for (const p of Array.isArray(d.contacts) ? d.contacts.slice(0, 500) : []) {
+    if (!isObj(p) || typeof p.id !== "string" || !/^[a-z0-9]{1,40}$/.test(p.id) || seenP.has(p.id)) continue;
+    seenP.add(p.id);
+    const c = {id: p.id, ...strsOf(p, ["name", "where", "company", "phone", "email"], 300), ...strsOf(p, ["note"], 5000)};
+    for (const k of ["name", "where", "company", "phone", "email", "note"]) c[k] = c[k] || "";
+    c.next = isDay(p.next) ? p.next : "";
+    people.push(c);
+  }
+  return {v: 1, keep: d.keep !== false, cv, me: {name: m.name || "", contact: m.contact || "", ...(m.goal ? {goal: m.goal} : {})}, contacts: people, cur: seen.has(d.cur) ? d.cur : undefined, offers: list};
 }
 function restore(){
   let raw = null, d = null;
   try { raw = JSON.parse(localStorage.getItem(STORE) || "null"); d = cleanSave(raw); } catch {}
   if (!d) return false;
   $("#keep").checked = d.keep;
-  offers = d.offers;
+  offers = d.offers; contacts = d.contacts;
   // suivi seul : le CV et les offres n'ont pas été gardés, on repart sur une offre vide (sans toucher aux candidatures)
   cur = d.keep ? offers.find(o => o.id === d.cur) || offers[offers.length - 1] || null : null;
   if (cur) { fixes = cur.fixes; over = cur.over; $("#offer").value = cur.text; } else newOffer();
