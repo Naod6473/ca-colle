@@ -88,6 +88,7 @@ function openHash(){
 }
 if (location.hash === "#suivi" || /^#etape-[1-5]$/.test(location.hash)) addEventListener("DOMContentLoaded", openHash);
 addEventListener("popstate", openHash);
+document.addEventListener("cacolle-simple", () => { if (!$("#track").hidden) renderTrack(); });
 function renderBadge(){
   const n = apps().reduce((s, o) => s + todosOf(o).filter(t => t.urgent).length, 0);
   $("#trackn").hidden = !n; $("#trackn").textContent = n;
@@ -125,7 +126,7 @@ function cardHTML(o){
   return `<article class="app-card" id="app-${esc(o.id)}" style="--k: ${ST[a.status].c}">
     <div class="app-h">
       <div><h3>${esc(appTitle(o))}</h3><p>${esc(a.company || tr("Entreprise à préciser", "Company not set"))}</p></div>
-      ${o.score != null && o.text.trim() ? `<span class="app-score" title="${tr("Score de l'analyse", "Analysis score")}">${esc(o.score)} %</span>` : ""}
+      ${o.score != null && o.text.trim() ? `<span class="app-score" title="${tr("Score de l'analyse", "Analysis score")}">${esc(pctTxt(o.score))}</span>` : ""}
     </div>
     <div class="app-row">${statusSelect(o)}${td.map(t => `<i class="tag must">${esc(t.t)}</i>`).join("")}</div>
     <dl class="app-dates">
@@ -166,7 +167,7 @@ function tableHTML(list){
     <tbody>${list.map(o => { const a = o.app, late = todosOf(o).some(t => t.urgent); return `<tr>
       <td class="t-job"><b>${esc(appTitle(o))}</b></td><td class="t-co">${esc(a.company || "–")}</td><td class="t-off" data-l="${cols[2][1]}">${fmtDate(a.offerDate) || "–"}</td><td data-l="${cols[3][1]}">${fmtDate(a.appliedDate) || "–"}</td>
       <td class="t-st">${statusSelect(o)}</td><td data-l="${cols[5][1]}" class="${late ? "late" : ""}">${fmtDate(a.next) || "–"}${late ? ` <span class="sr-only">${tr("(en retard)", "(overdue)")}</span>` : ""}</td>
-      <td data-l="${cols[6][1]}">${o.text.trim() && o.score != null ? esc(o.score) + " %" : "–"}</td>
+      <td data-l="${cols[6][1]}">${o.text.trim() && o.score != null ? esc(pctTxt(o.score)) : "–"}</td>
       <td class="t-open"><button type="button" class="btn light small" data-openapp="${esc(o.id)}">${tr("Ouvrir", "Open")}</button></td></tr>`; }).join("")}</tbody>
   </table></div>`;
 }

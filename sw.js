@@ -6,7 +6,7 @@
 //   Le lecteur PDF et la lecture d'image ne sont gardés qu'à leur premier usage (les données de langue de la lecture
 //   d'image sont gardées par Tesseract lui-même).
 // - À l'installation, seulement les pages de la langue utilisée (pas les 15 pages).
-const VERSION = "cacolle-2026-10-23b", LIB = "cacolle-lib-1", WAIT = 3500;
+const VERSION = "cacolle-2026-10-23c", LIB = "cacolle-lib-1", WAIT = 3500;
 const COMMON = [
   "css/app.css", "css/skins.css", "fonts/fonts.css",
   "js/lang.js", "js/lecteur.js", "js/moteur.js", "js/suivi.js", "js/outils.js", "js/fiches.js", "js/entrainement.js", "js/contacts.js", "js/confort.js", "js/demo.js", "js/export.js", "js/app.js", "js/mescv.js", "js/salaire.js",
