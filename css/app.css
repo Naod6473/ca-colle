@@ -335,7 +335,27 @@ mark.miss { background: var(--yellow); padding: 0 3px; border: 1px dashed var(--
   .p-cv p { margin: 0 0 3pt; }
   .p-cv ins { text-decoration: none; background: none; }
   .p-letter p { margin: 0 0 2pt; }
+  /* CV mis en page et fiche entretien (js/fiches.js) */
+  .p-cv .sub { font-weight: 700; }
+  .p-cv .contact { margin-bottom: 4pt; }
+  .p-cv .jobh { margin-top: 5pt; }
+  .p-cv .li { padding-left: 11pt; text-indent: -8pt; }
+  .p-sheet { font-size: 10pt; line-height: 1.35; }
+  .p-sheet .name { font-size: 16pt; }
+  .p-sheet .sec { margin-top: 9pt; }
+  .p-sheet ul { margin: 0; padding-left: 13pt; }
+  .p-sheet li { margin: 0 0 2pt; break-inside: avoid; }
+  .p-sheet .notes { height: 32mm; border: 1pt dashed #777; }
 }
+/* CV mis en page : aperçu sous l'export de l'étape 4 */
+.cvpage { border-top: 2px dashed var(--ink); }
+.cvpage > summary { padding: 12px 18px; cursor: pointer; font-weight: 800; }
+.cvpage > .hint { margin: 0; padding: 0 18px 10px; }
+.cvpage .cvdoc { border-top: 2px dashed var(--ink); }
+.cvdoc .sub { font-weight: 700; }
+.cvdoc .jobh { margin-top: 4px; }
+.cvdoc .li { padding-left: 1.1em; text-indent: -.75em; }
+.tone-hint { margin: 8px 0 0; }
 .field .str { font: 500 15px/1.35 var(--body); text-transform: none; margin: 0; }
 .str b { font-weight: 800; }
 .str small { font-size: 13px; }

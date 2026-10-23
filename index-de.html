@@ -205,6 +205,7 @@
         <button class="btn light small" id="compare" type="button">Mit einem anderen Angebot vergleichen</button>
         <button class="btn light small" type="button" data-trackthis>Diese Bewerbung verfolgen</button>
         <button class="btn light small" type="button" id="listen" aria-pressed="false">Ergebnis vorlesen</button>
+        <button class="btn light small" type="button" data-sheet>Blatt fürs Vorstellungsgespräch</button>
       </div>
       <details class="share">
         <summary class="btn light small">Auswertung teilen</summary>
@@ -265,6 +266,11 @@
         <button class="btn light small" type="button" data-dl="cv-copy">Text kopieren</button>
       </div>
       <p class="preview-foot"><ins>Markiert</ins> = deine Ergänzungen. Die Word-Datei enthält den Text: Dein eigenes Layout kannst du danach wieder anlegen.</p>
+      <details class="cvpage" id="cvpagebox"><summary>Mein Lebenslauf mit Layout</summary>
+        <p class="hint">Eine einfache Vorlage in einer Spalte: klare Überschriften, keine Tabellen, keine Bilder. Bewerbungssoftware liest sie gut. Es wird nichts hinzugefügt: nur dein Lebenslauf, nach Rubriken geordnet.</p>
+        <div class="box-body cvdoc" id="cvpage"></div>
+        <div class="export"><button class="btn small" type="button" data-cvpage="pdf">Als PDF</button><button class="btn light small" type="button" data-cvpage="docx">Als Word</button></div>
+      </details>
     </aside>
   </div>
   <div class="next-row"><button class="btn" data-go="5">Weiter: mein Anschreiben →</button></div>
@@ -288,7 +294,7 @@
 <div class="below" data-for="5" hidden style="--c: var(--violet)">
   <div class="rewrite">
     <form class="letter-form" id="lform" autocomplete="on">
-      <fieldset class="field"><legend>Ton des Anschreibens</legend><div class="filters" role="group" aria-label="Ton des Anschreibens"><button class="chip" type="button" data-tone="classic" aria-pressed="true">Klassisch</button><button class="chip" type="button" data-tone="dynamic" aria-pressed="false">Locker</button><button class="chip" type="button" data-tone="change" aria-pressed="false">Beruflicher Neustart</button><button class="chip" type="button" data-tone="study" aria-pressed="false">Ausbildung oder Praktikum</button></div></fieldset>
+      <fieldset class="field"><legend>Ton des Anschreibens</legend><div class="filters" role="group" aria-label="Ton des Anschreibens"><button class="chip" type="button" data-tone="classic" aria-pressed="true">Klassisch</button><button class="chip" type="button" data-tone="direct" aria-pressed="false">Direkt</button><button class="chip" type="button" data-tone="short" aria-pressed="false">Kurz (E-Mail)</button><button class="chip" type="button" data-tone="change" aria-pressed="false">Beruflicher Neustart</button><button class="chip" type="button" data-tone="study" aria-pressed="false">Ausbildung oder Praktikum</button></div><p class="hint tone-hint">Klassisch für einen Brief, direkt für einen kleinen Betrieb, kurz für eine E-Mail oder eine Nachricht auf einem Jobportal. Was du nicht ausgefüllt hast, bleibt in eckigen Klammern.</p></fieldset>
       <div class="field"><label for="l-name">Dein Name</label><input id="l-name" autocomplete="name"></div>
       <fieldset class="field" id="l-gender" hidden><legend>Du unterschreibst als</legend><div class="filters" role="group" aria-label="Du unterschreibst als"><button class="chip" type="button" data-g="f" aria-pressed="false">Frau</button><button class="chip" type="button" data-g="m" aria-pressed="false">Herr</button><button class="chip" type="button" data-g="n" aria-pressed="true">Ohne Angabe</button></div></fieldset>
       <div class="field"><label for="l-contact">Deine E-Mail und Telefonnummer</label><input id="l-contact"></div>
@@ -379,6 +385,7 @@
 <script src="js/app.js"></script>
 <script src="js/suivi.js"></script>
 <script src="js/outils.js"></script>
+<script src="js/fiches.js"></script>
 <script src="js/confort.js"></script>
 <script src="js/demo.js"></script><!-- mode démo temporaire -->
 </body>

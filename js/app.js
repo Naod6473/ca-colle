@@ -290,7 +290,7 @@ function renderLetterForm(){
   prefillLetter();
   const L = cur.letter;
   $("#l-name").value = me.name; $("#l-contact").value = me.contact;
-  $$("[data-tone]").forEach(b => b.setAttribute("aria-pressed", b.dataset.tone === (L.tone || "classic")));
+  $$("[data-tone]").forEach(b => b.setAttribute("aria-pressed", b.dataset.tone === toneOf(L)));
   // Madame / Monsieur : accords de la lettre (« heureuse », « prêt »), seulement dans les langues qui en ont besoin
   $("#l-gender").hidden = !(LANG === "fr" || L10N?.letterGender);
   $$("[data-g]").forEach(b => b.setAttribute("aria-pressed", b.dataset.g === (L.g || "n")));
@@ -343,28 +343,35 @@ function letterText(){
   // Madame / Monsieur / sans préciser : « heureuse », « heureux », ou une tournure neutre
   const g = L.g || "n", glad = {f: "je serais heureuse de vous rencontrer", m: "je serais heureux de vous rencontrer", n: "ce serait un plaisir de vous rencontrer"}[g] || "ce serait un plaisir de vous rencontrer";
   const ready = {f: "Je suis prête à me former", m: "Je suis prêt à me former", n: "J'ai envie de me former"}[g] || "J'ai envie de me former";
-  const tone = L.tone || "classic", at = L.company ? tr(" chez " + L.company, " at " + L.company) : "";
+  const tone = toneOf(L), at = L.company ? tr(" chez " + L.company, " at " + L.company) : "";
   const why = L.why ? " " + sentence(L.why) : tr(" [pourquoi ce poste ou cette entreprise]", " [why this job or company]");
   // Ce que l'offre demande et que le CV ne montre pas encore : seulement cité, jamais inventé
   const gaps = results.filter(r => r.st === "no" && !["y", "h", "x"].includes(r.type)).sort((a, b) => (a.prio === "must" ? 0 : 1) - (b.prio === "must" ? 0 : 1)).slice(0, 2).map(r => KEEPCASE ? r.k : r.k.charAt(0).toLowerCase() + r.k.slice(1));
   // Autre langue : L10N.letter({job, at, why, L, gaps}) rend le même objet que la version anglaise
   const T = L10N?.letter ? L10N.letter({job, at, why, L, gaps}) : EN ? {
     classic: {subj: `Application for the position of ${job}`, open: `I was very interested to see your offer for the position of ${job}${at}.${why}`, intro: "Here is what I can bring:", extra: "", close: `I am available ${L.when ? L.when.trim() : "soon"} and would be glad to meet you to talk about it.`, bye: "Yours sincerely,"},
-    dynamic: {subj: `Application: ${job}`, open: `Your ${job} offer${at} made me want to write to you straight away.${why}`, intro: "What I bring, in practice:", extra: "", close: `I am available ${L.when ? L.when.trim() : "now"} and would love to tell you more in person.`, bye: "Best regards,"},
+    direct: {hello: "Hello,", subj: `Application: ${job}`, open: `I am writing about the ${job} position${at}.${why}`, intro: "What I already know how to do:", extra: "", close: `I am available ${L.when ? L.when.trim() : "[date]"} for an interview or a trial day.`, bye: "Kind regards,"},
+    short: {mail: true, hello: "Hello,", subj: `Application for the position of ${job}`, open: `I am interested in your ${job} position${at}.${why}`, intro: "What I already know how to do:", extra: "", close: `My CV is attached. I am available ${L.when ? L.when.trim() : "[date]"} to talk about it.`, bye: "Have a good day,"},
     change: {subj: `Application for the position of ${job} (career change)`, open: `I am moving into a new line of work, and your offer for the position of ${job}${at} matches that plan exactly.${why}`, intro: "What my background has taught me and I can bring to this role:", extra: gaps.length ? `I am ready to train in what I do not know yet, such as ${gaps.join(" and ")}.` : "I am ready to train in whatever I do not know yet.", close: `I am available ${L.when ? L.when.trim() : "soon"} and would be glad to meet you to talk about it.`, bye: "Yours sincerely,"},
     study: {subj: `Application for an apprenticeship or internship: ${job}`, open: `I am looking for an apprenticeship or internship [say which, with the dates or the schedule and your school] as ${job}${at}.${why}`, intro: "What I can already bring:", extra: "I am keen to learn on the job and to grow with your team.", close: `I am available ${L.when ? L.when.trim() : "soon"} and would be glad to meet you to talk about it.`, bye: "Yours sincerely,"}
   } : {
     classic: {subj: `Objet : candidature au poste « ${job} »`, open: `Votre offre pour le poste « ${job} »${at} a retenu toute mon attention.${why}`, intro: "Voici ce que je peux vous apporter :", extra: "", close: `Je suis disponible ${L.when ? L.when.trim() : "rapidement"} et ${glad} pour en parler.`, bye: "Je vous prie d'agréer, Madame, Monsieur, mes salutations distinguées."},
-    dynamic: {subj: `Objet : candidature « ${job} »`, open: `Votre offre pour le poste « ${job} »${at} m'a donné envie de vous écrire tout de suite.${why}`, intro: "Ce que j'apporte, concrètement :", extra: "", close: `Je suis disponible ${L.when ? L.when.trim() : "dès maintenant"} et j'aimerais beaucoup vous en dire plus de vive voix.`, bye: "Bien cordialement,"},
+    direct: {hello: "Bonjour,", subj: `Objet : candidature « ${job} »`, open: `Je vous écris pour le poste « ${job} »${at}.${why}`, intro: "Ce que je sais déjà faire :", extra: "", close: `Je suis disponible ${L.when ? L.when.trim() : "[date]"} pour un entretien ou un essai.`, bye: "Bien à vous,"},
+    short: {mail: true, hello: "Bonjour,", subj: `Objet : candidature « ${job} »`, open: `Votre offre pour le poste « ${job} »${at} m'intéresse.${why}`, intro: "Ce que je sais déjà faire :", extra: "", close: `Mon CV est en pièce jointe. Je suis disponible ${L.when ? L.when.trim() : "[date]"} pour en parler.`, bye: "Bonne journée,"},
     change: {subj: `Objet : candidature au poste « ${job} » (reconversion)`, open: `Je souhaite mettre mon expérience au service d'un nouveau métier, et votre offre pour le poste « ${job} »${at} correspond exactement à ce projet.${why}`, intro: "Ce que mon parcours m'a appris et que je peux mettre à profit :", extra: gaps.length ? `${ready} sur ce que je ne connais pas encore, comme ${gaps.join(" et ")}.` : `${ready} sur ce que je ne connais pas encore.`, close: `Je suis disponible ${L.when ? L.when.trim() : "rapidement"} et ${glad} pour en parler.`, bye: "Je vous prie d'agréer, Madame, Monsieur, mes salutations distinguées."},
     study: {subj: `Objet : candidature en alternance ou en stage « ${job} »`, open: `Je recherche une alternance ou un stage [précise lequel, avec les dates ou le rythme et ton école] au poste « ${job} »${at}.${why}`, intro: "Ce que je peux déjà vous apporter :", extra: "J'ai envie d'apprendre sur le terrain et de progresser avec votre équipe.", close: `Je suis disponible ${L.when ? L.when.trim() : "rapidement"} et ${glad} pour en parler.`, bye: "Je vous prie d'agréer, Madame, Monsieur, mes salutations distinguées."}
   };
-  const t = T[tone] || T.classic;
+  const t = T[tone] || T.classic, sign = me.name || tr("[ton nom]", "[your name]");
+  // Courte (mail) : pas d'adresse, les points forts sur une ligne, la signature avec le contact
+  if (t.mail) {
+    const keys = results.filter(r => L.strengths.includes(r.k) && r.st === "ok").map(low);
+    return [t.subj, "", t.hello, "", t.open, "", ...(keys.length ? [t.intro + " " + keys.join(", ") + "."] : []), t.close, "", t.bye, sign + " · " + (me.contact || tr("[ton email et ton téléphone]", "[your email and phone]"))].join("\n");
+  }
   return [
     me.name || tr("[ton nom]", "[your name]"), me.contact || tr("[ton email et ton téléphone]", "[your email and phone]"), "",
     co, tr("À l'attention du service recrutement", "Recruitment team"), "",
     t.subj, "",
-    tr("Madame, Monsieur,", "Dear Hiring Manager,"), "",
+    t.hello || tr("Madame, Monsieur,", "Dear Hiring Manager,"), "",
     t.open, "",
     ...(strong.length ? [t.intro, ...strong, ""] : []),
     ...(t.extra ? [t.extra, ""] : []),
@@ -373,6 +380,8 @@ function letterText(){
     me.name || tr("[ton nom]", "[your name]")
   ].join("\n");
 }
+// Ancien ton « Dynamique » (sessions et sauvegardes d'avant) : devenu « Directe »
+const toneOf = L => L.tone === "dynamic" ? "direct" : L.tone || "classic";
 const currentLetter = () => cur.letter.frozen ? cur.letter.text : letterText();
 // Check-list avant d'envoyer : certains points se vérifient tout seuls, les autres se cochent
 function renderChecklist(){

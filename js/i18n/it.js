@@ -3,6 +3,22 @@
 const I18N = {
   lang: "it",
   s: {
+    // Fiche entretien et CV mis en page (js/fiches.js)
+    "Ajoute le texte de l'annonce pour avoir ce résumé.": "Aggiungi il testo dell'annuncio per avere questo riepilogo.",
+    "Autres": "Altro",
+    "Expérience": "Esperienza",
+    "Fiche entretien": "Scheda per il colloquio",
+    "Fiche entretien (PDF)": "Scheda colloquio (PDF)",
+    "Formation": "Formazione",
+    "Mes notes": "I miei appunti",
+    "Pas indiqué": "Non indicato",
+    "Prochaine étape : ": "Prossimo passo: ",
+    "Rien de prouvé dans ton CV pour l'instant. Ajoute des exemples à l'étape 4.": "Per ora nel tuo CV non c'è niente di dimostrato. Aggiungi degli esempi al passo 4.",
+    "Sans le texte de l'annonce et ton CV, la fiche ne contient que les questions à poser.": "Senza il testo dell'annuncio e il tuo CV, la scheda contiene solo le domande da fare.",
+    "Tes points forts": "I tuoi punti di forza",
+    "cité sans exemple. Prépare un exemple vrai : où, ce que tu as fait, le résultat.": "citato senza esempio. Prepara un esempio vero: dove, cosa hai fatto tu, il risultato.",
+    "pas dans ton CV. Dis ce qui s'en rapproche et que tu es prêt(e) à apprendre. N'invente rien.": "non è nel tuo CV. Di' cosa ci si avvicina di più e che hai voglia di imparare. Non inventare niente.",
+    "À préparer": "Da preparare",
     // ---------- app.js ----------
     "Offre": "Offerta",
     "offre": "offerta",
@@ -801,7 +817,8 @@ Requisiti: 4 anni di sviluppo Java, Git, inglese.`,
     const close = `Sono disponibile ${when("a breve")} e sarei felice di incontrarvi per parlarne.`;
     return {
       classic: {subj: `Oggetto: candidatura per la posizione di ${job}`, open: `Ho letto con grande interesse il vostro annuncio per la posizione di ${job}${at}.${why}`, intro: "Ecco cosa posso offrirvi:", extra: "", close, bye: "Cordiali saluti,"},
-      dynamic: {subj: `Oggetto: candidatura ${job}`, open: `Il vostro annuncio per la posizione di ${job}${at} mi ha fatto venire voglia di scrivervi subito.${why}`, intro: "Cosa porto, in concreto:", extra: "", close: `Sono disponibile ${when("da subito")} e mi farebbe molto piacere raccontarvi di più di persona.`, bye: "Un cordiale saluto,"},
+      direct: {hello: "Buongiorno,", subj: `Oggetto: candidatura ${job}`, open: `Vi scrivo per la posizione di ${job}${at}.${why}`, intro: "Cosa so già fare:", extra: "", close: `Sono disponibile ${when("[data]")} per un colloquio o una giornata di prova.`, bye: "Cordialmente,"},
+      short: {mail: true, hello: "Buongiorno,", subj: `Oggetto: candidatura per la posizione di ${job}`, open: `Mi interessa il vostro annuncio per la posizione di ${job}${at}.${why}`, intro: "Cosa so già fare:", extra: "", close: `Allego il mio CV. Sono disponibile ${when("[data]")} per parlarne.`, bye: "Buona giornata,"},
       change: {subj: `Oggetto: candidatura per la posizione di ${job} (cambio di professione)`, open: `Desidero mettere la mia esperienza al servizio di un nuovo mestiere, e il vostro annuncio per la posizione di ${job}${at} corrisponde esattamente a questo progetto.${why}`, intro: "Cosa mi ha insegnato il mio percorso e cosa posso mettere a frutto in questo ruolo:", extra: gaps.length ? `Ho voglia di formarmi su ciò che ancora non conosco, come ${gaps.join(" e ")}.` : "Ho voglia di formarmi su ciò che ancora non conosco.", close, bye: "Cordiali saluti,"},
       study: {subj: `Oggetto: candidatura per apprendistato o tirocinio: ${job}`, open: `Cerco un apprendistato o un tirocinio [di' quale, con le date o l'orario e la tua scuola] come ${job}${at}.${why}`, intro: "Cosa posso già offrirvi:", extra: "Ho voglia di imparare sul campo e di crescere con la vostra squadra.", close, bye: "Cordiali saluti,"}
     };

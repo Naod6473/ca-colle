@@ -143,6 +143,7 @@ function cardHTML(o){
     <div class="app-actions">
       ${o.text.trim() ? `<button type="button" class="btn light small" data-openoffer="${esc(o.id)}">${tr("Voir l'analyse", "See the analysis")}</button>` : ""}
       <button type="button" class="btn small" data-prep="${esc(o.id)}">${tr("Préparer l'entretien", "Prepare the interview")}</button>
+      <button type="button" class="btn light small" data-sheet="${esc(o.id)}">${tr("Fiche entretien (PDF)", "Interview sheet (PDF)")}</button>
       <button type="button" class="btn light small" data-mail="${esc(o.id)}">${tr("Écrire un mail", "Write an email")}</button>
       ${a.next ? `<button type="button" class="btn light small" data-ics="${esc(o.id)}">${tr("Ajouter à l'agenda", "Add to calendar")}</button>` : ""}
       ${a.link && /^https?:\/\//i.test(a.link) ? `<a class="btn light small" href="${esc(a.link)}" target="_blank" rel="noopener noreferrer">${tr("Ouvrir l'annonce", "Open the ad")}</a>` : ""}

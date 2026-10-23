@@ -3,6 +3,22 @@ const I18N = {
   lang: "de",
   /* ---------- Textes de l'interface : clé = texte français exact (ou modèle avec {0}, {1}…) ---------- */
   s: {
+    // Fiche entretien et CV mis en page (js/fiches.js)
+    "Ajoute le texte de l'annonce pour avoir ce résumé.": "Füge den Text der Anzeige hinzu, um diese Übersicht zu bekommen.",
+    "Autres": "Sonstiges",
+    "Expérience": "Berufserfahrung",
+    "Fiche entretien": "Blatt fürs Vorstellungsgespräch",
+    "Fiche entretien (PDF)": "Blatt fürs Gespräch (PDF)",
+    "Formation": "Ausbildung",
+    "Mes notes": "Meine Notizen",
+    "Pas indiqué": "Nicht angegeben",
+    "Prochaine étape : ": "Nächster Schritt: ",
+    "Rien de prouvé dans ton CV pour l'instant. Ajoute des exemples à l'étape 4.": "In deinem Lebenslauf ist noch nichts belegt. Füge in Schritt 4 Beispiele hinzu.",
+    "Sans le texte de l'annonce et ton CV, la fiche ne contient que les questions à poser.": "Ohne den Text der Anzeige und deinen Lebenslauf enthält das Blatt nur die Fragen, die du stellen kannst.",
+    "Tes points forts": "Deine Stärken",
+    "cité sans exemple. Prépare un exemple vrai : où, ce que tu as fait, le résultat.": "erwähnt, aber ohne Beispiel. Bereite ein echtes Beispiel vor: wo, was du getan hast, das Ergebnis.",
+    "pas dans ton CV. Dis ce qui s'en rapproche et que tu es prêt(e) à apprendre. N'invente rien.": "nicht in deinem Lebenslauf. Sag, was dem am nächsten kommt und dass du bereit bist, es zu lernen. Erfinde nichts.",
+    "À préparer": "Vorzubereiten",
     "fr-FR": "de-DE",
     // app.js
     "Offre": "Stellenangebot",
@@ -797,7 +813,8 @@ Dein Profil: 4 Jahre Java-Entwicklung, Git, Englisch.`,
     const close = `Ich stehe Ihnen ${when("kurzfristig")} zur Verfügung und freue mich auf ein persönliches Gespräch.`;
     return {
       classic: {subj: `Bewerbung als ${job}`, open: `mit großem Interesse habe ich Ihre Stellenanzeige für die Position „${job}“${at} gelesen.${why}`, intro: "Das kann ich Ihnen bieten:", extra: "", close, bye: "Mit freundlichen Grüßen"},
-      dynamic: {subj: `Bewerbung: ${job}`, open: `Ihre Anzeige für die Stelle „${job}“${at} hat mich sofort angesprochen.${why}`, intro: "Was ich konkret mitbringe:", extra: "", close: `Ich bin ${when("ab sofort")} verfügbar und erzähle Ihnen gern persönlich mehr.`, bye: "Beste Grüße"},
+      direct: {hello: "Guten Tag,", subj: `Bewerbung: ${job}`, open: `ich schreibe Ihnen wegen der Stelle „${job}“${at}.${why}`, intro: "Das kann ich schon:", extra: "", close: `Ich bin ${when("[Datum]")} für ein Gespräch oder einen Probetag verfügbar.`, bye: "Viele Grüße"},
+      short: {mail: true, hello: "Guten Tag,", subj: `Bewerbung als ${job}`, open: `Ihre Stelle „${job}“${at} interessiert mich.${why}`, intro: "Das kann ich schon:", extra: "", close: `Meinen Lebenslauf finden Sie im Anhang. Ich bin ${when("[Datum]")} für ein Gespräch verfügbar.`, bye: "Viele Grüße"},
       change: {subj: `Bewerbung als ${job} (beruflicher Neustart)`, open: `ich möchte beruflich neu durchstarten, und Ihre Stelle „${job}“${at} passt genau zu diesem Plan.${why}`, intro: "Was ich aus meinem bisherigen Weg mitbringe:", extra: gaps.length ? `Was ich noch nicht kenne, lerne ich gern, zum Beispiel ${gaps.join(" und ")}.` : "Was ich noch nicht kenne, lerne ich gern.", close, bye: "Mit freundlichen Grüßen"},
       study: {subj: `Bewerbung um eine Ausbildungsstelle oder ein Praktikum: ${job}`, open: `ich suche eine Ausbildungsstelle oder ein Praktikum [sag, was genau, mit Zeitraum und deiner Schule] als ${job}${at}.${why}`, intro: "Das kann ich schon mitbringen:", extra: "Ich möchte in der Praxis lernen und mit Ihrem Team wachsen.", close, bye: "Mit freundlichen Grüßen"}
     };

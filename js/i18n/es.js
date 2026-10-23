@@ -10,6 +10,22 @@ const I18N = {
     const t = k => /\{\d\}/.test(k) ? k.replace(/\{\d\}/g, "").length : 1e4;
     return t(b) - t(a);
   })))({
+    // Fiche entretien et CV mis en page (js/fiches.js)
+    "Ajoute le texte de l'annonce pour avoir ce résumé.": "Añade el texto del anuncio para tener este resumen.",
+    "Autres": "Otros",
+    "Expérience": "Experiencia",
+    "Fiche entretien": "Ficha para la entrevista",
+    "Fiche entretien (PDF)": "Ficha para la entrevista (PDF)",
+    "Formation": "Formación",
+    "Mes notes": "Mis notas",
+    "Pas indiqué": "No indicado",
+    "Prochaine étape : ": "Próximo paso: ",
+    "Rien de prouvé dans ton CV pour l'instant. Ajoute des exemples à l'étape 4.": "Por ahora no hay nada demostrado en tu CV. Añade ejemplos en el paso 4.",
+    "Sans le texte de l'annonce et ton CV, la fiche ne contient que les questions à poser.": "Sin el texto del anuncio y tu CV, la ficha solo tiene las preguntas que puedes hacer.",
+    "Tes points forts": "Tus puntos fuertes",
+    "cité sans exemple. Prépare un exemple vrai : où, ce que tu as fait, le résultat.": "citado sin ejemplo. Prepara un ejemplo real: dónde, qué hiciste tú, el resultado.",
+    "pas dans ton CV. Dis ce qui s'en rapproche et que tu es prêt(e) à apprendre. N'invente rien.": "no está en tu CV. Di lo que más se parece y que tienes ganas de aprender. No inventes nada.",
+    "À préparer": "Para preparar",
     "Mon": "Mi", " : ": ": ",
     "fr-FR": "es-ES",
     // app.js
@@ -828,7 +844,8 @@ Tu perfil: 4 años de desarrollo en Java, Git, inglés.`,
     const ready = L.g === "f" ? "Estoy dispuesta a formarme" : L.g === "m" ? "Estoy dispuesto a formarme" : "Tengo ganas de formarme";
     return {
       classic: {subj: `Asunto: candidatura al puesto de ${job}`, open: `He leído con mucho interés su oferta para el puesto de ${job}${at}.${why}`, intro: "Esto es lo que puedo aportar:", extra: "", close: `Estoy disponible ${when("en breve")} y me encantaría reunirme con ustedes para hablarlo.`, bye: "Atentamente,"},
-      dynamic: {subj: `Asunto: candidatura «${job}»`, open: `Su oferta para el puesto de ${job}${at} me ha dado ganas de escribirles enseguida.${why}`, intro: "Lo que aporto, en concreto:", extra: "", close: `Estoy disponible ${when("desde ya")} y me encantaría contárselo en persona.`, bye: "Un cordial saludo,"},
+      direct: {hello: "Buenos días:", subj: `Asunto: candidatura «${job}»`, open: `Les escribo por el puesto de ${job}${at}.${why}`, intro: "Lo que ya sé hacer:", extra: "", close: `Estoy disponible ${when("[fecha]")} para una entrevista o un día de prueba.`, bye: "Un saludo,"},
+      short: {mail: true, hello: "Buenos días:", subj: `Asunto: candidatura al puesto de ${job}`, open: `Me interesa su oferta para el puesto de ${job}${at}.${why}`, intro: "Lo que ya sé hacer:", extra: "", close: `Adjunto mi CV. Estoy disponible ${when("[fecha]")} para hablarlo.`, bye: "Que tenga un buen día,"},
       change: {subj: `Asunto: candidatura al puesto de ${job} (cambio de profesión)`, open: `Quiero poner mi experiencia al servicio de una nueva profesión, y su oferta para el puesto de ${job}${at} encaja justo con este proyecto.${why}`, intro: "Lo que me ha enseñado mi trayectoria y puedo aprovechar en este puesto:", extra: gaps.length ? `${ready} en lo que todavía no conozco, como ${gaps.join(" y ")}.` : `${ready} en lo que todavía no conozco.`, close: `Estoy disponible ${when("en breve")} y me encantaría reunirme con ustedes para hablarlo.`, bye: "Atentamente,"},
       study: {subj: `Asunto: candidatura para prácticas o FP dual: ${job}`, open: `Busco unas prácticas o una plaza de FP dual [indica cuál, con las fechas o el horario y tu centro de estudios] como ${job}${at}.${why}`, intro: "Lo que ya puedo aportar:", extra: "Tengo muchas ganas de aprender sobre el terreno y de crecer con su equipo.", close: `Estoy disponible ${when("en breve")} y me encantaría reunirme con ustedes para hablarlo.`, bye: "Atentamente,"}
     };

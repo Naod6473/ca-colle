@@ -204,6 +204,7 @@
         <button class="btn light small" id="compare" type="button">Compare with another offer</button>
         <button class="btn light small" type="button" data-trackthis>Track this application</button>
         <button class="btn light small" type="button" id="listen" aria-pressed="false">Listen to the result</button>
+        <button class="btn light small" type="button" data-sheet>Interview sheet</button>
       </div>
       <details class="share">
         <summary class="btn light small">Share the summary</summary>
@@ -264,6 +265,11 @@
         <button class="btn light small" type="button" data-dl="cv-copy">Copy the text</button>
       </div>
       <p class="preview-foot"><ins>Highlighted</ins> = your additions. The Word file has the text: put your own layout back afterwards if you like.</p>
+      <details class="cvpage" id="cvpagebox"><summary>My formatted CV</summary>
+        <p class="hint">A simple one-column layout: clear headings, no tables or images. CV sorting software reads it well. Nothing is added: just your CV sorted into sections.</p>
+        <div class="box-body cvdoc" id="cvpage"></div>
+        <div class="export"><button class="btn small" type="button" data-cvpage="pdf">As PDF</button><button class="btn light small" type="button" data-cvpage="docx">As Word</button></div>
+      </details>
     </aside>
   </div>
   <div class="next-row"><button class="btn" data-go="5">Next step: my letter →</button></div>
@@ -287,7 +293,7 @@
 <div class="below" data-for="5" hidden style="--c: var(--violet)">
   <div class="rewrite">
     <form class="letter-form" id="lform" autocomplete="on">
-      <fieldset class="field"><legend>Tone of the letter</legend><div class="filters" role="group" aria-label="Tone of the letter"><button class="chip" type="button" data-tone="classic" aria-pressed="true">Classic</button><button class="chip" type="button" data-tone="dynamic" aria-pressed="false">Upbeat</button><button class="chip" type="button" data-tone="change" aria-pressed="false">Career change</button><button class="chip" type="button" data-tone="study" aria-pressed="false">Apprenticeship or internship</button></div></fieldset>
+      <fieldset class="field"><legend>Tone of the letter</legend><div class="filters" role="group" aria-label="Tone of the letter"><button class="chip" type="button" data-tone="classic" aria-pressed="true">Classic</button><button class="chip" type="button" data-tone="direct" aria-pressed="false">Direct</button><button class="chip" type="button" data-tone="short" aria-pressed="false">Short (email)</button><button class="chip" type="button" data-tone="change" aria-pressed="false">Career change</button><button class="chip" type="button" data-tone="study" aria-pressed="false">Apprenticeship or internship</button></div><p class="hint tone-hint">Classic for a formal letter, direct for a small business, short for an email or a message on a job site. Whatever you have not filled in stays in brackets.</p></fieldset>
       <div class="field"><label for="l-name">Your name</label><input id="l-name" autocomplete="name"></div>
       <fieldset class="field" id="l-gender" hidden><legend>You sign as</legend><div class="filters" role="group" aria-label="You sign as"><button class="chip" type="button" data-g="f" aria-pressed="false">Ms</button><button class="chip" type="button" data-g="m" aria-pressed="false">Mr</button><button class="chip" type="button" data-g="n" aria-pressed="true">Not specified</button></div></fieldset>
       <div class="field"><label for="l-contact">Your email and phone</label><input id="l-contact"></div>
@@ -378,6 +384,7 @@
 <script src="js/app.js"></script>
 <script src="js/suivi.js"></script>
 <script src="js/outils.js"></script>
+<script src="js/fiches.js"></script>
 <script src="js/confort.js"></script>
 <script src="js/demo.js"></script><!-- mode démo temporaire -->
 </body>
