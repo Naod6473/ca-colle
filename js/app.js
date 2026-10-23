@@ -235,7 +235,7 @@ const READY = () => tr("Prêt.", "Ready."), FILL = () => tr("Remplis les cases j
 function renderRewrite(){
   const list = results.filter(r => r.fix && (r.st !== "ok" || r.fixedNow)).sort((a, b) => urgency(a) - urgency(b));
   const jobs = jobsOf();
-  $("#sugs").innerHTML = list.map((r, n) => {
+  const cards = list.map((r, n) => {
     const f = ensureFix(r), fix = f.fix, line = CV.find(l => l.id === targetId(fix, f.to)); let i = 0;
     const labels = blanksOf(fix.tpl).map((ph, j) => `<label class="blank-l" for="b${n}-${j}">${esc(splitPh(ph)[0].replace(/^(¿?)(\p{L})/u, (m, a, b) => a + b.toUpperCase()))}</label>`).join("");
     const blanks = esc(fix.tpl).replace(/\{([^}]+)\}/g, (m, ph) => { const j = i++, [, hint] = splitPh(ph); return `<input class="blank" id="b${n}-${j}" data-k="${esc(r.k)}" data-i="${j}" placeholder="${esc(hint || "…")}" value="${esc(f.vals[j] || "")}" size="${Math.max(8, Math.min(40, (hint || ph).length))}">`; });
@@ -254,12 +254,125 @@ function renderRewrite(){
         : `<button class="btn small" data-add="${esc(r.k)}" ${filled(r.k) ? "" : "disabled"}>${tr("Ajouter à mon CV", "Add to my CV")}</button><small>${filled(r.k) ? READY() : FILL()}</small>`}</div>`;
     return `<article class="sug ${f.state === "accepted" ? "accepted" : f.state === "skipped" ? "skipped" : ""}">
       <div class="sug-h"><h3>${esc(r.k)}</h3><span class="point-h">${tagOf(r)}<i class="stamp ${r.fixedNow ? "ok" : r.st}">${r.fixedNow ? LABEL.ok : LABEL[r.st]}</i></span></div>${body}</article>`;
-  }).join("") || `<p class="notice">${tr("Rien à améliorer pour cette offre : ton CV couvre déjà tout ce qu'on sait repérer.", "Nothing to improve for this offer: your CV already covers everything we can detect.")}</p>`;
-  const p = scoreOf(results), c = countOf(results);
-  $("#score4").textContent = p + " %"; $("#meter4").style.width = p + "%";
-  $("#score4txt").textContent = tr(`${c.ok} point${c.ok > 1 ? "s" : ""} sur ${results.length} prouvé${c.ok > 1 ? "s" : ""} dans ton CV.`, `${c.ok} of ${results.length} points proven in your CV.`);
+  }).join("");
+  const top = startHTML() + gap4HTML();
+  $("#sugs").innerHTML = top + (cards || (top ? "" : `<p class="notice">${tr("Rien à améliorer pour cette offre : ton CV couvre déjà tout ce qu'on sait repérer.", "Nothing to improve for this offer: your CV already covers everything we can detect.")}</p>`)) + wordsHTML();
+  renderScore4();
   $("#cv4").innerHTML = cvHTML(true);
   renderReview();
+}
+// Score en direct : l'analyse tourne vraiment sur le CV amélioré, avec les phrases remplies (ajoutées ou pas encore).
+// L'ancien score (en gris) est celui du CV sans aucun ajout de l'étape 4.
+function liveScore(){
+  const off = $("#offer").value, now = fixes, live = {};
+  let pend = 0;
+  for (const [k, f] of Object.entries(now)) {
+    const p = f.state === "yes" && f.fix?.line !== "word" && filled(k); if (p) pend++;
+    live[k] = p ? {...f, state: "accepted"} : f;
+  }
+  let old, rs;
+  try { fixes = {}; old = scoreOf(analyse(off)); fixes = live; rs = analyse(off); } finally { fixes = now; }
+  return {old, rs, p: scoreOf(rs), pend};
+}
+let liveTimer;
+const liveSoon = () => { clearTimeout(liveTimer); liveTimer = setTimeout(renderScore4, 300); };
+function renderScore4(){
+  if (!$("#score4")) return;
+  const {old, rs, p, pend} = liveScore(), c = countOf(rs), d = p - old;
+  $("#score4").textContent = p + " %"; $("#meter4").style.width = p + "%";
+  const o = $("#meter4old"); if (o) o.style.width = (d > 0 ? old : 0) + "%";
+  const up = $("#score4up"); if (up) { up.textContent = d > 0 ? (d > 1 ? tr(`+${d} points`, `+${d} points`) : tr("+1 point", "+1 point")) : ""; up.hidden = d <= 0; }
+  const was = $("#score4was"); if (was) was.textContent = d ? tr(`avant : ${old} %`, `before: ${old}%`) : "";
+  $("#score4txt").textContent = tr(`${c.ok} point${c.ok > 1 ? "s" : ""} sur ${rs.length} prouvé${c.ok > 1 ? "s" : ""} dans ton CV.`, `${c.ok} of ${rs.length} points proven in your CV.`)
+    + (!pend ? "" : pend > 1 ? tr(` ${pend} phrases remplies ne sont pas encore dans ton CV : clique sur « Ajouter à mon CV ».`, ` ${pend} filled-in sentences are not in your CV yet: click "Add to my CV".`) : tr(" Une phrase remplie n'est pas encore dans ton CV : clique sur « Ajouter à mon CV ».", " One filled-in sentence is not in your CV yet: click \"Add to my CV\"."));
+}
+// Carte d'ajout sur une ligne à part (trou, stage, loisir) : mêmes cases que les autres points, même bouton « Ajouter »
+function ownForm(k, id){
+  const f = fixes[k]; let i = 0;
+  // Chaque case a sa question juste au-dessus, dans la phrase (plusieurs cases par phrase)
+  const blanks = esc(f.fix.tpl).replace(/\{([^}]+)\}/g, (m, ph) => { const j = i++, [q, hint] = splitPh(ph); return `<span class="blank-w"><label class="blank-l" for="${id}-${j}">${q.replace(/^(¿?)(\p{L})/u, (m, a, b) => a + b.toUpperCase())}</label><input class="blank" id="${id}-${j}" data-k="${esc(k)}" data-i="${j}" placeholder="${hint || "…"}" value="${esc(f.vals[j] || "")}" size="${Math.max(8, Math.min(24, (hint || ph).length))}"></span>`; });
+  return `<div class="sentence own">${blanks}</div>
+    <div class="sug-a">${f.state === "accepted"
+      ? `<i class="stamp ok">${tr("Ajouté", "Added")}</i><button class="btn light small" data-undo="${esc(k)}">${tr("Retirer", "Remove")}</button>`
+      : `<button class="btn small" data-add="${esc(k)}" ${filled(k) ? "" : "disabled"}>${tr("Ajouter à mon CV", "Add to my CV")}</button><small>${filled(k) ? READY() : FILL()}</small>`}</div>`;
+}
+// Premier emploi ou reconversion : peu d'expérience dans le CV, on aide à ajouter stages, bénévolat, jobs, loisirs
+const START4 = () => [
+  ["stage", "job", tr("Un stage", "An internship"), tr("Stage : {quel métier, où ? ex : vendeur, magasin de sport à Caen} ({quand ? ex : 2024, 6 semaines}) : {ce que tu as fait ? ex : mise en rayon, accueil des clients}", "Internship: {what job, where? e.g. sales assistant, sports shop in Leeds} ({when? e.g. 2024, 6 weeks}): {what you did? e.g. stocking shelves, serving customers}")],
+  ["benevolat", "job", tr("Du bénévolat", "Volunteering"), tr("Bénévolat : {où ? ex : banque alimentaire du quartier} ({depuis quand ? ex : depuis 2023}) : {ce que tu fais ? ex : tri des dons, accueil des familles}", "Volunteering: {where? e.g. local food bank} ({since when? e.g. since 2023}): {what you do? e.g. sorting donations, welcoming families}")],
+  ["job", "job", tr("Un job d'été ou un petit boulot", "A summer or casual job"), tr("Job d'été : {quoi et où ? ex : cueillette, ferme de la vallée} ({quand ? ex : été 2023}) : {ce que tu as fait ? ex : récolte, tri, travail en équipe}", "Summer job: {what and where? e.g. fruit picking, valley farm} ({when? e.g. summer 2023}): {what you did? e.g. picking, sorting, teamwork}")],
+  ["loisir", "hobby", tr("Un loisir utile", "A useful hobby"), tr("{ton loisir ? ex : football en club} : {ce que ça montre ? ex : entraîneur des moins de 10 ans le samedi}", "{your hobby? e.g. club football}: {what it shows? e.g. coaching the under-10s on Saturdays}")]
+];
+function startHTML(){
+  if (!cvExperience().little) return "";
+  const parts = START4().map(([id, line, title, tpl]) => {
+    const k = "~debut:" + id, f = fixes[k] = fixes[k] || {vals: {}, state: "yes", fix: {line, tpl}};
+    if (f.state !== "accepted") f.fix = {line, tpl};
+    const open = f.state === "accepted" || Object.values(f.vals).some(v => v.trim());
+    return `<details class="sug-sub${f.state === "accepted" ? " accepted" : ""}"${open ? " open" : ""}><summary>${esc(title)}${f.state === "accepted" ? ` <i class="stamp ok">${tr("Ajouté", "Added")}</i>` : ""}</summary>${ownForm(k, "bs" + id)}</details>`;
+  }).join("");
+  return `<article class="sug help4"><div class="sug-h"><h3>${tr("Premier emploi ou nouveau métier ?", "First job or new career?")}</h3></div>
+    <p>${tr("Ton CV montre peu d'expérience. Ce n'est pas grave : un stage, du bénévolat, un job d'été ou un loisir montrent aussi ce que tu sais faire. Ajoute seulement ce que tu as vraiment fait.", "Your CV shows little experience. That's fine: an internship, volunteering, a summer job or a hobby also show what you can do. Only add what you really did.")}</p>${parts}</article>`;
+}
+// Trou de 6 mois ou plus entre deux postes : une phrase à compléter, seulement si la personne en choisit une
+const GAPK = () => [
+  ["formation", tr("Formation", "Training"), tr("{Quand ? ex : 2018 - 2019} : Formation {laquelle, et où ? ex : CACES R489 à Caen}", "{When? e.g. 2018 - 2019}: Training {which one, and where? e.g. forklift licence in Leeds}")],
+  ["enfants", tr("Enfants", "Children"), tr("{Quand ? ex : 2018 - 2019} : Congé parental, {et aujourd'hui ? ex : disponible à temps plein}", "{When? e.g. 2018 - 2019}: Parental leave, {and now? e.g. available full time}")],
+  ["sante", tr("Santé", "Health"), tr("{Quand ? ex : 2018 - 2019} : Pause pour raisons de santé, {et aujourd'hui ? ex : de retour et disponible}", "{When? e.g. 2018 - 2019}: Career break for health reasons, {and now? e.g. back and available}")],
+  ["projet", tr("Projet perso", "Personal project"), tr("{Quand ? ex : 2018 - 2019} : Projet personnel : {lequel ? ex : rénovation d'une maison}", "{When? e.g. 2018 - 2019}: Personal project: {which one? e.g. renovating a house}")],
+  ["recherche", tr("Recherche d'emploi", "Job search"), tr("{Quand ? ex : 2018 - 2019} : Recherche d'emploi, {et à côté ? ex : bénévolat, permis B}", "{When? e.g. 2018 - 2019}: Job search, {and alongside? e.g. volunteering, driving licence}")]
+];
+const gapYM = d => d.m == null ? String(d.y) : `${String(d.m + 1).padStart(2, "0")}/${d.y}`;
+const gapYMLong = d => d.m == null ? String(d.y) : new Date(d.y, d.m, 1).toLocaleDateString(tr("fr-FR", "en-GB"), {month: "long", year: "numeric"});
+// Le trou lui-même : du mois après la fin du poste d'avant au mois avant le suivant (sans mois écrits : les deux années)
+function gapPeriod(g){
+  if (g.from.m == null || g.to.m == null) return `${g.from.y} - ${g.to.y}`;
+  const a = g.from.y * 12 + g.from.m + 1, b = g.to.y * 12 + g.to.m - 1, f = n => gapYM({y: Math.floor(n / 12), m: n % 12});
+  return a === b ? f(a) : `${f(a)} - ${f(b)}`;
+}
+// Nom du poste sans les dates (« Serveuse, Brasserie Exemple - juin » → « Serveuse, Brasserie Exemple »)
+const gapJob = j => j.title.replace(/\s*\(.*$/, "").replace(/[\s–-]+(\p{L}{3,10})\.?$/u, (m, w) => monthOf(fold(w)) !== null ? "" : m).replace(/[\s,:–-]+$/, "") || j.title;
+function gap4HTML(){
+  return cvGaps().slice(0, 3).map((g, n) => {
+    const k = `~trou:${g.prev.id}-${g.next.id}`, f = fixes[k], kind = f?.fix?.why, a = gapYMLong(g.from), b = gapYMLong(g.to), pj = gapJob(g.prev), nj = gapJob(g.next);
+    const chips = !f || f.state !== "accepted" ? `<div class="chips" role="group" aria-label="${tr("Ce qui s'est passé", "What happened")}">${GAPK().map(([id, lab]) => `<button type="button" class="chip" data-gap="${id}" data-gk="${esc(k)}" aria-pressed="${kind === id}">${esc(lab)}</button>`).join("")}</div>` : "";
+    return `<article class="sug gap4${f?.state === "accepted" ? " accepted" : ""}"><div class="sug-h"><h3>${tr("Un trou dans ton parcours", "A gap in your history")}</h3></div>
+      <p>${esc(g.months >= 18 ? tr(`Entre ${a} (${pj}) et ${b} (${nj}), ton CV ne dit rien pendant environ ${Y(Math.round(g.months / 12))}.`, `Between ${a} (${pj}) and ${b} (${nj}), your CV says nothing for about ${Y(Math.round(g.months / 12))}.`)
+        : tr(`Entre ${a} (${pj}) et ${b} (${nj}), ton CV ne dit rien pendant ${g.months} mois.`, `Between ${a} (${pj}) and ${b} (${nj}), your CV says nothing for ${g.months} months.`))}
+      ${tr("Les recruteurs posent souvent la question. Si tu veux, explique-le en une ligne. Ce n'est pas obligatoire.", "Recruiters often ask about it. If you like, explain it in one line. You don't have to.")}</p>
+      ${chips}${kind === "sante" && f.state !== "accepted" ? `<p class="hint">${tr("Tu n'as pas à donner de détail sur ta santé.", "You don't have to give any detail about your health.")}</p>` : ""}
+      ${f && kind ? ownForm(k, "bg" + n) : ""}</article>`;
+  }).join("");
+}
+function chooseGap(id, k){
+  const g = cvGaps().find(g => `~trou:${g.prev.id}-${g.next.id}` === k), t = GAPK().find(x => x[0] === id); if (!g || !t) return;
+  const old = fixes[k], vals = old?.vals?.[0] ? {0: old.vals[0]} : {0: gapPeriod(g)};
+  fixes[k] = {vals, state: "yes", fix: {line: "gap", tpl: t[2], why: id}, to: g.after};
+  stat("trou-explique", {k: id});
+  renderRewrite(); save();
+  $(`.blank[data-k="${CSS.escape(k)}"][data-i="1"]`)?.focus();
+}
+// Mots de l'offre : le CV dit un mot proche (« caisse »), l'offre un autre (« encaissement ») : on propose de reprendre celui de l'offre
+const wordKey = (cv, off) => `~mot:${fold(cv)}>${fold(off)}`;
+function wordsHTML(){
+  const seen = new Set(), items = [];
+  results.filter(r => r.vocab).forEach(r => { const k = wordKey(r.vocab.cv, r.vocab.offer); if (!seen.has(k)) { seen.add(k); items.push({k, cv: r.vocab.cv, offer: r.vocab.offer, line: r.proof?.t || ""}); } });
+  Object.entries(fixes).forEach(([k, f]) => { if (f.fix?.line === "word" && f.state === "accepted" && !seen.has(k)) { seen.add(k); items.push({k, cv: f.fix.find, offer: f.fix.tpl, done: true}); } });
+  if (!items.length) return "";
+  return `<section class="group words4"><h2 class="section-title" style="--k: var(--blue)">${tr("Reprends les mots de l'offre", "Use the offer's own words")}</h2>
+    <p class="hint">${tr("Les recruteurs et leurs logiciels cherchent les mots exacts de l'offre. Remplace ton mot seulement si c'est vrai pour toi.", "Recruiters and their software look for the offer's exact words. Only swap your word if it is true for you.")}</p>
+    <ul class="words4-list">${items.slice(0, 8).map(x => {
+      const i = x.line ? fold(x.line).indexOf(fold(x.cv)) : -1, ctx = i >= 0 ? mark(x.line.length > 120 ? x.line.slice(Math.max(0, i - 50), i + x.cv.length + 50) : x.line, x.line.length > 120 ? i - Math.max(0, i - 50) : i, x.cv.length) : "";
+      return `<li class="${x.done ? "done" : ""}"><p><b>${esc(tr(`L'offre dit « ${x.offer} » : reprends ce mot.`, `The offer says "${x.offer}": use this word.`))}</b> ${esc(tr(`Ton CV dit « ${x.cv} ».`, `Your CV says "${x.cv}".`))}</p>
+        ${ctx && !x.done ? `<p class="words4-ctx">${ctx}</p>` : ""}
+        <div class="sug-a">${x.done ? `<i class="stamp ok">${tr("Repris", "Done")}</i><button type="button" class="btn light small" data-unword="${esc(x.k)}">${tr("Annuler", "Undo")}</button>`
+          : `<button type="button" class="btn small" data-word="${esc(x.k)}" data-cv="${esc(x.cv)}" data-offer="${esc(x.offer)}">${esc(tr(`Écrire « ${x.offer} »`, `Write "${x.offer}"`))}</button>`}</div></li>`;
+    }).join("")}</ul></section>`;
+}
+function useWord(t){
+  const r = results.find(r => r.vocab && wordKey(r.vocab.cv, r.vocab.offer) === t.dataset.word);
+  fixes[t.dataset.word] = {vals: {}, state: "accepted", fix: {line: "word", find: t.dataset.cv, tpl: t.dataset.offer.replace(/[{}]/g, ""), why: r?.k || ""}, to: r?.proof?.id};
+  stat("mot-offre"); refresh(); toast(tr("Mot repris dans ton CV", "Word used in your CV"));
 }
 // Relecture : fautes fréquentes (corrigeables en un clic), verbes faibles, phrases longues, chiffres
 function renderReview(){
@@ -454,7 +567,7 @@ function summaryParts(){
   out.push({h: tr("L'annonce", "The ad")}, ...ad.facts.map(f => ({t: `- ${f.label}${tr(" : ", ": ")}${f.v}`})), ...ad.missing.map(f => ({t: `- ${f.label}${tr(" : pas indiqué", ": not given")}`})), ...ad.flags.map(f => ({t: `- ⚠ ${f.label} (« ${f.v} »)`})));
   const ats = atsCheck($("#cvraw").value, cvFile.info).filter(a => !a.ok);
   if (ats.length) out.push({h: tr("Test robot recruteur : à corriger", "Recruiter robot test: to fix")}, ...ats.map(a => ({t: `- ${a.label}${tr(" : ", ": ")}${a.help}`})));
-  const added = Object.values(fixes).filter(f => f.state === "accepted").map(f => ({t: "- " + fillTpl(f.fix, f.vals)}));
+  const added = Object.values(fixes).filter(f => f.state === "accepted").map(f => ({t: "- " + (f.fix.line === "word" ? `${f.fix.find} → ${f.fix.tpl}` : fillTpl(f.fix, f.vals))}));
   if (added.length) out.push({h: tr("Ajouté au CV avec l'app", "Added to the CV with the app")}, ...added);
   const rv = cvCheck($("#cvraw").value);
   if (rv.length) out.push({h: tr("Relecture du CV", "CV proofreading")}, ...rv.map(r => ({t: "- " + r.msg})));
@@ -575,6 +688,7 @@ function cleanSave(d){
       if (!okKey(k) || !isObj(f) || !isObj(f.fix) || typeof f.fix.tpl !== "string" || !["open", "yes", "accepted", "skipped"].includes(f.state)) continue;
       const vals = {}; if (isObj(f.vals)) for (const [i, v] of Object.entries(f.vals)) if (/^\d{1,2}$/.test(i) && typeof v === "string") vals[i] = v.slice(0, 2000);
       x.fixes[k] = {state: f.state, vals, fix: strsOf(f.fix, ["line", "why", "ask", "tpl", "nope", "find"], 2000)};
+      if (typeof f.to === "string" && /^[a-zA-Z0-9]{1,20}$/.test(f.to)) x.fixes[k].to = f.to;
     }
     if (isObj(o.over)) for (const [k, v] of Object.entries(o.over)) if (okKey(k) && ["ok", "mid", "no", "skip"].includes(v)) x.over[k] = v;
     if (isObj(o.letter)) {
@@ -655,6 +769,9 @@ document.addEventListener("click", e => {
   if (t.dataset.f) { filter = t.dataset.f; $$(".chip").forEach(c => c.setAttribute("aria-pressed", c === t)); return renderResult(); }
   if (t.dataset.yes) { fixes[t.dataset.yes].state = "yes"; renderRewrite(); $(`.blank[data-k="${CSS.escape(t.dataset.yes)}"]`)?.focus(); return save(); }
   if (t.dataset.no) { fixes[t.dataset.no].state = "skipped"; renderRewrite(); return save(); }
+  if (t.dataset.gap) return chooseGap(t.dataset.gap, t.dataset.gk);
+  if (t.dataset.word) return useWord(t);
+  if (t.dataset.unword) { delete fixes[t.dataset.unword]; return refresh(); }
   if (t.dataset.undo) { const f = fixes[t.dataset.undo]; f.state = f.fix.ask ? "open" : "yes"; return refresh(); }
   if (t.dataset.add) { stat("ajout-cv"); fixes[t.dataset.add].state = "accepted"; refresh(); return toast(tr("Ajouté à ton CV", "Added to your CV")); }
   if (t.dataset.over !== undefined) {
@@ -706,9 +823,9 @@ document.addEventListener("input", e => {
   if (t.id === "cvraw") { clearTimeout(cvTimer); cvTimer = setTimeout(() => setCV(t.value, true), 300); return; }
   if (t.classList.contains("blank")) {
     const k = t.dataset.k; fixes[k].vals[t.dataset.i] = t.value;
-    const card = t.closest(".sug"), btn = card.querySelector("[data-add]"), sm = card.querySelector(".sug-a small");
+    const card = t.closest(".sug-sub, .sug"), btn = card.querySelector("[data-add]"), sm = card.querySelector(".sug-a small");
     if (btn) { btn.disabled = !filled(k); sm.textContent = filled(k) ? READY() : FILL(); }
-    return save();
+    liveSoon(); return save();
   }
   if (t.closest("#lform")) {
     const L = cur.letter;
@@ -727,7 +844,7 @@ document.addEventListener("change", e => {
   if (e.target.id === "keep" && saveNow() !== false) { toast(keep() ? tr("Ta session restera sur cet appareil", "Your session will stay on this device") : offers.some(o => o.app) ? tr("Ton CV et tes offres ne sont plus gardés. Ton suivi reste sur cet appareil.", "Your CV and offers are no longer kept. Your tracker stays on this device.") : tr("Plus rien n'est gardé sur cet appareil", "Nothing is kept on this device any more"), 4000); }
 });
 document.addEventListener("keydown", e => {
-  if (e.key === "Enter" && e.target.classList.contains("blank")) { const b = e.target.closest(".sug").querySelector("[data-add]"); if (b && !b.disabled) b.click(); }
+  if (e.key === "Enter" && e.target.classList.contains("blank")) { const b = e.target.closest(".sug-sub, .sug").querySelector("[data-add]"); if (b && !b.disabled) b.click(); }
 });
 // Annonce collée depuis un site : on enlève les boutons et menus, avec possibilité de revenir en arrière
 let rawOffer = "";

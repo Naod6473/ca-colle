@@ -27,6 +27,11 @@ ok("clés inconnues retirées, __proto__ ignoré", () => {
   assert.deepStrictEqual(Object.keys(d.offers[0].over), ["Excel"]);
   assert.deepStrictEqual(JSON.parse(JSON.stringify(d.offers[0].fixes.Excel)), {state: "accepted", vals: {0: "a"}, fix: {tpl: "{x}"}});
 });
+ok("ajouts de l'étape 4 : poste choisi gardé, poste piégé retiré", () => {
+  const d = ctx.cleanSave(JSON.parse('{"v":1,"offers":[{"id":"c","text":"t","fixes":{"~trou:l3-l1":{"state":"accepted","vals":{"0":"2016 - 2019","1":"x"},"fix":{"line":"gap","tpl":"{a} : {b}","why":"enfants"},"to":"l3"},"~mot:a>b":{"state":"accepted","vals":{},"fix":{"line":"word","find":"a","tpl":"b"},"to":"<img src=x>"}}}]}'));
+  assert.strictEqual(d.offers[0].fixes["~trou:l3-l1"].to, "l3"); assert.strictEqual(d.offers[0].fixes["~trou:l3-l1"].fix.line, "gap");
+  assert.strictEqual(d.offers[0].fixes["~mot:a>b"].to, undefined);
+});
 ok("pas une sauvegarde", () => { assert.strictEqual(ctx.cleanSave([1]), null); assert.strictEqual(ctx.cleanSave({v: 2}), null); assert.strictEqual(ctx.cleanSave("x"), null); });
 ok("suivi seul (case décochée)", () => assert.strictEqual(ctx.cleanSave({v: 1, keep: false, offers: []}).keep, false));
 ok("carnet de contacts : champs connus, bons types, date vérifiée", () => {

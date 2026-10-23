@@ -416,22 +416,34 @@ const put = (s, a) => !s ? a.replace(/^[,.\s]+/, "").replace(/^./, c => c.toUppe
 // « Sage 100 », « Office 365 » : le nom continue sur un mot en majuscule ou un nombre (2 au plus)
 const nameEnd = (raw, i, n) => { let e = i + n; for (let k = 0; k < 2; k++) { const m = raw.slice(e).match(/^ ([\p{Lu}0-9][\p{L}0-9.+#-]*)/u); if (!m || /[.,;:]$/.test(m[1])) break; e += m[0].length; } return e; };
 
+// Ajouts sur une ligne à part (étape 4) : trou expliqué, stage ou bénévolat, loisir ; mot de l'offre repris à la place du mot du CV
+const OWN = new Set(["gap", "job", "hobby", "word"]);
 function cvLines(withIns){
-  const acc = Object.values(fixes).filter(f => f.state === "accepted" && f.fix), jobs = jobsOf();
+  const all = Object.values(fixes).filter(f => f.state === "accepted" && f.fix), acc = all.filter(f => !OWN.has(f.fix.line)), jobs = jobsOf();
   const wrap = x => withIns ? `<ins>${esc(x)}</ins>` : esc(x);
+  // Mot de l'offre repris (« Tableur » → « Excel ») : appliqué en premier, sur la ligne choisie ou la première qui a le mot
+  const body = CV.filter(l => l.t && !l.name && !l.sec), swap = new Map();
+  const words = all.filter(f => f.fix.line === "word" && f.fix.find && f.fix.tpl).map(f => { const w = fold(f.fix.find); swap.set(w, f.fix.tpl); return {f, w, id: (f.to && body.find(l => l.id === f.to && fold(l.t).includes(w)) || body.find(l => fold(l.t).includes(w)))?.id}; });
   const lines = CV.flatMap(l => {
     if (l.sec || l.name) return [{...l}];
     let t = esc(l.t), raw = l.t;
+    words.filter(x => x.id === l.id).forEach(({f, w}) => {
+      const i = fold(raw).indexOf(w); if (i < 0) return;
+      const old = raw.substr(i, w.length), now = /^\p{Lu}/u.test(old) ? cap(f.fix.tpl) : f.fix.tpl;
+      raw = raw.slice(0, i) + now + raw.slice(i + w.length); t = t.replace(esc(old), () => wrap(now));
+    });
     const extra = [], job = l.exp && jobs.find(j => j.ids[j.ids.length - 1] === l.id);
     acc.filter(f => targetId(f.fix, f.to) === l.id).forEach(f => {
-      const add = fillTpl(f.fix, f.vals);
-      const i = f.fix.find ? fold(raw).indexOf(fold(f.fix.find)) : -1;
+      // Mot du CV remplacé entre-temps par celui de l'offre : on cherche le nouveau mot
+      const fd = f.fix.find && fold(raw).indexOf(fold(f.fix.find)) < 0 && swap.get(fold(f.fix.find)) || f.fix.find;
+      const add = fd !== f.fix.find ? fillTpl(f.fix, f.vals).replace(f.fix.find, fd) : fillTpl(f.fix, f.vals);
+      const i = fd ? fold(raw).indexOf(fold(fd)) : -1;
       if (i >= 0) {
         // « Excel (RECHERCHEV, TCD) » + « Excel (factures) » → « Excel (RECHERCHEV, TCD, factures) » ; « Sage 100 » reste entier
-        const e = nameEnd(raw, i, f.fix.find.length), name = raw.slice(i, e), par = raw.slice(e).match(/^\s*\(([^)]*)\)/);
-        const m = add.match(/^(.*?)\s*\((.*)\)$/), inner = m && fold(m[1]) === fold(f.fix.find) ? m[2] : null;
-        const word = name + (par && inner !== null ? par[0] : ""), now = inner === null ? add + raw.slice(i + f.fix.find.length, e) : name + " (" + (par ? par[1] + ", " : "") + inner + ")";
-        t = t.replace(esc(word), wrap(now)); raw = raw.replace(word, now);
+        const e = nameEnd(raw, i, fd.length), name = raw.slice(i, e), par = raw.slice(e).match(/^\s*\(([^)]*)\)/);
+        const m = add.match(/^(.*?)\s*\((.*)\)$/), inner = m && fold(m[1]) === fold(fd) ? m[2] : null;
+        const word = name + (par && inner !== null ? par[0] : ""), now = inner === null ? add + raw.slice(i + fd.length, e) : name + " (" + (par ? par[1] + ", " : "") + inner + ")";
+        t = t.replace(withIns && t.includes(wrap(word)) ? wrap(word) : esc(word), () => wrap(now)); raw = raw.replace(word, now);
       }
       // Poste en plusieurs lignes (dates, puis tâches à puces) : l'ajout fait une ligne de plus
       else if (f.fix.line === "exp" && job?.multi && !f.fix.find) { const a = add.replace(/^[,.\s]+/, ""); extra.push({id: l.id + "+" + extra.length, t: a, raw: a, html: wrap(a), exp: true, kind: l.kind, added: true}); }
@@ -447,7 +459,31 @@ function cvLines(withIns){
     return [{...l, html:t, raw}, ...extra];
   });
   const autoEmpty = !lines.find(l => l.id === "kAuto")?.raw;
-  return lines.filter(l => !(l.auto && autoEmpty));
+  return addOwn(lines.filter(l => !(l.auto && autoEmpty)), all.filter(f => OWN.has(f.fix.line)), wrap);
+}
+const HOBBY = /loisir|interet|hobb|interest|freizeit|aficion|passion|tempo libero|interess/;
+function addOwn(lines, own, wrap){
+  let n = 0;
+  const item = (a, more) => ({id: "a" + n++, t: a, raw: a, html: wrap(a), added: true, ...more});
+  const ins = (i, ...ls) => lines.splice(i < 0 ? lines.length : i, 0, ...ls);
+  own.filter(f => f.fix.line !== "word").forEach(f => {
+    const a = fillTpl(f.fix, f.vals).replace(/\s+/g, " ").trim(), k = f.fix.line; if (!a) return;
+    const lastExp = lines.findLastIndex(l => l.exp || l.gap);
+    if (k === "gap") {
+      // Entre les deux postes : après le dernier morceau du poste qui vient en premier dans le CV
+      const ids = jobOf(f.to)?.ids || [], i = lines.findLastIndex(l => l.id && ids.includes(String(l.id).split("+")[0]));
+      return ins((i >= 0 ? i : lastExp) + 1 || -1, item(a, {kind: "exp", gap: true}));
+    }
+    if (k === "job") {
+      if (lastExp >= 0) return ins(lastExp + 1, item(a, {kind: "exp", exp: true}));
+      return ins(lines.findIndex(l => l.sec), {id: "a" + n++, sec: tr("Expériences", "Experience"), kind: "exp", added: true}, item(a, {kind: "exp", exp: true}));
+    }
+    const h = lines.findIndex(l => l.sec && HOBBY.test(fold(l.sec)));
+    if (h < 0) return ins(-1, {id: "a" + n++, sec: tr("Centres d'intérêt", "Interests"), kind: "misc", added: true}, item(a, {kind: "misc"}));
+    const end = lines.findIndex((l, i) => i > h && l.sec);
+    ins(end, item(a, {kind: "misc"}));
+  });
+  return lines;
 }
 
 /* ---------- Années d'expérience écrites dans le CV ---------- */
@@ -462,6 +498,59 @@ function cvYears(text){
   let tot = 0, [s, e] = iv[0];
   for (const [a, b] of iv.slice(1)) { if (a <= e) e = Math.max(e, b); else { tot += e - s; [s, e] = [a, b]; } }
   return Math.round(tot + e - s);
+}
+
+/* ---------- Dates de chaque poste : trous de 6 mois ou plus, peu d'expérience ----------
+   Mois en lettres (5 langues) ou en chiffres (« 06/2019 »). Sans mois, une année de fin compte jusqu'en décembre et une année
+   de début dès janvier : le trou trouvé est le plus court possible, on ne signale que ce qui est sûr. Mois comptés de 0 (année × 12 + mois). */
+const MONTHS = ["janvier janv jan january januar janner jaenner enero ene gennaio gen", "fevrier fevr fev february feb februar febrero febbraio",
+  "mars march mar marz maerz marzo", "avril avr april apr abril abr aprile", "mai may mayo maggio mag", "juin june jun juni junio giugno giu",
+  "juillet juil july jul juli julio luglio lug", "aout august aug agosto ago", "septembre sept sep september septiembre settembre set",
+  "octobre oct october oktober okt octubre ottobre ott", "novembre nov november noviembre", "decembre dec december dezember dez diciembre dicembre dic"].map(g => g.split(" "));
+const monthOf = w => { const i = MONTHS.findIndex(g => g.includes(w)); return i < 0 ? null : i; };
+const DTOK = /(?<!\d)(?:([a-zß-ÿ]{3,10})\.?\s+|(0?[1-9]|1[0-2])\s*[/.]\s*)?((?:19|20)\d\d)(?!\d)/g;
+const DSEP = new RegExp(String.raw`^\s*(?:-|–|—|à|a|au|to|until|till|\/${L10N?.re?.to ? "|" + L10N.re.to : ""})\s*$`);
+const DNOW = new RegExp(String.raw`^\s*(?:-|–|—|à|a|au|to|until|till|jusqu.(?:a|en|au)|\/${L10N?.re?.to ? "|" + L10N.re.to : ""})\s*(?:aujourd.hui|auj\.?|present|actuel\w*|maintenant|en cours|ce jour|current\w*|now|today|ongoing|date${L10N?.re?.now ? "|" + L10N.re.now : ""})`);
+const DSINCE = /(?:depuis|since|seit|desde|dal|dall.|da)\s*$/;
+function jobDates(cv = CV){
+  const d = new Date(), today = d.getFullYear() * 12 + d.getMonth();
+  return jobsOf(cv).map(job => {
+    const F = fold(job.lines.map(l => l.t).join(" ")), toks = [...F.matchAll(DTOK)].map(m => {
+      const mo = m[2] ? +m[2] - 1 : m[1] ? monthOf(m[1]) : null, ys = m.index + m[0].length - 4;
+      return {y: +m[3], m: mo, s: mo === null ? ys : m.index, e: m.index + m[0].length, pre: F.slice(Math.max(0, ys - 12), ys)};
+    });
+    let a = null, b = null;
+    for (let i = 0; i < toks.length && !a; i++) {
+      const t = toks[i], n = toks[i + 1];
+      if (n && DSEP.test(F.slice(t.e, n.s))) { a = t; b = n; }
+      else if (DNOW.test(F.slice(t.e)) || DSINCE.test(t.pre)) { a = t; b = {now: true}; }
+    }
+    if (!a && toks.length) { a = toks[0]; b = toks[0]; }
+    if (!a) return null;
+    const s = a.y * 12 + (a.m ?? 0), e = b.now ? today : b.y * 12 + (b.m ?? 11);
+    // Durée : sans les mois, « 2021 - 2023 » fait 2 ans, une année seule 6 mois
+    const len = b.now ? today - s : (b.y - a.y) * 12 + (b.m ?? 0) - (a.m ?? 0);
+    return {job, s, e, len: len > 0 ? len : a.m != null && b.m != null ? 1 : 6, from: {y: a.y, m: a.m}, to: b.now ? null : {y: b.y, m: b.m}};
+  }).filter(Boolean);
+}
+// Trous de 6 mois ou plus entre deux postes : {months, prev (poste d'avant), next, from (fin du poste d'avant), to (début du suivant),
+// after : le poste qui vient en premier dans le CV (la ligne qui explique le trou se met juste après, entre les deux)}
+function cvGaps(cv = CV){
+  const out = []; let last = null;
+  const pos = j => cv.findIndex(l => l.id === j.id);
+  jobDates(cv).sort((x, y) => x.s - y.s).forEach(x => {
+    if (last && x.s - last.e - 1 >= 6) out.push({months: x.s - last.e - 1, prev: last.job, next: x.job, from: last.to, to: x.from, after: pos(last.job) < pos(x.job) ? last.job.id : x.job.id});
+    if (!last || x.e > last.e) last = x;
+  });
+  return out;
+}
+// Peu d'expérience : aucun poste, ou des postes tous datés qui font moins d'un an en tout
+function cvExperience(cv = CV){
+  const jobs = jobsOf(cv), ds = jobDates(cv).sort((x, y) => x.s - y.s);
+  let tot = 0, s = null, e = null;
+  ds.forEach(x => { const xe = x.s + x.len; if (s === null || x.s > e) { if (s !== null) tot += e - s; s = x.s; e = xe; } else e = Math.max(e, xe); });
+  if (s !== null) tot += e - s;
+  return {jobs: jobs.length, months: ds.length ? tot : null, little: !jobs.length || (ds.length === jobs.length && tot < 12)};
 }
 
 /* ---------- Mots importants d'une ligne de l'offre qui n'est pas dans le lexique ---------- */
@@ -538,7 +627,7 @@ function analyse(offer){
   // Années d'expérience demandées
   const my = OM.match(L10N?.re?.years ? new RegExp(L10N.re.years) : /(\d{1,2})\s*(?:a|à)?\s*\d{0,2}\s*ans? (?:minimum )?(?:d'|d’|de )?experience|experience (?:de |d'au moins |minimum (?:de )?)?(\d{1,2}) ans?|(\d{1,2})\+?\s*(?:years?|yrs?)(?:'|’)?\s*(?:of\s+)?(?:[a-z-]+\s+){0,3}?experience|at least (\d{1,2}) years?|experience of (\d{1,2})\+? years?/);
   if (my) {
-    const need = +(my[1] || my[2] || my[3] || my[4] || my[5]), have = cvYears(allTxt);
+    const need = +(my[1] || my[2] || my[3] || my[4] || my[5]), have = cvYears(lines.filter(l => l.raw && !l.gap).map(l => l.raw).join("\n"));
     out.push({k: need > 1 ? tr(`${need} ans d'expérience`, `${need} years of experience`) : tr("1 an d'expérience", "1 year of experience"), type:"y", st: have === null ? "mid" : have >= need ? "ok" : "no", pos:my.index, prio:weight(my.index), need, have, offerCtx:ctxAt(my.index)});
   }
 

@@ -448,5 +448,73 @@ Communcation, teamwork`,
   ad: {facts: {salary: "£11.50 per hour", hours: "part-time", place: "Bristol", contract: "fixed-term"}, flags: ["pay", "tooGood", "chat"]},
   review: {typos: [["custumer", "customer"], ["Communcation", "Communication"]], types: ["weak", "nonum"]}
 },
+{
+  name: "Trou dans le parcours : années seules, ligne d'explication entre les deux postes", lang: "fr",
+  offer: `Agent d'entretien (H/F)
+- Nettoyage des locaux
+- 2 ans d'expérience`,
+  cv: `Nadia Exemple · Lille
+Expériences
+Agent d'entretien, Société Exemple (2019 - 2024) : nettoyage de bureaux.
+Employée de cantine, Collège Exemple (2012 - 2016) : service, plonge.
+Formation
+CAP Agent de propreté (2011)`,
+  gaps: [[24, "Employée de cantine", "Agent d'entretien"]], little: false,
+  adds: [{line: "gap", tpl: "{quand} : Congé parental, {et aujourd'hui}", vals: {0: "2016 - 2019", 1: "disponible à temps plein"}, gap: 0}],
+  cvOrder: ["Agent d'entretien, Société", "2016 - 2019 : Congé parental, disponible à temps plein", "Employée de cantine"], years: 9
+},
+{
+  name: "Trou dans le parcours : mois écrits, poste en cours, pas de trou court", lang: "fr",
+  offer: `Vendeur (H/F)
+- Accueil des clients`,
+  cv: `Paul Exemple
+Expériences
+Vendeur, Boutique Exemple (mars 2021 - aujourd'hui)
+Vendeur, Boutique Deux (01/2020 - 06/2020)
+Agent, Entrepôt Exemple (janvier 2018 - décembre 2019)
+Stage, Magasin Exemple (2016)
+Formation
+Bac pro (2017)`,
+  gaps: [[12, "Stage", "Agent"], [8, "Vendeur, Boutique Deux", "Vendeur, Boutique Exemple"]], little: false
+},
+{
+  name: "Peu d'expérience : aucun poste, stage et loisir ajoutés dans leur rubrique", lang: "fr",
+  offer: `Employé de rayon (H/F)
+- Mise en rayon
+- Accueil des clients`,
+  cv: `Léo Exemple · Caen
+Formation
+Bac pro commerce (2025)
+Compétences
+Sourire, ponctualité`,
+  gaps: [], little: true,
+  adds: [{line: "job", tpl: "Stage : {où} ({quand}) : {quoi}", vals: {0: "vendeur, Boutique Exemple", 1: "2024, 6 semaines", 2: "mise en rayon"}}, {line: "hobby", tpl: "{loisir} : {ce que ça montre}", vals: {0: "Football en club", 1: "entraîneur des moins de 10 ans"}}],
+  cvOrder: ["Léo Exemple", "Expériences", "Stage : vendeur, Boutique Exemple (2024, 6 semaines) : mise en rayon", "Formation", "Compétences", "Centres d'intérêt", "Football en club"]
+},
+{
+  name: "Peu d'expérience : un seul job court ; mot de l'offre repris", lang: "fr",
+  offer: `Hôte de caisse (H/F)
+- Encaissement des clients`,
+  cv: `Inès Exemple
+Expériences
+Caissière, Magasin Exemple (06/2024 - 09/2024) : tenue de caisse
+Loisirs
+Lecture`,
+  gaps: [], little: true,
+  adds: [{line: "word", tpl: "hôtesse de caisse", find: "caissière"}, {line: "hobby", tpl: "{x}", vals: {0: "Théâtre"}}],
+  cvOrder: ["Hôtesse de caisse, Magasin Exemple", "Loisirs", "Lecture", "Théâtre"], cvNot: ["Caissière", "Centres d'intérêt"]
+},
+{
+  name: "Gap in the CV and little experience (English)", lang: "en",
+  offer: `Retail assistant
+- Serving customers`,
+  cv: `Robin Sample
+Experience
+Sales assistant, Sample Shop (June 2022 - present)
+Waiter, Sample Cafe (Jan 2020 - Oct 2021)
+Education
+GCSEs (2019)`,
+  gaps: [[7, "Waiter", "Sales assistant"]], little: false
+},
 ];
 if (typeof module !== "undefined") module.exports = CASES;
