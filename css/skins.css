@@ -29,7 +29,7 @@ body::before, .panel::before {
 .panel::before { --grid: rgba(27, 35, 64, .1); --dot: 22px; animation-duration: 9s; }
 .logo { padding: 0; border: 0; background: var(--ink); border-radius: 8px; box-shadow: 4px 4px 0 var(--yellow); }
 .logo span { border-color: rgba(244, 241, 234, .5); color: var(--paper); text-shadow: -3px 2px 0 var(--red); border-radius: 6px; margin: 4px; }
-.box, .point, .sug, .notice, .job, .filecard, .err, .sheet-input, .linkhelp, .resume, .app-card, .alert, .ask-rec, .sal-col, .share-body, .comfort-menu, .tablewrap, .promise, .drop { border-radius: 10px; }
+.box, .point, .sug, .sug-sub, .words4-list li, .notice, .job, .filecard, .err, .sheet-input, .linkhelp, .resume, .app-card, .alert, .ask-rec, .sal-col, .share-body, .comfort-menu, .tablewrap, .promise, .drop { border-radius: 10px; }
 .box { box-shadow: 5px 5px 0 var(--ink); overflow: hidden; }
 .preview, .box.preview { overflow: visible; }
 .btn { border-radius: 8px; }
@@ -96,6 +96,8 @@ html[data-skin="fiche"] .label { border: 0; border-radius: 999px; background: va
 html[data-skin="fiche"] .box, html[data-skin="fiche"] .point, html[data-skin="fiche"] .sug, html[data-skin="fiche"] .app-card, html[data-skin="fiche"] .notice, html[data-skin="fiche"] .ask-rec, html[data-skin="fiche"] .sal-col, html[data-skin="fiche"] .share-body, html[data-skin="fiche"] .alert, html[data-skin="fiche"] .job, html[data-skin="fiche"] .filecard, html[data-skin="fiche"] .resume, html[data-skin="fiche"] .linkhelp, html[data-skin="fiche"] .tablewrap {
   border: 0; border-radius: 20px; background: var(--card); box-shadow: var(--soft) !important;
 }
+html[data-skin="fiche"] .words4-list li { border: 0; border-radius: 20px; box-shadow: var(--soft) !important; }
+html[data-skin="fiche"] .sug-sub { border: 1.5px solid var(--hair); border-radius: 14px; }
 html[data-skin="fiche"] .alert.red { background: var(--no-bg); }
 html[data-skin="fiche"] .alert { background: var(--mid-bg); }
 html[data-skin="fiche"] .resume { background: var(--green); }
@@ -188,7 +190,7 @@ html[data-skin="fiche"] [data-p="3"] .big { color: var(--accent); }
   }
   html.c-dark .panel::before { --grid: rgba(233, 227, 213, .07); }
   html.c-dark .box, html.c-dark .point, html.c-dark .sug, html.c-dark .app-card, html.c-dark .q, html.c-dark .notice,
-  html.c-dark .job, html.c-dark .filecard, html.c-dark .tablewrap, html.c-dark .kpis > div { box-shadow: 5px 5px 0 rgba(0, 0, 0, .45), 5px 5px 0 1.5px var(--ink); }
+  html.c-dark .job, html.c-dark .filecard, html.c-dark .tablewrap, html.c-dark .kpis > div, html.c-dark .words4-list li { box-shadow: 5px 5px 0 rgba(0, 0, 0, .45), 5px 5px 0 1.5px var(--ink); }
   html.c-dark .blank::placeholder { color: var(--mid); }
   html.c-dark img { filter: brightness(.92); }
 

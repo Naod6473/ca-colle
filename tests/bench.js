@@ -15,6 +15,23 @@ function runCases(cases){
       (c.cvNot || []).forEach(w => { if (txt.includes(w)) fails.push(`ajout : « ${w} » ne devrait pas être dans le CV`); });
       fixes = {};
     }
+    // Trous de 6 mois ou plus entre deux postes : [mois, début de l'intitulé du poste d'avant, du suivant]
+    if (c.gaps) {
+      const g = cvGaps();
+      if (g.length !== c.gaps.length) fails.push(`trous : ${g.length} trouvés (${g.map(x => x.months + " mois").join(", ")}) au lieu de ${c.gaps.length}`);
+      else c.gaps.forEach(([m, a, b], i) => { if (g[i].months !== m || !g[i].prev.title.startsWith(a) || !g[i].next.title.startsWith(b)) fails.push(`trou ${i + 1} : ${g[i].months} mois, « ${g[i].prev.title} » → « ${g[i].next.title} »`); });
+    }
+    if (c.little !== undefined && cvExperience().little !== c.little) fails.push(`peu d'expérience : ${cvExperience().little} au lieu de ${c.little} (${cvExperience().months} mois)`);
+    // Ajouts sur une ligne à part (trou, stage, loisir, mot de l'offre) : {line, tpl, vals, gap (numéro du trou), find, to}, puis l'ordre attendu des lignes
+    if (c.adds) {
+      c.adds.forEach((a, i) => { const g = a.gap != null ? cvGaps()[a.gap] : null; fixes["~t" + i] = {vals: Object.assign({}, a.vals), state: "accepted", fix: {line: a.line, tpl: a.tpl, find: a.find}, to: g ? g.after : a.to}; });
+      const ls = cvLines(false), txt = ls.map(l => l.sec || l.raw || l.t || "").join("\n");
+      (c.cvHas || []).forEach(w => { if (!txt.includes(w)) fails.push(`ajout : « ${w} » absent du CV`); });
+      (c.cvNot || []).forEach(w => { if (txt.includes(w)) fails.push(`ajout : « ${w} » ne devrait pas être dans le CV`); });
+      let at = -1; (c.cvOrder || []).forEach(w => { const i = txt.indexOf(w, at + 1); if (i < 0) fails.push(`ordre : « ${w} » pas à sa place`); else at = i; });
+      if (c.years !== undefined) { const y = analyse(text).find(r => r.type === "y"); if (!y || y.have !== c.years) fails.push(`années : ${y ? y.have : "aucun point"} au lieu de ${c.years}`); }
+      fixes = {};
+    }
     if (c.minPoints && rs.length < c.minPoints) fails.push(`${rs.length} points repérés, au moins ${c.minPoints} attendus`);
     Object.entries(c.proof || {}).forEach(([k, w]) => { const p = by[k]?.proof; if (!p || !fold(p.t).includes(fold(w))) fails.push(`preuve de « ${k} » : « ${p ? p.t.slice(0, 60) : "rien"} » au lieu d'une ligne avec « ${w} »`); });
     if (c.clean) {
