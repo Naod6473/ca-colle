@@ -215,6 +215,8 @@ body::before, .panel::before {
 .blank { max-width: 100%; padding: 2px 8px; border: 0; border-bottom: 3px solid var(--ink); background: var(--mid-bg); font-weight: 700; }
 .blank::placeholder { color: #7d6a2c; font-weight: 500; }
 .blank:not(:placeholder-shown) { background: var(--ok-bg); border-bottom-color: var(--ok); }
+.blank-l { display: block; margin-bottom: -6px; font-weight: 700; font-size: 14px; color: var(--ink); }
+.where .to-sel { margin-left: 4px; text-transform: none; letter-spacing: 0; font-size: 14px; background: var(--card); color: var(--ink); }
 .ask { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-weight: 700; color: var(--ink); }
 .sug-a { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
 .sug-a small { font-weight: 600; color: var(--ink-soft); }
