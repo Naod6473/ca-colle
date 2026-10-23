@@ -49,7 +49,7 @@ function renderMail(o){
     <label class="afield"><span>${tr("Objet", "Subject")}</span><input id="mailsubj" value="${esc(m.subject)}"></label>
     <label class="afield"><span>${tr("Message", "Message")}</span><textarea id="mailbody" rows="12">${esc(m.body)}</textarea></label>
     <p class="hint">${tr("Relis et complète ce qui est entre crochets avant d'envoyer. Le mail part de ta propre messagerie.", "Read it and fill in what is in brackets before sending. The email goes from your own mailbox.")}${email ? "" : tr(" Ajoute l'email du contact dans la fiche pour qu'il soit rempli tout seul.", " Add the contact's email to the card to fill it in automatically.")}</p>
-    <div class="export"><button class="btn small" type="button" data-mailsend="${o.id}">${tr("Ouvrir dans ma messagerie", "Open in my email app")}</button><button class="btn light small" type="button" data-mailcopy>${tr("Copier", "Copy")}</button>${kind === "followup" && (o.app.status === "sent" || o.app.status === "silent") ? `<button class="btn light small" type="button" data-markfollow="${o.id}">${tr("Noter comme relancée", "Mark as followed up")}</button>` : ""}</div>
+    <div class="export"><button class="btn small" type="button" data-mailsend="${esc(o.id)}">${tr("Ouvrir dans ma messagerie", "Open in my email app")}</button><button class="btn light small" type="button" data-mailcopy>${tr("Copier", "Copy")}</button>${kind === "followup" && (o.app.status === "sent" || o.app.status === "silent") ? `<button class="btn light small" type="button" data-markfollow="${esc(o.id)}">${tr("Noter comme relancée", "Mark as followed up")}</button>` : ""}</div>
   </div>`;
 }
 
@@ -85,7 +85,7 @@ function gapsHTML(){
   const top = Object.values(m).filter(g => g.n >= 2).sort((a, b) => b.n - a.n || b.must - a.must || b.no - a.no).slice(0, 8);
   return `<section class="group gaps"><h2 class="section-title" style="--k: var(--pink)">${tr("Ce qui manque le plus à ton CV", "What your CV lacks most")}</h2>
     ${top.length ? `<p class="hint">${tr(`Sur tes ${list.length} offres, ces points reviennent souvent et ton CV ne les prouve pas encore. Les ajouter aide pour plusieurs candidatures à la fois.`, `Across your ${list.length} offers, these points come up often and your CV does not prove them yet. Adding them helps several applications at once.`)}</p>
-      <ul class="gaplist">${top.map(g => `<li><span><b>${esc(g.k)}</b><small>${tr(`revient dans ${g.n} offres sur ${list.length}`, `asked for in ${g.n} of ${list.length} offers`)}${g.must ? tr(" · indispensable dans " + g.must, " · essential in " + g.must) : ""} · ${g.no === g.n ? tr("pas dans ton CV", "not in your CV") : tr("à prouver", "needs proof")}</small></span><i class="bar" style="--w: ${Math.round(g.n / list.length * 100)}%" aria-hidden="true"></i><button type="button" class="btn light small" data-gapfix="${esc(g.k)}" data-o="${g.o}">${tr("Corriger", "Fix")}</button></li>`).join("")}</ul>`
+      <ul class="gaplist">${top.map(g => `<li><span><b>${esc(g.k)}</b><small>${tr(`revient dans ${g.n} offres sur ${list.length}`, `asked for in ${g.n} of ${list.length} offers`)}${g.must ? tr(" · indispensable dans " + g.must, " · essential in " + g.must) : ""} · ${g.no === g.n ? tr("pas dans ton CV", "not in your CV") : tr("à prouver", "needs proof")}</small></span><i class="bar" style="--w: ${Math.round(g.n / list.length * 100)}%" aria-hidden="true"></i><button type="button" class="btn light small" data-gapfix="${esc(g.k)}" data-o="${esc(g.o)}">${tr("Corriger", "Fix")}</button></li>`).join("")}</ul>`
       : `<p class="hint">${tr("Aucun point ne manque dans plusieurs offres à la fois : bonne nouvelle.", "No point is missing from several offers at once: good news.")}</p>`}</section>`;
 }
 
@@ -96,7 +96,7 @@ function compareHTML(list){
   const data = L.map(o => { const ad = adCheck(o.text), f = id => ad.facts.find(x => x.id === id)?.v || "", rs = resultsFor(o); return {o, ad, f, no: rs.filter(r => r.st === "no").length, mustNo: rs.filter(r => r.st === "no" && r.prio === "must").length}; });
   const best = Math.max(...data.map(d => d.o.score ?? -1));
   const rows = [
-    [tr("Score", "Score"), d => d.o.score != null ? `<b class="${d.o.score === best ? "best" : ""}">${d.o.score} %</b>` : "–"],
+    [tr("Score", "Score"), d => d.o.score != null ? `<b class="${d.o.score === best ? "best" : ""}">${esc(d.o.score)} %</b>` : "–"],
     [tr("État", "Status"), d => esc(stLabel(d.o.app.status))],
     [tr("Contrat", "Contract"), d => esc(d.f("contract")) || "–"],
     [tr("Lieu", "Location"), d => esc(d.f("place")) || "–"],
@@ -108,7 +108,7 @@ function compareHTML(list){
     [tr("Alertes", "Warnings"), d => d.ad.flags.length ? `<span class="flagged">⚠ ${esc(d.ad.flags.map(f => f.label).join(", "))}</span>` : "–"]
   ];
   return `<div class="tablewrap"><table class="apps-table compare">
-    <thead><tr><th scope="col"><span class="sr-only">${tr("Critère", "Criterion")}</span></th>${data.map(d => `<th scope="col"><button type="button" data-openoffer="${d.o.id}">${esc(appTitle(d.o))}</button>${d.o.app.company ? `<small>${esc(d.o.app.company)}</small>` : ""}</th>`).join("")}</tr></thead>
+    <thead><tr><th scope="col"><span class="sr-only">${tr("Critère", "Criterion")}</span></th>${data.map(d => `<th scope="col"><button type="button" data-openoffer="${esc(d.o.id)}">${esc(appTitle(d.o))}</button>${d.o.app.company ? `<small>${esc(d.o.app.company)}</small>` : ""}</th>`).join("")}</tr></thead>
     <tbody>${rows.map(([l, f]) => `<tr><th scope="row">${l}</th>${data.map(d => `<td>${f(d)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>
     <p class="hint">${tr("Seules les offres dont tu as collé le texte apparaissent ici. Clique sur un titre pour revoir son analyse.", "Only offers whose text you pasted appear here. Click a title to see its analysis again.")}</p>`;
 }
@@ -141,20 +141,23 @@ const askHTML = o => `<section class="ask-rec"><h3>${tr("Questions à poser au r
 /* ---------- Sauvegarde dans un fichier (pour passer du PC au téléphone) ---------- */
 function exportBackup(){
   syncOffer();
-  const data = snapshot();
+  const data = snapshot(true); // le fichier contient tout, même si la case « Garder ma session » n'est pas cochée
   Export.download(new Blob([JSON.stringify(data, null, 1)], {type: "application/json"}), tr("ca-colle-sauvegarde-", "ca-colle-backup-") + today() + ".json");
   toast(tr("Fichier enregistré : ouvre-le sur ton autre appareil", "File saved: open it on your other device"));
   stat("sauvegarde", {how: "export"});
 }
+// Le fichier vient peut-être de quelqu'un d'autre : il passe par cleanSave (js/app.js), qui ne garde que les champs connus
 async function importBackup(file){
-  let d;
-  try { d = JSON.parse(await file.text()); } catch {}
-  if (!d || d.v !== 1 || !Array.isArray(d.offers)) return toast(tr("Ce fichier n'est pas une sauvegarde de Ça colle ?", "This file is not a Good fit? backup"));
+  let d = null;
+  try { if (file.size < 20e6) d = cleanSave(JSON.parse(await file.text())); } catch {}
+  if (!d || !(d.offers.length || d.cv.text)) return toast(tr("Ce fichier n'est pas une sauvegarde de Ça colle ?", "This file is not a Good fit? backup"), 4000);
   if ((offers.some(o => o.text.trim() || o.app) || cvReady) && !confirm(tr("Remplacer ce qui est dans l'app par le contenu de ce fichier ?", "Replace what is in the app with the content of this file?"))) return;
-  // la case décochée empêche la sauvegarde automatique à la fermeture d'écraser le fichier ouvert ; restore() la recoche
-  $("#keep").checked = false; clearTimeout(saveTimer);
-  try { localStorage.setItem(STORE, JSON.stringify(d)); } catch { return toast(tr("Impossible d'enregistrer sur cet appareil", "Could not save on this device")); }
+  // tout le contenu du fichier est gardé sur l'appareil (case « Garder ma session » cochée), puis on rouvre sur le suivi
+  d.keep = true; d.imported = true;
+  noSave = true; clearTimeout(saveTimer); // la sauvegarde automatique à la fermeture ne doit pas écraser le fichier ouvert
+  try { localStorage.setItem(STORE, JSON.stringify(d)); } catch { noSave = false; return toast(tr("Impossible d'enregistrer sur cet appareil", "Could not save on this device"), 4000); }
   stat("sauvegarde", {how: "import"});
+  history.replaceState(null, "", location.pathname + location.search + "#suivi");
   location.reload();
 }
 
@@ -183,7 +186,7 @@ document.addEventListener("change", e => { if (e.target.id === "restorefile" && 
 const sentDate = o => o.app.appliedDate || (o.app.history.find(h => h.s !== "todo") || {}).d || "";
 function proofDoc(period){
   const now = new Date(today() + "T12:00:00"), ym = d => d.slice(0, 7);
-  const last = new Date(now.getFullYear(), now.getMonth() - 1, 15).toISOString().slice(0, 7);
+  const last = ymd(new Date(now.getFullYear(), now.getMonth() - 1, 15)).slice(0, 7);
   const keepIt = d => d && (period === "all" || (period === "month" ? ym(d) === today().slice(0, 7) : ym(d) === last));
   const list = apps().filter(o => o.app.status !== "todo" && keepIt(sentDate(o))).sort((a, b) => sentDate(a).localeCompare(sentDate(b)));
   if (!list.length) return toast(tr("Aucune candidature envoyée sur cette période", "No application sent in this period"));
@@ -203,7 +206,7 @@ function proofDoc(period){
 
 /* ---------- Mon tableau de bord : rythme, réponses, objectif de la semaine ---------- */
 const REPLY = ["call", "interview", "met", "test", "offer", "accepted", "refused"];
-const monday = d => { const x = new Date(d + "T12:00:00"), k = (x.getDay() + 6) % 7; x.setDate(x.getDate() - k); return x.toISOString().slice(0, 10); };
+const monday = d => { const x = new Date(d + "T12:00:00"), k = (x.getDay() + 6) % 7; x.setDate(x.getDate() - k); return ymd(x); };
 function statsHTML(){
   const all = apps(), sent = all.filter(o => o.app.status !== "todo" && sentDate(o));
   if (!sent.length) return `<p class="notice">${tr("Ton tableau de bord se remplira quand tu auras noté des candidatures envoyées.", "Your dashboard fills up once you have noted applications as sent.")}</p>`;

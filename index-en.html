@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://stats.pissits.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://stats.pissits.com blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Good fit? · your CV vs a job offer</title>
 <meta name="description" content="Paste a job offer, add your CV and see what matches. Free, and your CV never leaves your device.">
@@ -324,7 +325,7 @@
         </div></details>
         <input type="file" id="restorefile" accept=".json,application/json" hidden>
       </div>
-      <p class="notice" id="tracknokeep" hidden>Your tracker is not kept on this device yet: it will disappear when you close the page. <button class="btn small" id="keepon" type="button">Keep it on this device</button></p>
+      <p class="notice" id="tracknokeep" hidden>Your tracker is kept on this device, without your CV or the text of the offers: you will need to add them again next time. <button class="btn small" id="keepon" type="button">Keep them too</button></p>
     </div>
     <aside class="box">
       <div class="box-head">To do</div>
@@ -356,9 +357,9 @@
   <div class="foot-inner">
     <h2>Your CV stays with you.</h2>
     <div class="foot-text">
-      <p>Your CV and the offer stay in your browser. No account, nothing on a server. Only visits are counted, anonymously and without cookies (Umami).</p>
+      <p>Your CV and the offer stay in your browser. No account, nothing on a server. Your application tracker (job, company, dates, notes) is kept on this device. Your CV and offers are kept only if you tick the box. Only visits are counted, anonymously and without cookies (Umami).</p>
       <p class="hint-foot" id="ioshint" hidden>On iPhone: Share button, then "Add to Home Screen" to get the app, even offline.</p>
-      <label class="keep"><input type="checkbox" id="keep"> Keep my session on this device to come back later</label>
+      <label class="keep"><input type="checkbox" id="keep"> Also keep my CV and offers on this device to come back later</label>
       <p><a href="salary-en.html">Work out take-home pay</a> · <a href="infos-en.html">About, privacy and site map</a></p>
       <p><button type="button" class="linkbtn" id="wipe">Erase my data from this device</button> · <small>An app by <a href="https://portfolio.pissits.com/index-en.html">Simon Victor</a>.</small></p>
     </div>

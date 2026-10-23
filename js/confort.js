@@ -52,8 +52,8 @@ initComfort();
 // Onglets des étapes : même état que dans l'app (hachurés tant que l'offre et le CV ne sont pas remplis), lu dans la session gardée
 (() => {
   let d = null; try { d = JSON.parse(localStorage.getItem(LANG === "fr" ? "cacolle-v1" : `cacolle-${LANG}-v1`)); } catch {}
-  const o = d && (d.offers || []).find(x => x.id === d.cur) || d?.offers?.at(-1), txt = o?.text || "";
-  const ok1 = txt.trim().split(/\s+/).filter(Boolean).length >= 25 && !/^\s*https?:\/\/\S+\s*$/.test(txt), ok2 = !!d?.cv?.text?.trim();
+  const L = Array.isArray(d?.offers) ? d.offers : [], o = L.find(x => x?.id === d.cur) || L.at(-1), txt = typeof o?.text === "string" ? o.text : ""; // session abîmée : onglets fermés
+  const ok1 = txt.trim().split(/\s+/).filter(Boolean).length >= 25 && !/^\s*https?:\/\/\S+\s*$/.test(txt), ok2 = typeof d?.cv?.text === "string" && !!d.cv.text.trim();
   document.querySelectorAll('a.tab[href*="#etape-"]').forEach(a => {
     const n = +a.href.slice(-1), can = n === 1 || (n === 2 && ok1) || (n >= 3 && ok1 && ok2);
     a.classList.toggle("done", (n === 1 && ok1) || (n === 2 && ok2));

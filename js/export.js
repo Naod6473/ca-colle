@@ -24,7 +24,8 @@ function zip(files){
   end.setUint32(12, size, true); end.setUint32(16, off, true);
   return new Blob([...parts, ...dir, end], {type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
 }
-const x = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+// Caractères interdits en XML (contrôles invisibles collés depuis un PDF ou un site, demi-paires) : Word refuserait d'ouvrir le fichier
+const x = s => String(s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F\uFFFE\uFFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g, "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 // paras : [{text, style: "title" | "head" | "", bold}]
 function docx(paras){

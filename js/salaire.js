@@ -4,13 +4,23 @@
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const fold = s => String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 const nf = new Intl.NumberFormat(tr("fr-FR", "en-GB"), {maximumFractionDigits: 2, minimumFractionDigits: 0});
-const num = v => { const n = parseFloat(String(v).replace(/[\s  ]/g, "").replace(/[£€$]/g, "").replace(/,(?=\d{3}\b)/g, EN ? "" : ",").replace(LANG === "fr" || EN ? /$^/ : /\.(?=\d{3}\b)/g, "").replace(",", ".")); return isFinite(n) ? n : 0; };
+// Un nombre écrit à la main, dans toutes les langues : « 1 850 », « 1.850 », « 1,850 », « 1'850 », « 1.850,50 », « 12.50 », « 12,50 ».
+// Les deux signes présents : le dernier est la virgule. Un seul signe : séparateur des milliers s'il revient plusieurs fois
+// ou s'il est suivi de 3 chiffres exactement (sauf « 0.850 »), sinon c'est la virgule.
+const toNum = t => {
+  let s = String(t).replace(/[\s\u00a0\u202f'’]/g, "").replace(/[£€$]|chf|fr\.?$/gi, "").replace(/[.,]+$/, "");
+  const d = Math.max(s.lastIndexOf("."), s.lastIndexOf(","));
+  if (s.includes(".") && s.includes(",")) s = s.slice(0, d).replace(/[.,]/g, "") + "." + s.slice(d + 1);
+  else if (d >= 0) { const c = s[d]; s = s.split(c).length > 2 || /^[1-9]\d{0,2}$/.test(s.slice(0, d)) && /^\d{3}$/.test(s.slice(d + 1)) ? s.split(c).join("") : s.replace(c, "."); }
+  return parseFloat(s);
+};
+const num = v => { const n = toNum(v); return isFinite(n) ? n : 0; };
 const show = n => { if (!n) return ""; const r = Math.round(n * 100) / 100; return new Intl.NumberFormat(tr("fr-FR", "en-GB"), {minimumFractionDigits: r % 1 ? 2 : 0, maximumFractionDigits: 2}).format(r); };
 
 // Lit un salaire tel qu'il est écrit dans une annonce : « 45 000 € brut par an », « 48 k€ », « £11.50 per hour »
 function parseSalary(t){
   const f = fold(t), m = f.match(/(\d[\d\s.,]*)\s?(k)?/); if (!m) return null;
-  let v = parseFloat(m[1].replace(/\s/g, "").replace(EN ? /,/g : /\./g, "").replace(",", "."));
+  let v = toNum(m[1]);
   if (m[2] || /\dk\b/.test(f)) v *= 1000;
   const u = /heure|hour|\/ ?h\b|\bh\b/.test(f) ? "h" : /mois|month/.test(f) ? "m" : /semaine|week/.test(f) ? "w" : /an\b|annuel|year|annum/.test(f) || v > 10000 ? "a" : v < 100 ? "h" : "m";
   return {v, u};

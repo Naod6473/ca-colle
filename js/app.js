@@ -17,7 +17,7 @@ const canReach = n => n === 1 || (n === 2 && offerOk()) || (n >= 3 && offerOk() 
 const LL = o => o[LANG] ?? tr(o.fr, o.en);
 const plural = (n, w) => { if (L10N && !EN) { const b = L10N.w?.[w] ?? w; return `${n} ${n > 1 ? L10N.pl?.[b] ?? b : b}`; } return `${n} ${w}${n > 1 ? "s" : ""}`; };
 
-function toast(t){ const el = $("#toast"); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 2200); }
+function toast(t, ms = 2200){ const el = $("#toast"); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, ms); }
 
 /* ---------- Offres ---------- */
 const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
@@ -38,8 +38,8 @@ function renderOffers(){
   const list = offers.filter(o => o.text && o.text.trim());
   $("#offersbox").hidden = list.length < 1 || !cvReady;
   $("#offers").innerHTML = list.map(o => `<li class="${o === cur ? "on" : ""}">
-    <button type="button" data-offer="${o.id}"><b>${esc(o.title || titleOf(o.text))}</b>${o.score != null ? `<span class="score">${o.score} %</span>` : ""}</button>
-    <button type="button" class="del" data-deloffer="${o.id}" aria-label="${tr("Retirer cette offre", "Remove this offer")}">✕</button></li>`).join("");
+    <button type="button" data-offer="${esc(o.id)}"><b>${esc(o.title || titleOf(o.text))}</b>${o.score != null ? `<span class="score">${esc(o.score)} %</span>` : ""}</button>
+    <button type="button" class="del" data-deloffer="${esc(o.id)}" aria-label="${tr("Retirer cette offre", "Remove this offer")}">✕</button></li>`).join("");
 }
 
 /* ---------- Onglets et navigation : on n'avance que quand l'étape d'avant est remplie ---------- */
@@ -56,11 +56,19 @@ function gates(){
     t.classList.toggle("done", (n === 1 && offerOk()) || (n === 2 && cvReady));
   });
 }
+// Une entrée d'historique par étape (#etape-2…5, l'étape 1 sans #) et pour le suivi (#suivi) : le bouton Retour du
+// téléphone revient à l'étape d'avant au lieu de quitter l'app. navOn reste faux au démarrage (le lien direct est lu par suivi.js),
+// navReplace remplace l'entrée au lieu d'en ajouter une (lien direct, retour arrière).
+let navOn = false, navReplace = false;
+function navTo(h){
+  if (!navOn || location.hash === h) return;
+  history[navReplace ? "replaceState" : "pushState"](null, "", location.pathname + location.search + h);
+}
 function go(n){
   if (!canReach(n)) return;
   if (typeof hideTrack === "function") hideTrack();
   if (step !== n) stat("etape-" + n);
-  step = n;
+  step = n; navTo(n === 1 ? "" : "#etape-" + n);
   if (n >= 2) syncOffer();
   results = analyse($("#offer").value);
   $$(".tab").forEach(t => t.setAttribute("aria-selected", +t.dataset.step === n));
@@ -433,36 +441,100 @@ async function useOfferFile(f){
   } finally { $("#ojob").hidden = true; $("#offerfile").value = ""; }
 }
 
-/* ---------- Session gardée sur l'appareil (seulement si la case est cochée) ---------- */
+/* ---------- Ce qui reste sur l'appareil ----------
+   Par défaut, seul le suivi des candidatures est gardé (poste, entreprise, dates, état, notes), sans le CV ni le texte des offres.
+   Si la case « Garder ma session » est cochée, tout est gardé : CV, offres, réponses, lettre, préparation d'entretien. */
 const keep = () => $("#keep").checked;
-let saveTimer;
+let saveTimer, noSave = false; // noSave : après « Effacer » ou à l'ouverture d'une sauvegarde, plus rien n'est écrit avant le rechargement
 function saveNow(){
   clearTimeout(saveTimer);
-  if (!keep()) return;
-  try { localStorage.setItem(STORE, JSON.stringify(snapshot())); } catch {}
+  if (noSave) return;
+  const d = snapshot();
+  try {
+    if (d.keep === false && !d.offers.length) localStorage.removeItem(STORE);
+    else localStorage.setItem(STORE, JSON.stringify(d));
+    saveNow.warned = 0; return true;
+  } catch {
+    if (Date.now() - (saveNow.warned || 0) > 60000) { saveNow.warned = Date.now(); toast(tr("Je n'arrive pas à enregistrer sur cet appareil (mémoire du navigateur pleine ?). Pour ne rien perdre, fais une sauvegarde : Mes candidatures, menu Import / Export.", "I can't save on this device (browser storage full?). To lose nothing, make a backup: My applications, Import / Export menu."), 7000); }
+    return false;
+  }
 }
-function snapshot(){
+// full : tout (case cochée, ou fichier de sauvegarde) ; sinon le suivi seulement
+function snapshot(full = keep()){
   if (cur) { cur.text = $("#offer").value; cur.title = titleOf(cur.text); }
+  if (!full) return {v: 1, keep: false, me: me.goal ? {goal: me.goal} : {}, offers: offers.filter(o => o.app).map(o => ({id: o.id, title: o.title, app: o.app}))};
   return {v: 1, cv: {text: $("#cvraw").value, ...cvFile}, me, cur: cur?.id, offers: offers.filter(o => o.text.trim() || o.app).map(o => ({id: o.id, text: o.text, title: o.title, score: o.score, fixes: o.fixes, over: o.over, letter: o.letter, app: o.app, prep: o.prep, check: o.check}))};
 }
 function save(){ clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, 400); }
 addEventListener("pagehide", saveNow);
+// Date du jour en heure locale (pas en UTC : entre minuit et 2 h, en France, l'UTC est encore la veille)
+const ymd = x => `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}-${String(x.getDate()).padStart(2, "0")}`;
+// Données relues (session gardée ou fichier de sauvegarde ouvert) : on ne garde que les champs connus, avec le bon type.
+// Un fichier piégé ou abîmé ne doit ni casser la page ni glisser du code dans l'affichage.
+const isObj = v => !!v && typeof v === "object" && !Array.isArray(v);
+const okKey = k => k !== "__proto__" && k !== "constructor" && k !== "prototype";
+const str = (v, max = 100000) => typeof v === "string" ? v.slice(0, max) : "";
+const strsOf = (v, keys, max) => { const o = {}; if (isObj(v)) for (const k of keys) if (typeof v[k] === "string") o[k] = v[k].slice(0, max); return o; };
+const isDay = v => typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v);
+const okStatus = s => typeof s === "string" && (typeof ST === "undefined" ? /^[a-z]{1,20}$/.test(s) : !!ST[s]); // suivi.js revérifie au chargement
+function cleanSave(d){
+  if (!isObj(d) || d.v !== 1) return null;
+  const seen = new Set(), list = [];
+  for (const o of Array.isArray(d.offers) ? d.offers : []) {
+    if (!isObj(o) || typeof o.id !== "string" || !/^[a-z0-9]{1,40}$/.test(o.id) || seen.has(o.id)) continue;
+    seen.add(o.id);
+    const x = {id: o.id, text: str(o.text), title: str(o.title, 300), fixes: {}, over: {}, letter: {}};
+    if (typeof o.score === "number" && isFinite(o.score)) x.score = Math.max(0, Math.min(100, Math.round(o.score)));
+    if (isObj(o.fixes)) for (const [k, f] of Object.entries(o.fixes)) {
+      if (!okKey(k) || !isObj(f) || !isObj(f.fix) || typeof f.fix.tpl !== "string" || !["open", "yes", "accepted", "skipped"].includes(f.state)) continue;
+      const vals = {}; if (isObj(f.vals)) for (const [i, v] of Object.entries(f.vals)) if (/^\d{1,2}$/.test(i) && typeof v === "string") vals[i] = v.slice(0, 2000);
+      x.fixes[k] = {state: f.state, vals, fix: strsOf(f.fix, ["line", "why", "ask", "tpl", "nope", "find"], 2000)};
+    }
+    if (isObj(o.over)) for (const [k, v] of Object.entries(o.over)) if (okKey(k) && ["ok", "mid", "no", "skip"].includes(v)) x.over[k] = v;
+    if (isObj(o.letter)) {
+      x.letter = strsOf(o.letter, ["company", "job", "why", "when", "tone", "text"], 20000);
+      if (Array.isArray(o.letter.strengths)) x.letter.strengths = o.letter.strengths.filter(v => typeof v === "string").slice(0, 50);
+      if (o.letter.frozen === true) x.letter.frozen = true;
+    }
+    if (isObj(o.app)) {
+      const a = o.app, status = okStatus(a.status) ? a.status : "todo";
+      x.app = {...strsOf(a, ["job", "company", "contact", "link", "notes"], 5000), status};
+      for (const k of ["job", "company", "contact", "link", "notes"]) x.app[k] = x.app[k] || "";
+      for (const k of ["offerDate", "appliedDate", "next"]) x.app[k] = isDay(a[k]) ? a[k] : "";
+      x.app.history = (Array.isArray(a.history) ? a.history : []).filter(h => isObj(h) && isDay(h.d) && okStatus(h.s)).slice(0, 200).map(h => ({d: h.d, s: h.s}));
+      if (!x.app.history.length) x.app.history = [{d: x.app.appliedDate || ymd(new Date()), s: status}];
+    }
+    if (isObj(o.prep)) { x.prep = {}; for (const [k, v] of Object.entries(o.prep)) if (okKey(k) && isObj(v)) x.prep[k] = strsOf(v, ["t", "s", "a", "r"], 5000); }
+    if (isObj(o.check)) { x.check = {}; for (const [k, v] of Object.entries(o.check)) if (okKey(k) && typeof v === "boolean") x.check[k] = v; }
+    list.push(x);
+  }
+  const cv = isObj(d.cv) ? {text: str(d.cv.text), name: str(d.cv.name, 300), info: str(d.cv.info, 300), conf: typeof d.cv.conf === "number" && isFinite(d.cv.conf) ? d.cv.conf : 0} : {text: ""};
+  const m = strsOf(d.me, ["name", "contact"], 500), g = isObj(d.me) ? +d.me.goal : 0;
+  if (g >= 1 && g <= 50) m.goal = Math.round(g);
+  return {v: 1, keep: d.keep !== false, cv, me: {name: m.name || "", contact: m.contact || "", ...(m.goal ? {goal: m.goal} : {})}, cur: seen.has(d.cur) ? d.cur : undefined, offers: list};
+}
 function restore(){
-  let d; try { d = JSON.parse(localStorage.getItem(STORE) || "null"); } catch {}
-  if (!d || d.v !== 1) return false;
-  $("#keep").checked = true;
-  offers = (d.offers || []).map(o => ({...o, fixes: o.fixes || {}, over: o.over || {}, letter: o.letter || {}}));
-  cur = offers.find(o => o.id === d.cur) || offers[offers.length - 1] || null;
-  if (cur) { fixes = cur.fixes; over = cur.over; $("#offer").value = cur.text; }
-  me = d.me || me;
-  if (d.cv?.text) { cvFile = {name: d.cv.name, info: d.cv.info, conf: d.cv.conf}; setCV(d.cv.text); showFile(d.cv.name || "Ton CV", d.cv.info || ""); }
-  $("#resume").hidden = false;
-  $("#resumetxt").textContent = [cvReady && tr("Ton CV", "Your CV"), offers.length && plural(offers.length, tr("offre", "offer"))].filter(Boolean).join(tr(" et ", " and ")) + (cvReady || offers.length ? tr(" sont là.", " are here.") : "");
+  let raw = null, d = null;
+  try { raw = JSON.parse(localStorage.getItem(STORE) || "null"); d = cleanSave(raw); } catch {}
+  if (!d) return false;
+  $("#keep").checked = d.keep;
+  offers = d.offers;
+  // suivi seul : le CV et les offres n'ont pas été gardés, on repart sur une offre vide (sans toucher aux candidatures)
+  cur = d.keep ? offers.find(o => o.id === d.cur) || offers[offers.length - 1] || null : null;
+  if (cur) { fixes = cur.fixes; over = cur.over; $("#offer").value = cur.text; } else newOffer();
+  me = d.me;
+  if (d.keep && d.cv.text) { cvFile = {name: d.cv.name, info: d.cv.info, conf: d.cv.conf}; setCV(d.cv.text); showFile(d.cv.name || "Ton CV", d.cv.info || ""); }
+  if (d.keep) {
+    $("#resume").hidden = false;
+    $("#resumetxt").textContent = [cvReady && tr("Ton CV", "Your CV"), offers.length && plural(offers.length, tr("offre", "offer"))].filter(Boolean).join(tr(" et ", " and ")) + (cvReady || offers.length ? tr(" sont là.", " are here.") : "");
+  }
+  if (raw.imported === true) setTimeout(() => toast(tr("Sauvegarde ouverte. Ta session est maintenant gardée sur cet appareil : tu peux décocher la case en bas de page.", "Backup opened. Your session is now kept on this device: you can untick the box at the bottom of the page."), 7000), 100);
   return true;
 }
 function wipe(){
-  $("#keep").checked = false; clearTimeout(saveTimer);
+  noSave = true; $("#keep").checked = false; clearTimeout(saveTimer);
   try { localStorage.removeItem(STORE); } catch {}
+  history.replaceState(null, "", location.pathname + location.search);
   location.reload();
 }
 
@@ -541,7 +613,8 @@ document.addEventListener("input", e => {
   if (t.dataset.check) { (cur.check = cur.check || {})[t.dataset.check] = t.checked; renderChecklist(); return save(); }
 });
 document.addEventListener("change", e => {
-  if (e.target.id === "keep") { if (keep()) { save(); toast(tr("Ta session restera sur cet appareil", "Your session will stay on this device")); } else { try { localStorage.removeItem(STORE); } catch {} toast(tr("Plus rien n'est gardé sur cet appareil", "Nothing is kept on this device any more")); } }
+  // décochée : le CV et les offres sont retirés de l'appareil, le suivi des candidatures reste (« Effacer mes données » enlève tout)
+  if (e.target.id === "keep" && saveNow() !== false) { toast(keep() ? tr("Ta session restera sur cet appareil", "Your session will stay on this device") : offers.some(o => o.app) ? tr("Ton CV et tes offres ne sont plus gardés. Ton suivi reste sur cet appareil.", "Your CV and offers are no longer kept. Your tracker stays on this device.") : tr("Plus rien n'est gardé sur cet appareil", "Nothing is kept on this device any more"), 4000); }
 });
 document.addEventListener("keydown", e => {
   if (e.key === "Enter" && e.target.classList.contains("blank")) { const b = e.target.closest(".sug").querySelector("[data-add]"); if (b && !b.disabled) b.click(); }
@@ -582,6 +655,7 @@ $("#ioshint").hidden = !(/iphone|ipad/i.test(navigator.userAgent) && !navigator.
 if (!restore()) newOffer();
 gates();
 go(1);
+navOn = true;
 // « Partager vers Ça colle » depuis un site d'emploi (app installée sur téléphone) : ?title=…&text=…&url=…
 (() => {
   const q = new URLSearchParams(location.search), title = q.get("title") || "", text = q.get("text") || "", url = q.get("url") || (text.match(/https?:\/\/\S+/) || [""])[0];

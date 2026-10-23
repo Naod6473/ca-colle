@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://stats.pissits.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://stats.pissits.com blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>¿Encaja? · tu CV frente a una oferta de empleo</title>
 <meta name="description" content="Pega una oferta de empleo, añade tu CV y mira lo que encaja. Gratis, y tu CV nunca sale de tu dispositivo.">
@@ -325,7 +326,7 @@
         </div></details>
         <input type="file" id="restorefile" accept=".json,application/json" hidden>
       </div>
-      <p class="notice" id="tracknokeep" hidden>Tu seguimiento todavía no se guarda en este dispositivo: desaparecerá al cerrar la página. <button class="btn small" id="keepon" type="button">Guardarlo en este dispositivo</button></p>
+      <p class="notice" id="tracknokeep" hidden>Tu seguimiento se guarda en este dispositivo, sin tu CV ni el texto de las ofertas: tendrás que volver a ponerlos la próxima vez. <button class="btn small" id="keepon" type="button">Guardarlos también</button></p>
     </div>
     <aside class="box">
       <div class="box-head">Por hacer</div>
@@ -357,9 +358,9 @@
   <div class="foot-inner">
     <h2>Tu CV se queda contigo.</h2>
     <div class="foot-text">
-      <p>Tu CV y la oferta se quedan en tu navegador. Sin cuenta, nada en un servidor. Solo se cuentan las visitas, de forma anónima y sin cookies (Umami).</p>
+      <p>Tu CV y la oferta se quedan en tu navegador. Sin cuenta, nada en un servidor. Tu seguimiento de candidaturas (puesto, empresa, fechas, notas) se guarda en este dispositivo. Tu CV y tus ofertas, solo si marcas la casilla. Solo se cuentan las visitas, de forma anónima y sin cookies (Umami).</p>
       <p class="hint-foot" id="ioshint" hidden>En iPhone: botón Compartir y luego «Añadir a pantalla de inicio» para tener la app, incluso sin conexión.</p>
-      <label class="keep"><input type="checkbox" id="keep"> Guardar mi sesión en este dispositivo para volver más tarde</label>
+      <label class="keep"><input type="checkbox" id="keep"> Guardar también mi CV y mis ofertas en este dispositivo para volver más tarde</label>
       <p><a href="salary-es.html">Calcular el sueldo neto</a> · <a href="infos-es.html">Información, privacidad y mapa del sitio</a></p>
       <p><button type="button" class="linkbtn" id="wipe">Borrar mis datos de este dispositivo</button> · <small>Una app de <a href="https://portfolio.pissits.com/index-en.html">Simon Victor</a>.</small></p>
     </div>

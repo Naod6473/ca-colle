@@ -2,6 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://stats.pissits.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://stats.pissits.com blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Passt das? · dein Lebenslauf und das Stellenangebot</title>
 <meta name="description" content="Füg ein Stellenangebot ein, lade deinen Lebenslauf hoch und sieh, was passt. Kostenlos, und dein Lebenslauf verlässt nie dein Gerät.">
@@ -325,7 +326,7 @@
         </div></details>
         <input type="file" id="restorefile" accept=".json,application/json" hidden>
       </div>
-      <p class="notice" id="tracknokeep" hidden>Deine Übersicht wird noch nicht auf diesem Gerät gespeichert: Sie verschwindet, wenn du die Seite schließt. <button class="btn small" id="keepon" type="button">Auf diesem Gerät behalten</button></p>
+      <p class="notice" id="tracknokeep" hidden>Deine Übersicht wird auf diesem Gerät gespeichert, ohne deinen Lebenslauf und ohne den Text der Stellenangebote: Die musst du beim nächsten Mal neu einfügen. <button class="btn small" id="keepon" type="button">Auch diese behalten</button></p>
     </div>
     <aside class="box">
       <div class="box-head">Zu erledigen</div>
@@ -357,9 +358,9 @@
   <div class="foot-inner">
     <h2>Dein Lebenslauf bleibt bei dir.</h2>
     <div class="foot-text">
-      <p>Dein Lebenslauf und das Stellenangebot bleiben in deinem Browser. Kein Konto, nichts auf einem Server. Nur Besuche werden gezählt, anonym und ohne Cookies (Umami).</p>
+      <p>Dein Lebenslauf und das Stellenangebot bleiben in deinem Browser. Kein Konto, nichts auf einem Server. Deine Bewerbungsübersicht (Stelle, Firma, Daten, Notizen) wird auf diesem Gerät gespeichert. Lebenslauf und Stellenangebote nur, wenn du das Kästchen ankreuzt. Nur Besuche werden gezählt, anonym und ohne Cookies (Umami).</p>
       <p class="hint-foot" id="ioshint" hidden>Auf dem iPhone: Teilen-Button, dann „Zum Home-Bildschirm“, und du hast die App, auch offline.</p>
-      <label class="keep"><input type="checkbox" id="keep"> Meine Sitzung auf diesem Gerät behalten, um später weiterzumachen</label>
+      <label class="keep"><input type="checkbox" id="keep"> Auch meinen Lebenslauf und meine Stellenangebote auf diesem Gerät behalten, um später weiterzumachen</label>
       <p><a href="salary-de.html">Nettolohn berechnen</a> · <a href="infos-de.html">Impressum, Datenschutz und Seitenübersicht</a></p>
       <p><button type="button" class="linkbtn" id="wipe">Meine Daten von diesem Gerät löschen</button> · <small>Eine App von <a href="https://portfolio.pissits.com/index-en.html">Simon Victor</a>.</small></p>
     </div>

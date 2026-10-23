@@ -1,7 +1,7 @@
 // Suivi des candidatures (fiche par offre ou tableau) et préparation d'entretien.
 // Chaque candidature est une offre de la liste « offers » (js/app.js) avec un objet « app » :
 // {job, company, offerDate, appliedDate, status, next, contact, link, notes, history: [{d, s}]}.
-// Rien ne part sur un serveur : c'est gardé sur l'appareil seulement si la case « Garder ma session » est cochée.
+// Rien ne part sur un serveur. Le suivi est gardé sur l'appareil (sans le CV ni le texte des offres, qui ne le sont qu'avec « Garder ma session »).
 
 const STATUSES = [
   {id: "todo",      fr: "À postuler",                en: "To apply",               g: "active", c: "var(--card)"},
@@ -19,10 +19,12 @@ const STATUSES = [
 ];
 const ST = Object.fromEntries(STATUSES.map(s => [s.id, s]));
 const stLabel = id => (LL(ST[id] || ST.todo));
-const today = () => new Date().toISOString().slice(0, 10);
-const addDays = (d, n) => { const x = new Date(d + "T12:00:00"); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
+const today = () => ymd(new Date()); // heure locale (ymd : js/app.js)
+const addDays = (d, n) => { const x = new Date(d + "T12:00:00"); x.setDate(x.getDate() + n); return ymd(x); };
 const daysFrom = d => Math.round((new Date(today() + "T12:00:00") - new Date(d + "T12:00:00")) / 864e5);
 const fmtDate = d => d ? new Date(d + "T12:00:00").toLocaleDateString(tr("fr-FR", "en-GB"), {day: "numeric", month: "short", year: "numeric"}) : "";
+// Session relue avant ce fichier (js/app.js) : un état inconnu redevient « À postuler », l'historique reste lisible
+offers.forEach(o => { const a = o.app; if (!a) return; if (!ST[a.status]) a.status = "todo"; a.history = a.history.filter(h => ST[h.s]); if (!a.history.length) a.history = [{d: a.appliedDate || today(), s: a.status}]; });
 let trackView = "table", trackFilter = "all", trackSort = {k: "appliedDate", dir: -1}, openApp = null, prepFor = null;
 
 const apps = () => offers.filter(o => o.app);
@@ -59,7 +61,7 @@ const appTitle = o => o.app.job || o.title || titleOf(o.text || "") || tr("Candi
 
 /* ---------- Affichage ---------- */
 function showTrack(focusId){
-  syncOffer();
+  syncOffer(); navTo("#suivi");
   $$("[data-p]").forEach(p => p.hidden = true); $$("[data-for]").forEach(p => p.hidden = true);
   $$(".tab").forEach(t => t.setAttribute("aria-selected", "false"));
   $("#track").hidden = false; $("#trackbelow").hidden = false; $("#trackbtn").setAttribute("aria-selected", "true");
@@ -72,13 +74,16 @@ function showTrack(focusId){
 function hideTrack(){ $("#track").hidden = true; $("#trackbelow").hidden = true; $("#trackbtn").setAttribute("aria-selected", "false"); }
 // Lien direct vers le suivi (onglet « Mes candidatures » des pages outils)
 // et vers une étape (onglets des pages outils) : on va à l'étape demandée, ou à la dernière qu'on peut atteindre
-{
-  const h = location.hash, n = +(h.match(/^#etape-([1-5])$/) || [])[1];
-  if (h === "#suivi" || n) setTimeout(() => {
-    if (n) { for (let k = n; k >= 1; k--) if (canReach(k)) { go(k); break; } } else showTrack();
-    history.replaceState(null, "", location.pathname + location.search);
-  }, 0);
+// Le bouton Retour (ou Suivant) du navigateur passe par le même chemin, sans ajouter d'entrée
+function openHash(){
+  const h = location.hash, n = +(h.match(/^#etape-([1-5])$/) || [])[1] || (h ? 0 : 1);
+  navReplace = true;
+  try {
+    if (n) { for (let k = n; k >= 1; k--) if (canReach(k)) { go(k); break; } } else if (h === "#suivi") showTrack();
+  } finally { navReplace = false; }
 }
+if (location.hash === "#suivi" || /^#etape-[1-5]$/.test(location.hash)) setTimeout(openHash, 0);
+addEventListener("popstate", openHash);
 function renderBadge(){
   const n = apps().reduce((s, o) => s + todosOf(o).filter(t => t.urgent).length, 0);
   $("#trackn").hidden = !n; $("#trackn").textContent = n;
@@ -92,7 +97,7 @@ function renderTrack(){
   ["all", "active", "talk", "done"].forEach(f => $("#tf-" + f).textContent = f === "all" ? all.length : all.filter(o => grp(o) === f).length);
   const todos = all.flatMap(todosOf).sort((a, b) => b.urgent - !!a.urgent);
   $("#tracktodo").innerHTML = todos.length
-    ? `<ul class="todo">${todos.slice(0, 6).map(t => `<li class="${t.urgent ? "urgent" : ""}"><span><button type="button" class="linkbtn" data-openapp="${t.o.id}">${esc(appTitle(t.o))}</button>${t.o.app.company ? ` · ${esc(t.o.app.company)}` : ""}</span><small>${esc(t.t)}</small></li>`).join("")}</ul>`
+    ? `<ul class="todo">${todos.slice(0, 6).map(t => `<li class="${t.urgent ? "urgent" : ""}"><span><button type="button" class="linkbtn" data-openapp="${esc(t.o.id)}">${esc(appTitle(t.o))}</button>${t.o.app.company ? ` · ${esc(t.o.app.company)}` : ""}</span><small>${esc(t.t)}</small></li>`).join("")}</ul>`
     : `<p>${all.length ? tr("Rien d'urgent. Pense à noter chaque réponse.", "Nothing urgent. Remember to note every reply.") : tr("Aucune candidature pour l'instant. Ajoute-en une, ou clique sur « Suivre cette candidature » après une analyse.", "No applications yet. Add one, or click \"Track this application\" after an analysis.")}</p>`;
   const list = all.filter(o => trackFilter === "all" || grp(o) === trackFilter);
   $("#trackfilters").hidden = !!prepFor || !!mailFor || !all.length;
@@ -104,16 +109,16 @@ function renderTrack(){
   // La liste d'abord, puis ce qui manque le plus au CV sur toutes les offres
   $("#trackout").innerHTML = (trackView === "table" ? tableHTML(list) : `<div class="apps">${list.sort((a, b) => (b.app.appliedDate || b.app.history[0].d).localeCompare(a.app.appliedDate || a.app.history[0].d)).map(cardHTML).join("")}</div>`) + gapsHTML();
 }
-const statusSelect = o => `<select class="stsel" data-app="${o.id}" data-fld="status" aria-label="${tr("État", "Status")}" style="--k: ${ST[o.app.status].c}">${STATUSES.map(s => `<option value="${s.id}" ${s.id === o.app.status ? "selected" : ""}>${LL(s)}</option>`).join("")}</select>`;
+const statusSelect = o => `<select class="stsel" data-app="${esc(o.id)}" data-fld="status" aria-label="${tr("État", "Status")}" style="--k: ${ST[o.app.status].c}">${STATUSES.map(s => `<option value="${s.id}" ${s.id === o.app.status ? "selected" : ""}>${LL(s)}</option>`).join("")}</select>`;
 const field = (o, k, label, type = "text", ph = "") => `<label class="afield"><span>${label}</span>${type === "area"
-  ? `<textarea data-app="${o.id}" data-fld="${k}" rows="3" placeholder="${esc(ph)}">${esc(o.app[k] || "")}</textarea>`
-  : `<input type="${type}" data-app="${o.id}" data-fld="${k}" value="${esc(o.app[k] || "")}" placeholder="${esc(ph)}">`}</label>`;
+  ? `<textarea data-app="${esc(o.id)}" data-fld="${k}" rows="3" placeholder="${esc(ph)}">${esc(o.app[k] || "")}</textarea>`
+  : `<input type="${type}" data-app="${esc(o.id)}" data-fld="${k}" value="${esc(o.app[k] || "")}" placeholder="${esc(ph)}">`}</label>`;
 function cardHTML(o){
   const a = o.app, td = todosOf(o).filter(t => t.urgent), open = openApp === o.id;
-  return `<article class="app-card" id="app-${o.id}" style="--k: ${ST[a.status].c}">
+  return `<article class="app-card" id="app-${esc(o.id)}" style="--k: ${ST[a.status].c}">
     <div class="app-h">
       <div><h3>${esc(appTitle(o))}</h3><p>${esc(a.company || tr("Entreprise à préciser", "Company not set"))}</p></div>
-      ${o.score != null && o.text.trim() ? `<span class="app-score" title="${tr("Score de l'analyse", "Analysis score")}">${o.score} %</span>` : ""}
+      ${o.score != null && o.text.trim() ? `<span class="app-score" title="${tr("Score de l'analyse", "Analysis score")}">${esc(o.score)} %</span>` : ""}
     </div>
     <div class="app-row">${statusSelect(o)}${td.map(t => `<i class="tag must">${esc(t.t)}</i>`).join("")}</div>
     <dl class="app-dates">
@@ -121,7 +126,7 @@ function cardHTML(o){
       <div><dt>${tr("Candidature", "Applied")}</dt><dd>${fmtDate(a.appliedDate) || "–"}</dd></div>
       <div><dt>${tr("Prochaine étape", "Next step")}</dt><dd>${fmtDate(a.next) || "–"}</dd></div>
     </dl>
-    <details class="app-more" ${open ? "open" : ""} data-more="${o.id}"><summary>${tr("Détails et suivi", "Details and history")}</summary>
+    <details class="app-more" ${open ? "open" : ""} data-more="${esc(o.id)}"><summary>${tr("Détails et suivi", "Details and history")}</summary>
       <div class="app-form">
         ${field(o, "job", tr("Poste", "Job"))}${field(o, "company", tr("Entreprise", "Company"))}
         ${field(o, "offerDate", tr("Date de l'offre", "Offer date"), "date")}${field(o, "appliedDate", tr("Date de candidature", "Application date"), "date")}
@@ -133,12 +138,12 @@ function cardHTML(o){
       <ol class="history">${a.history.slice().reverse().map(h => `<li><b>${fmtDate(h.d)}</b> ${esc(stLabel(h.s))}</li>`).join("")}</ol>
     </details>
     <div class="app-actions">
-      ${o.text.trim() ? `<button type="button" class="btn light small" data-openoffer="${o.id}">${tr("Voir l'analyse", "See the analysis")}</button>` : ""}
-      <button type="button" class="btn small" data-prep="${o.id}">${tr("Préparer l'entretien", "Prepare the interview")}</button>
-      <button type="button" class="btn light small" data-mail="${o.id}">${tr("Écrire un mail", "Write an email")}</button>
-      ${a.next ? `<button type="button" class="btn light small" data-ics="${o.id}">${tr("Ajouter à l'agenda", "Add to calendar")}</button>` : ""}
+      ${o.text.trim() ? `<button type="button" class="btn light small" data-openoffer="${esc(o.id)}">${tr("Voir l'analyse", "See the analysis")}</button>` : ""}
+      <button type="button" class="btn small" data-prep="${esc(o.id)}">${tr("Préparer l'entretien", "Prepare the interview")}</button>
+      <button type="button" class="btn light small" data-mail="${esc(o.id)}">${tr("Écrire un mail", "Write an email")}</button>
+      ${a.next ? `<button type="button" class="btn light small" data-ics="${esc(o.id)}">${tr("Ajouter à l'agenda", "Add to calendar")}</button>` : ""}
       ${a.link && /^https?:\/\//i.test(a.link) ? `<a class="btn light small" href="${esc(a.link)}" target="_blank" rel="noopener noreferrer">${tr("Ouvrir l'annonce", "Open the ad")}</a>` : ""}
-      <button type="button" class="btn ghost small" data-delapp="${o.id}">${tr("Supprimer", "Delete")}</button>
+      <button type="button" class="btn ghost small" data-delapp="${esc(o.id)}">${tr("Supprimer", "Delete")}</button>
     </div>
   </article>`;
 }
@@ -152,8 +157,8 @@ function tableHTML(list){
     <tbody>${list.map(o => { const a = o.app, late = todosOf(o).some(t => t.urgent); return `<tr>
       <td class="t-job"><b>${esc(appTitle(o))}</b></td><td class="t-co">${esc(a.company || "–")}</td><td class="t-off" data-l="${cols[2][1]}">${fmtDate(a.offerDate) || "–"}</td><td data-l="${cols[3][1]}">${fmtDate(a.appliedDate) || "–"}</td>
       <td class="t-st">${statusSelect(o)}</td><td data-l="${cols[5][1]}" class="${late ? "late" : ""}">${fmtDate(a.next) || "–"}${late ? ` <span class="sr-only">${tr("(en retard)", "(overdue)")}</span>` : ""}</td>
-      <td data-l="${cols[6][1]}">${o.text.trim() && o.score != null ? o.score + " %" : "–"}</td>
-      <td class="t-open"><button type="button" class="btn light small" data-openapp="${o.id}">${tr("Ouvrir", "Open")}</button></td></tr>`; }).join("")}</tbody>
+      <td data-l="${cols[6][1]}">${o.text.trim() && o.score != null ? esc(o.score) + " %" : "–"}</td>
+      <td class="t-open"><button type="button" class="btn light small" data-openapp="${esc(o.id)}">${tr("Ouvrir", "Open")}</button></td></tr>`; }).join("")}</tbody>
   </table></div>`;
 }
 function csvExport(){
@@ -202,17 +207,17 @@ function renderPrep(o){
   if (!o) { prepFor = null; return renderTrack(); }
   o.prep = o.prep || {};
   const qs = interviewQs(o), P = o.prep;
-  const box = (q, f, label, ph) => `<label class="afield"><span>${label}</span><textarea rows="${q.id === "g1" ? 5 : 2}" data-prepq="${esc(q.id)}" data-pf="${f}" data-prepo="${o.id}" placeholder="${esc(ph)}">${esc((P[q.id] || {})[f] || "")}</textarea></label>`;
+  const box = (q, f, label, ph) => `<label class="afield"><span>${label}</span><textarea rows="${q.id === "g1" ? 5 : 2}" data-prepq="${esc(q.id)}" data-pf="${f}" data-prepo="${esc(o.id)}" placeholder="${esc(ph)}">${esc((P[q.id] || {})[f] || "")}</textarea></label>`;
   $("#trackout").innerHTML = `<div class="prep">
     <div class="prep-h"><button type="button" class="btn ghost small" id="prepback">${tr("← Retour au suivi", "← Back to my applications")}</button>
       <h2 class="section-title" style="--k: var(--violet)">${tr("Préparer l'entretien", "Prepare the interview")} · ${esc(appTitle(o))}${o.app.company ? " · " + esc(o.app.company) : ""}</h2></div>
     <p class="promise"><b>${tr("Méthode simple :", "Simple method:")}</b> ${tr("la situation (où, quand), ce que tu as fait toi, et le résultat (avec un chiffre si possible). Écris seulement des choses vraies : c'est toi qui réponds le jour J.", "the situation (where, when), what you did yourself, and the result (with a number if you can). Only write true things: you are the one answering on the day.")}</p>
     ${!o.text.trim() || !cvReady ? `<p class="notice">${tr("Pour avoir des questions sur cette offre, ajoute le texte de l'annonce et ton CV. En attendant, voici les questions classiques.", "To get questions about this offer, add the ad's text and your CV. Meanwhile, here are the classic questions.")}</p>` : ""}
     <ol class="qs">${qs.map(q => `<li class="q"><h3>${esc(q.q)}${q.must ? ` <i class="tag must">${tr("Indispensable", "Essential")}</i>` : ""}</h3>${q.tip ? `<p class="hint">${esc(q.tip)}</p>` : ""}
-      ${q.id === "g1" ? `<button type="button" class="btn light small pitchbtn" data-pitch="${o.id}">${tr("Préparer mon pitch d'une minute", "Build my one-minute pitch")}</button>` : ""}
+      ${q.id === "g1" ? `<button type="button" class="btn light small pitchbtn" data-pitch="${esc(o.id)}">${tr("Préparer mon pitch d'une minute", "Build my one-minute pitch")}</button>` : ""}
       ${q.one ? box(q, "t", tr("Ma réponse", "My answer"), "") : box(q, "s", tr("Situation", "Situation"), tr("ex : au Drive Super U, un samedi de rush", "e.g. at FreshMart, on a busy Saturday")) + box(q, "a", tr("Ce que j'ai fait", "What I did"), "") + box(q, "r", tr("Résultat", "Result"), tr("ex : 120 commandes prêtes à l'heure", "e.g. 120 orders ready on time"))}</li>`).join("")}</ol>
     ${askHTML(o)}
-    <div class="export"><button class="btn small" type="button" data-prepdl="docx" data-prepo="${o.id}">${tr("Télécharger en Word", "Download as Word")}</button><button class="btn light small" type="button" data-prepdl="pdf" data-prepo="${o.id}">${tr("En PDF", "As PDF")}</button><button class="btn light small" type="button" data-prepdl="copy" data-prepo="${o.id}">${tr("Copier", "Copy")}</button></div>
+    <div class="export"><button class="btn small" type="button" data-prepdl="docx" data-prepo="${esc(o.id)}">${tr("Télécharger en Word", "Download as Word")}</button><button class="btn light small" type="button" data-prepdl="pdf" data-prepo="${esc(o.id)}">${tr("En PDF", "As PDF")}</button><button class="btn light small" type="button" data-prepdl="copy" data-prepo="${esc(o.id)}">${tr("Copier", "Copy")}</button></div>
   </div>`;
 }
 function prepText(o){
