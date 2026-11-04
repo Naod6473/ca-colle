@@ -56,6 +56,10 @@ body::before, .panel::before {
 .logo { flex-shrink: 0; padding: 5px; border: var(--line); background: var(--card); box-shadow: 5px 5px 0 var(--ink); transform: rotate(-2deg); text-decoration: none; }
 .logo span { display: block; padding: 6px 16px 4px; border: 1.5px dashed var(--ink); font: italic 900 30px/1 var(--display); letter-spacing: -.02em; text-transform: uppercase; text-shadow: -3px 2px 0 var(--green); }
 .top-actions { margin-left: auto; display: flex; gap: 12px; }
+/* Logo : pictogramme « feuilles emboîtées » (l'offre et le CV qui se tiennent) posé en sticker à gauche de l'étiquette */
+.logo { position: relative; margin-left: 42px; }
+.logo::before { content: ""; position: absolute; z-index: 1; left: -46px; top: 50%; width: 58px; height: 58px; margin-top: -29px; background: url(../favicon.svg) center / contain no-repeat; transform: rotate(-4deg); }
+.logo span { padding-left: 22px; }
 .pill { min-height: 40px; display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border: var(--line); border-radius: 999px; background: var(--card); font: italic 900 13px/1 var(--display); text-transform: uppercase; box-shadow: 3px 3px 0 var(--ink); }
 .pill-safe svg { color: var(--ok); }
 .tabs { order: 3; flex-basis: 100%; min-width: 0; display: flex; align-items: flex-end; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-top: 6px; padding-right: 16px; }
@@ -267,7 +271,9 @@ ins { text-decoration: none; background: var(--green); padding: 0 3px; }
   .letter, .cvdoc { max-height: none; }
 }
 @media (max-width: 560px) {
-  .logo span { font-size: 22px; padding: 5px 10px 3px; }
+  .logo span { font-size: 22px; padding: 5px 10px 3px 18px; }
+  .logo { margin-left: 32px; }
+  .logo::before { left: -36px; width: 46px; height: 46px; margin-top: -23px; }
   .pill-safe { font-size: 11px; padding: 8px 10px; }
   .tab { padding: 7px 12px 8px; }
   .tab b { font-size: 14px; }
@@ -686,7 +692,9 @@ html[data-skin="fiche"] .checklist input { accent-color: var(--accent); }
 /* Téléphone : en-tête sur une ligne, titres d'étape plus petits, cartes du résultat repliées */
 @media (max-width: 560px) {
   .top { gap: 8px 10px; padding-top: 12px; }
-  .logo span { font-size: 18px; padding: 5px 8px 3px; }
+  .logo span { font-size: 16px; padding: 5px 6px 3px 11px; }
+  .logo { margin-left: 18px; }
+  .logo::before { left: -23px; width: 31px; height: 31px; margin-top: -15.5px; }
   .top-actions { flex-wrap: nowrap; gap: 6px; min-width: 0; }
   .top-actions .pill { min-width: 44px; padding: 6px 10px; justify-content: center; }
   .pill-safe { gap: 5px; font-size: 11px; }
