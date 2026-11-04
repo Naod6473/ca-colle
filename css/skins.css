@@ -72,8 +72,8 @@ html[data-skin="fiche"] .section-title { font-weight: 800; font-size: 22px; }
 html[data-skin="fiche"] .section-title::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 10px; border-radius: 50%; background: var(--k, var(--accent)); vertical-align: middle; outline: 1.5px solid rgba(21, 20, 43, .15); }
 
 /* Haut de page */
-html[data-skin="fiche"] .logo { padding: 0; border: 0; background: none; transform: none; display: flex; align-items: center; gap: 10px; }
-html[data-skin="fiche"] .logo::before { content: "✓"; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 11px; background: var(--accent); color: var(--lime); font: 900 22px/1 var(--body); }
+html[data-skin="fiche"] .logo { padding: 0; border: 0; background: none; transform: none; display: flex; align-items: center; gap: 10px; margin-left: 0; }
+html[data-skin="fiche"] .logo::before { content: ""; position: static; display: block; flex-shrink: 0; width: 38px; height: 38px; margin: 0; transform: none; background: url(../icons/logo-fiche.svg) center / contain no-repeat; }
 html[data-skin="fiche"] .logo span { padding: 0; border: 0; font-weight: 800; font-size: 26px; color: var(--ink); }
 html[data-skin="fiche"] .pill { border: 0; background: var(--card); font-weight: 700; font-size: 13px; box-shadow: var(--soft) !important; }
 html[data-skin="fiche"] .pill-safe { background: var(--lime); }
@@ -168,7 +168,7 @@ html[data-skin="fiche"] .foot h2 { font-weight: 800; color: var(--lime); }
 html[data-skin="fiche"] :focus-visible { outline: 2.5px solid var(--accent); outline-offset: 2px; }
 @media (max-width: 560px) {
   html[data-skin="fiche"] .logo span { font-size: 21px; }
-  html[data-skin="fiche"] .logo::before { width: 32px; height: 32px; font-size: 18px; border-radius: 9px; }
+  html[data-skin="fiche"] .logo::before { width: 32px; height: 32px; }
   html[data-skin="fiche"] .tabs { margin-right: 0; }
 }
 
@@ -222,7 +222,7 @@ html[data-skin="fiche"] [data-p="3"] .big { color: var(--accent); }
   html[data-skin="fiche"] .tab::before { font: 800 16px/1.1 var(--body); }
   html[data-skin="fiche"] .tab-sep { margin: 10px 1px 14px; }
   html[data-skin="fiche"] .logo { gap: 7px; }
-  html[data-skin="fiche"] .logo::before { width: 30px; height: 30px; border-radius: 9px; font-size: 18px; }
+  html[data-skin="fiche"] .logo::before { width: 30px; height: 30px; }
   html[data-skin="fiche"] .logo span { font-size: 19px; }
   html[data-skin="fiche"] .pill { font-size: 12px; }
 }

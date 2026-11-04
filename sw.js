@@ -6,11 +6,11 @@
 //   Le lecteur PDF et la lecture d'image ne sont gardés qu'à leur premier usage (les données de langue de la lecture
 //   d'image sont gardées par Tesseract lui-même).
 // - À l'installation, seulement les pages de la langue utilisée (pas les 15 pages).
-const VERSION = "cacolle-2026-10-23c", LIB = "cacolle-lib-1", WAIT = 3500;
+const VERSION = "cacolle-2026-11-04a", LIB = "cacolle-lib-1", WAIT = 3500;
 const COMMON = [
   "css/app.css", "css/skins.css", "fonts/fonts.css",
   "js/lang.js", "js/lecteur.js", "js/moteur.js", "js/suivi.js", "js/outils.js", "js/fiches.js", "js/entrainement.js", "js/contacts.js", "js/confort.js", "js/demo.js", "js/export.js", "js/app.js", "js/mescv.js", "js/salaire.js",
-  "favicon.svg", "icons/icon-192.png", "icons/icon-512.png"
+  "favicon.svg", "icons/logo-fiche.svg", "icons/icon-192.png", "icons/icon-512.png"
 ];
 const FONTS = ["archivo-latin-700-normal", "archivo-latin-800-italic", "archivo-latin-900-italic", "archivo-latin-900-normal",
   "figtree-latin-400-normal", "figtree-latin-500-normal", "figtree-latin-600-normal", "figtree-latin-700-normal"].map(f => `fonts/${f}.woff2`);
